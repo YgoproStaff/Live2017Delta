@@ -40,12 +40,12 @@ function c511002808.damop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c511002808.valcheck(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g=c:GetMaterial():Filter(Card.IsRace,nil,RACE_BEAST)
+	local g=c:GetMaterial():Filter(Card.IsRace,nil,RACE_BEAST,c,SUMMON_TYPE_FUSION)
 	local atk=0
 	if g:GetCount()>0 and bit.band(c:GetSummonType(),SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION then
 		local tc=g:GetFirst()
 		if tc:GetPreviousControler()==c:GetControler() and tc:IsPreviousLocation(LOCATION_ONFIELD) then
-			atk=tc:GetTextAttack()
+			atk=tc:GetBaseAttack()
 		end
 		if atk<0 then atk=0 end
 	end

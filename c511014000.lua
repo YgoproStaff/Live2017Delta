@@ -11,7 +11,7 @@ function c511014000.initial_effect(c)
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e4:SetRange(LOCATION_FZONE)
-	e4:SetCode(EVENT_CUSTOM+71645242)
+	e4:SetCode(EVENT_CUSTOM+511014000)
 	e4:SetTarget(c511014000.tktg)
 	e4:SetOperation(c511014000.tkop)
 	c:RegisterEffect(e4)
@@ -50,16 +50,16 @@ function c511014000.regcon(e,tp,eg,ep,ev,re,r,rp)
 		sf=sf+2
 	end
 	e:SetLabel(sf)
-	return sf~=0
+	return sf~=0 --and (not re or not re:GetHandler():IsCode(511014000,71645242))
 end
 function c511014000.regop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.RaiseEvent(eg,EVENT_CUSTOM+71645242,e,r,rp,ep,e:GetLabel())
+	Duel.RaiseEvent(eg,EVENT_CUSTOM+511014000,e,r,rp,ep,e:GetLabel())
 end
 function c511014000.tktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
 	Duel.SetTargetCard(eg)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,0)
 end
 function c511014000.tkop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
@@ -76,7 +76,7 @@ function c511014000.tkop(e,tp,eg,ep,ev,re,r,rp)
 		end
 		tc=g:GetNext()
 	end
-	if bit.band(bit.rshift(ev,tp),1)~=0 and Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
+	if (ev>>tp)&1~=0 and Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,71645243,0,0x4011,800,800,2,RACE_PLANT,ATTRIBUTE_DARK,POS_FACEUP_ATTACK,1-tp) then
 		local token=Duel.CreateToken(tp,71645243)
 		Duel.SpecialSummonStep(token,0x20,tp,1-tp,false,false,POS_FACEUP_ATTACK)
@@ -93,7 +93,7 @@ function c511014000.tkop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetReset(RESET_EVENT+0x1fe0000)
 		token:RegisterEffect(e2)
 	end
-	if bit.band(bit.rshift(ev,1-tp),1)~=0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	if (ev>>(1-tp))&1~=0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,71645243,0,0x4011,800,800,2,RACE_PLANT,ATTRIBUTE_DARK) then
 		local token=Duel.CreateToken(1-tp,71645243)
 		Duel.SpecialSummonStep(token,0x20,tp,tp,false,false,POS_FACEUP_ATTACK)
@@ -116,16 +116,14 @@ function c511014000.desfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_PLANT)
 end
 function c511014000.spfilter(c,atk,e,tp)
-	return c:GetAttack()<=atk and c:IsCanBeSpecialSummoned(e,0x20,tp,false,false)
-end
-function c511014000.cfilter2(c,tp)
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 or (c:IsLocation(LOCATION_MZONE) and c:IsControler(tp))
+	return c:IsAttackBelow(atk) and c:IsCanBeSpecialSummoned(e,0x20,tp,false,false)
 end
 function c511014000.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(c511014000.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	local atk=g:GetSum(Card.GetAttack)
 	if chk==0 then return e:GetHandler():IsDestructable(e) and g:FilterCount(Card.IsDestructable,nil,e)==g:GetCount() 
-		and g:IsExists(c511014000.cfilter2,1,nil,tp) and Duel.IsExistingMatchingCard(c511014000.spfilter,tp,LOCATION_GRAVE,0,1,nil,atk,e,tp) end
+		and g:FilterCount(aux.MZFilter,nil,tp)+Duel.GetLocationCount(tp,LOCATION_MZONE)>0 
+		and Duel.IsExistingMatchingCard(c511014000.spfilter,tp,LOCATION_GRAVE,0,1,nil,atk,e,tp) end
 	g:AddCard(e:GetHandler())
 	Duel.Destroy(g,REASON_COST)
 	e:SetLabel(atk)

@@ -1,7 +1,6 @@
---強欲な壺
---fixed by MLD
+--Spell Reproduction (Anime)
 function c511777003.initial_effect(c)
-	--Activate add to hand
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -10,15 +9,18 @@ function c511777003.initial_effect(c)
 	e1:SetOperation(c511777003.activate)
 	c:RegisterEffect(e1)
 end
+function c511777003.filter(c)
+	return c:IsType(TYPE_SPELL) and c:IsAbleToHand() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
+end
 function c511777003.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local tc=Duel.GetFieldCard(tp,LOCATION_GRAVE,Duel.GetFieldGroupCount(tp,LOCATION_GRAVE,0)-1)
-	if chk==0 then return tc and tc:IsType(TYPE_SPELL) and tc:IsAbleToHand() end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,tc,1,0,0)
+	if chk==0 then return Duel.IsExistingMatchingCard(c511777003.filter,tp,LOCATION_GRAVE,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,0,0)
 end
 function c511777003.activate(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFieldCard(tp,LOCATION_GRAVE,Duel.GetFieldGroupCount(tp,LOCATION_GRAVE,0)-1)
-	if tc and tc:IsType(TYPE_SPELL) and tc:IsAbleToHand() and (aux.nvfilter(tc) or not Duel.IsChainDisablable(0)) then
-		Duel.SendtoHand(tc,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,tc)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,c511777003.filter,tp,LOCATION_GRAVE,0,1,1,nil)
+	if g:GetCount()>0 then
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
 	end
 end

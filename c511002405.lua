@@ -1,4 +1,6 @@
+--連撃
 --Relentless Attacks
+--updated by Larry126
 function c511002405.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -22,5 +24,11 @@ end
 function c511002405.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not tc or tc:IsFacedown() or not tc:IsRelateToEffect(e) or tc:IsControler(1-tp) or tc:IsImmuneToEffect(e) then return end
-	Duel.ChainAttack()
+	local ag=tc:GetAttackableTarget()
+	if #ag<=0 or Duel.SelectYesNo(tp,31) then
+		Duel.CalculateDamage(tc,nil)
+	else
+		Duel.Hint(HINT_SELECTMSG,tp,549)
+		Duel.CalculateDamage(tc,ag:Select(tp,1,1,nil):GetFirst())
+	end
 end

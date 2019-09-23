@@ -57,7 +57,7 @@ function c511002081.tktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>1 and not Duel.IsPlayerAffectedByEffect(tp,59822133) 
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,511002082,0,0x4011,0,0,1,RACE_WINDBEAST,ATTRIBUTE_DARK) end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,2,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,0)
 end
 function c511002081.tkop(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
@@ -102,16 +102,16 @@ function c511002081.synchk(e,tp,eg,ep,ev,re,r,rp)
 	while tc do
 		tc:RegisterFlagEffect(511002082,0,0,0)
 		local tpe=tc.synchro_type
-		local t={c.synchro_parameters()}
+		local t=tc.synchro_parameters
 		if tc.synchro_type==1 then
-			t[#t]=aux.FilterBoolFunction(Card.IsHasEffect,511002081)
+			local f1,min1,max1,f2,min2,max2,sub1,sub2,req1,req2,reqm=table.unpack(t)
 			local e1=Effect.CreateEffect(tc)
 			e1:SetType(EFFECT_TYPE_FIELD)
 			e1:SetCode(EFFECT_SPSUMMON_PROC)
 			e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE)
 			e1:SetRange(LOCATION_GRAVE)
-			e1:SetCondition(aux.SynCondition(table.unpack(t)))
-			e1:SetTarget(aux.SynTarget(table.unpack(t)))
+			e1:SetCondition(aux.SynCondition(f1,min1,max1,f2,min2,max2,sub1,sub2,req1,req2,c511002081.reqm(reqm)))
+			e1:SetTarget(aux.SynTarget(f1,min1,max1,f2,min2,max2,sub1,sub2,req1,req2,c511002081.reqm(reqm)))
 			e1:SetOperation(aux.SynOperation)
 			e1:SetValue(SUMMON_TYPE_SYNCHRO)
 			tc:RegisterEffect(e1)
@@ -121,8 +121,8 @@ function c511002081.synchk(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetCode(EFFECT_SPSUMMON_PROC)
 			e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE)
 			e1:SetRange(LOCATION_GRAVE)
-			e1:SetCondition(aux.SynCondition(table.unpack(t),aux.FilterBoolFunction(Card.IsHasEffect,511002081),1))
-			e1:SetTarget(aux.SynTarget(table.unpack(t),aux.FilterBoolFunction(Card.IsHasEffect,511002081),1))
+			e1:SetCondition(aux.SynCondition(table.unpack(t),c511002081.reqm()))
+			e1:SetTarget(aux.SynTarget(table.unpack(t),c511002081.reqm()))
 			e1:SetOperation(aux.SynOperation)
 			e1:SetValue(SUMMON_TYPE_SYNCHRO)
 			tc:RegisterEffect(e1)
@@ -132,12 +132,17 @@ function c511002081.synchk(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetCode(EFFECT_SPSUMMON_PROC)
 			e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE)
 			e1:SetRange(LOCATION_GRAVE)
-			e1:SetCondition(aux.SynCondition(table.unpack(t),aux.FilterBoolFunction(Card.IsHasEffect,511002081)))
-			e1:SetTarget(aux.SynTarget(table.unpack(t),aux.FilterBoolFunction(Card.IsHasEffect,511002081)))
+			e1:SetCondition(aux.SynCondition(table.unpack(t),c511002081.reqm()))
+			e1:SetTarget(aux.SynTarget(table.unpack(t),c511002081.reqm()))
 			e1:SetOperation(aux.SynOperation)
 			e1:SetValue(SUMMON_TYPE_SYNCHRO)
 			tc:RegisterEffect(e1)
 		end
 		tc=sg:GetNext()
 	end
+end
+function c511002081.reqm(reqm)
+	return	function(g,sc,tp)
+				return g:IsExists(Card.IsHasEffect,1,nil,511002081) and (not reqm or reqm(g,sc,tp))
+			end
 end

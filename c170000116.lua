@@ -43,64 +43,34 @@ function c170000116.initial_effect(c)
 	c:RegisterEffect(e5)
 	aux.CallToken(419)
 end
-function c170000116.spfilter(c,tpe1,tpe2)
-	return c:IsType(tpe1) and not c:IsType(tpe2) and c:IsAbleToGraveAsCost()
+function c170000116.spfilter(c,tpe)
+	return c:IsType(tpe) and c:IsAbleToGraveAsCost()
 end
-function c170000116.spfilter2(c)
-	return c:IsType(TYPE_PLUS) and c:IsType(TYPE_MINUS) and c:IsAbleToGraveAsCost()
+function c170000116.rescon(sg,e,tp,mg)
+	return aux.ChkfMMZ(1)(sg,e,tp,mg) and sg:IsExists(c170000116.chk,1,nil,sg)
+end
+function c170000116.chk(c,sg)
+	return c:IsType(TYPE_PLUS) and sg:IsExists(Card.IsType,1,c,TYPE_MINUS)
 end
 function c170000116.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft<-1 then return false end
-	local g1=Duel.GetMatchingGroup(c170000116.spfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,nil,TYPE_PLUS,TYPE_MINUS)
-	local g2=Duel.GetMatchingGroup(c170000116.spfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,nil,TYPE_MINUS,TYPE_PLUS)
-	local g3=Duel.GetMatchingGroup(c170000116.spfilter2,tp,LOCATION_HAND+LOCATION_ONFIELD,0,c)
-	local ct1=g1:GetCount()
-	local ct2=g2:GetCount()
-	local ct3=g3:GetCount()
-	if ct1+ct3==0 or ct2+ct3==0 then return false end
-	if ct1==0 and ct2==0 and ct3<2 then return false end
-	if ft>0 then return true end
-	local f1=g1:FilterCount(Card.IsLocation,nil,LOCATION_MZONE)
-	local f2=g2:FilterCount(Card.IsLocation,nil,LOCATION_MZONE)
-	local f3=g3:FilterCount(Card.IsLocation,nil,LOCATION_MZONE)
-	if ft==-1 then return (f1>0 and f2>0) or (f1>0 and f3>0) or (f2>0 and f3>0) or f3>1
-	else return f1>0 or f2>0 end
+	local g1=Duel.GetMatchingGroup(c170000116.spfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,nil,TYPE_PLUS)
+	local g2=Duel.GetMatchingGroup(c170000116.spfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,nil,TYPE_MINUS)
+	local g=g1:Clone()
+	g:Merge(g2)
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-2 and g1:GetCount()>0 and g2:GetCount()>0 and g:GetCount()>1 
+		and aux.SelectUnselectGroup(g,e,tp,2,2,c170000116.rescon,0)
 end
 function c170000116.spop(e,tp,eg,ep,ev,re,r,rp,c)
-local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	local g1=Duel.GetMatchingGroup(c170000116.spfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,nil,TYPE_PLUS,TYPE_MINUS)
-	local g2=Duel.GetMatchingGroup(c170000116.spfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,nil,TYPE_MINUS,TYPE_PLUS)
-	local g3=Duel.GetMatchingGroup(c170000116.spfilter2,tp,LOCATION_HAND+LOCATION_ONFIELD,0,c)
-	g1:Merge(g2)
-	g1:Merge(g3)
-	local g=Group.CreateGroup()
-	local tc=nil
-	for i=1,2 do
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-		if ft<=0 then
-			tc=g1:FilterSelect(tp,Card.IsLocation,1,1,nil,LOCATION_MZONE):GetFirst()
-		else
-			tc=g1:Select(tp,1,1,nil):GetFirst()
-		end
-		g:AddCard(tc)
-		if c170000116.spfilter2(tc) then
-			g1:RemoveCard(tc)
-		elseif c170000116.spfilter(tc,TYPE_PLUS,TYPE_MINUS) then
-			g1:Remove(c170000116.spfilter,nil,TYPE_PLUS,TYPE_MINUS)
-		else
-			g1:Remove(c170000116.spfilter,nil,TYPE_MINUS,TYPE_PLUS)
-		end
-		ft=ft+1
-	end
-	local cg=g:Filter(Card.IsFacedown,nil)
+	local g=Duel.GetMatchingGroup(c170000116.spfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,nil,TYPE_PLUS+TYPE_MINUS)
+	local sg=aux.SelectUnselectGroup(g,e,tp,2,2,c170000116.rescon,1,tp,HINTMSG_TOGRAVE)
+	local cg=sg:Filter(Card.IsFacedown,nil)
 	if cg:GetCount()>0 then
 		Duel.ConfirmCards(1-tp,cg)
 	end
-	Duel.SendtoGrave(g,REASON_COST)
-	c:SetMaterial(g)
+	Duel.SendtoGrave(sg,REASON_COST)
+	c:SetMaterial(sg)
 end
 function c170000116.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_PLUS+TYPE_MINUS)

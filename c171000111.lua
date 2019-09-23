@@ -24,8 +24,9 @@ function c171000111.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()~=1 then return false end
 		e:SetLabel(0)
-		return Duel.CheckReleaseGroup(tp,c171000111.cfilter,1,nil,tp) end
-	local g=Duel.SelectReleaseGroup(tp,c171000111.cfilter,1,1,nil,tp)
+		return Duel.CheckReleaseGroupCost(tp,c171000111.cfilter,1,false,nil,nil,tp)
+	end
+	local g=Duel.SelectReleaseGroupCost(tp,c171000111.cfilter,1,1,false,nil,nil,tp)
 	local ct=g:GetFirst():GetOverlayCount()
 	Duel.Release(g,REASON_COST)
 	Duel.SetTargetPlayer(tp)

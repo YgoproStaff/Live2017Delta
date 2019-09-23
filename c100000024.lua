@@ -22,7 +22,7 @@ function c100000024.filter(c,e,tp)
 end
 function c100000024.spfilter(c,e,tp,rc)
 	if not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,true,false) 
-		or Duel.GetLocationCountFromEx(tp,tp,rc,c)<=0 then return false end
+		or Duel.GetLocationCountFromEx(tp,tp,rc,c)<=0 or not c:CheckFusionMaterial() then return false end
 	local res1=c:IsCode(100000027) and rc:IsCode(100000026)
 	local res2=c:IsCode(100000028) and rc:IsCode(100000027)
 	return res1 or res2

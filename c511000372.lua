@@ -10,7 +10,11 @@ function c511000372.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c511000372.filter(c)
-	return not (c:IsHasEffect(EFFECT_UNRELEASABLE_SUM) or c:IsHasEffect(EFFECT_UNRELEASABLE_NONSUM))
+	local val,effs=false,{c:GetCardEffect(EFFECT_UNRELEASABLE_SUM)}
+	for _,eff in ipairs(effs) do
+		val=eff:GetValue()==nil or eff:GetValue()==1 or val
+	end
+	return not (c:IsHasEffect(EFFECT_UNRELEASABLE_SUM) and val==true and c:IsHasEffect(EFFECT_UNRELEASABLE_NONSUM))
 end
 function c511000372.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c511000372.filter(chkc) end

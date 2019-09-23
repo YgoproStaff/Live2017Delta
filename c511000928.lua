@@ -7,6 +7,7 @@ function c511000928.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCondition(c511000928.condition)
+	e1:SetCost(aux.RemainFieldCost)
 	e1:SetTarget(c511000928.target)
 	e1:SetOperation(c511000928.activate)
 	c:RegisterEffect(e1)
@@ -30,10 +31,10 @@ function c511000928.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c511000928.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) or c:IsStatus(STATUS_LEAVE_CONFIRMED) then return end
 	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
+	if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		Duel.Equip(tp,c,tc)
-		c:CancelToGrave()
 		--atk up
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -50,6 +51,8 @@ function c511000928.activate(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetValue(c511000928.eqlimit)
 		e3:SetReset(RESET_EVENT+0x1fe0000)
 		c:RegisterEffect(e3)
+	else
+		c:CancelToGrave(false)
 	end
 end
 function c511000928.atkup(e,tp,eg,ep,ev,re,r,rp)

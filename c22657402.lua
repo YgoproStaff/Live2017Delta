@@ -1,5 +1,7 @@
 --冥界の麗人イゾルデ
-function c22657402.initial_effect(c)
+--Isolde, Belle of the Underworld
+local s,id=GetID()
+function s.initial_effect(c)
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -12,35 +14,35 @@ function c22657402.initial_effect(c)
 	e2:SetCode(EFFECT_SPSUMMON_PROC)
 	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e2:SetRange(LOCATION_HAND)
-	e2:SetCondition(c22657402.spcon)
+	e2:SetCondition(s.spcon)
 	c:RegisterEffect(e2)
 	--lv change
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e3:SetCountLimit(1,22657402)
-	e3:SetTarget(c22657402.target)
-	e3:SetOperation(c22657402.operation)
+	e3:SetCountLimit(1,id)
+	e3:SetTarget(s.target)
+	e3:SetOperation(s.operation)
 	c:RegisterEffect(e3)
 end
-function c22657402.spfilter(c)
+function s.spfilter(c)
 	return c:IsFaceup() and c:IsCode(96163807)
 end
-function c22657402.spcon(e,c)
+function s.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c22657402.spfilter,tp,LOCATION_ONFIELD,0,1,nil)
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
-function c22657402.filter(c)
+function s.filter(c)
 	return c:IsFaceup() and c:GetLevel()>0 and c:IsRace(RACE_ZOMBIE)
 end
-function c22657402.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c22657402.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c22657402.filter,tp,LOCATION_MZONE,0,1,nil) end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local g=Duel.SelectTarget(tp,c22657402.filter,tp,LOCATION_MZONE,0,1,2,nil)
+	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_MZONE,0,1,2,nil)
 	local lv1=g:GetFirst():GetLevel()
 	local lv2=0
 	local tc2=g:GetNext()
@@ -49,11 +51,11 @@ function c22657402.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local lv=Duel.AnnounceLevel(tp,5,8,lv1,lv2)
 	Duel.SetTargetParam(lv)
 end
-function c22657402.lvfilter(c,e)
+function s.lvfilter(c,e)
 	return c:IsFaceup() and c:IsRelateToEffect(e)
 end
-function c22657402.operation(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(c22657402.lvfilter,nil,e)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(s.lvfilter,nil,e)
 	local lv=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
 	local tc=g:GetFirst()
 	while tc do
@@ -62,7 +64,7 @@ function c22657402.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_CHANGE_LEVEL)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetValue(lv)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
 		tc=g:GetNext()
 	end
@@ -71,10 +73,16 @@ function c22657402.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetTargetRange(1,0)
-	e1:SetTarget(c22657402.splimit)
+	e1:SetTarget(s.splimit)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
+	local e2=Effect.CreateEffect(e:GetHandler())
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
+	e2:SetDescription(aux.Stringid(id,2))
+	e2:SetReset(RESET_PHASE+PHASE_END)
+	e2:SetTargetRange(1,0)
+	Duel.RegisterEffect(e2,tp)
 end
-function c22657402.splimit(e,c)
+function s.splimit(e,c)
 	return c:GetRace()~=RACE_ZOMBIE
 end

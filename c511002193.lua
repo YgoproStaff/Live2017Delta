@@ -2,7 +2,7 @@
 function c511002193.initial_effect(c)
 	aux.AddPersistentProcedure(c,1,nil,CATEGORY_DRAW,nil,TIMING_STANDBY_PHASE,0x1c0,nil,nil,c511002193.target,c511002193.operation,true)
 end
-function c511001197.target(e,tp,eg,ep,ev,re,r,rp,tc,chk)
+function c511002193.target(e,tp,eg,ep,ev,re,r,rp,tc,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end

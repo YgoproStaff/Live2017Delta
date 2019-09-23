@@ -1,4 +1,5 @@
---無限械アイン・ソフ
+--無限械アイン・ソフ (Anime)
+--Endless Emptiness (Anime)
 function c513000047.initial_effect(c)
 	--Activate to Grave
 	local e1=Effect.CreateEffect(c)
@@ -30,11 +31,12 @@ function c513000047.initial_effect(c)
 	e3:SetValue(0)
 	c:RegisterEffect(e3)
 end
+c513000047.listed_names={9409625}
 function c513000047.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end
 function c513000047.costfilter(c)
-	return c:IsFaceup() and c:IsCode(100000012) and c:IsAbleToGraveAsCost()
+	return c:IsFaceup() and c:IsCode(9409625) and c:IsAbleToGraveAsCost()
 end
 function c513000047.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c513000047.costfilter,tp,LOCATION_SZONE,0,1,nil) end

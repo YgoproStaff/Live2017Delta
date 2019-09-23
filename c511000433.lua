@@ -1,4 +1,5 @@
---Glass Slippers
+--ガラスの靴 (Anime)
+--Glass Slippers (Anime)
 function c511000433.initial_effect(c)
 	aux.AddEquipProcedure(c,nil,c511000433.filter)
 	--change equip
@@ -42,12 +43,13 @@ function c511000433.initial_effect(c)
 	e6:SetOperation(c511000433.eqop)
 	c:RegisterEffect(e6)
 end
+c511000433.listed_names={78527720}
 function c511000433.filter(c,e,tp)
-	return c:IsCode(511000431) or c:GetControler()~=tp
+	return c:IsCode(78527720) or c:GetControler()~=tp
 end
 function c511000433.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	local eq=e:GetHandler():GetEquipTarget()
-	return ep~=tp and eq and eq:IsCode(511000431) and eg:GetFirst()==eq
+	return ep~=tp and eq and eq:IsCode(78527720) and eg:GetFirst()==eq
 end
 function c511000433.atkcon(e)
 	local eq=e:GetHandler():GetEquipTarget()
@@ -71,7 +73,7 @@ function c511000433.attg(e,c)
 	return c==e:GetHandler():GetEquipTarget() and not c:IsImmuneToEffect(e)
 end
 function c511000433.atkval(e,c)
-	return c:IsCode(511000431)
+	return c:IsCode(78527720)
 end
 function c511000433.eqcon2(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsReason(REASON_LOST_TARGET) and e:GetHandler():GetPreviousEquipTarget():IsReason(REASON_DESTROY)

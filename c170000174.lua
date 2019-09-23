@@ -30,7 +30,7 @@ function c170000174.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c170000174.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_RITUAL)==SUMMON_TYPE_RITUAL
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_RITUAL)
 end
 function c170000174.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -38,20 +38,25 @@ function c170000174.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,4,tp,0)
 end
 function c170000174.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<3 or Duel.IsPlayerAffectedByEffect(tp,59822133) then return end
-	if not Duel.IsPlayerCanSpecialSummonMonster(tp,170000175,0x530,0x4011,0,0,1,RACE_WARRIOR,ATTRIBUTE_DARK) then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<3 or Duel.IsPlayerAffectedByEffect(tp,59822133) 
+		or not Duel.IsPlayerCanSpecialSummonMonster(tp,170000175,0x530,0x4011,0,0,1,RACE_WARRIOR,ATTRIBUTE_DARK) then return end
+	local g=Group.CreateGroup()
 	for i=1,4 do
 		local token=Duel.CreateToken(tp,170000175)
 		Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP)
-		token:AddCounter(0x1106,1)
+		g:AddCard(token)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EFFECT_DESTROY_REPLACE)
 		e1:SetTarget(c170000174.reptg)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		token:RegisterEffect(e1)
 	end
 	Duel.SpecialSummonComplete()
+	Duel.BreakEffect()
+	g:ForEach(function(tc)
+		tc:AddCounter(0x1106,1)
+	end)
 end
 function c170000174.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsReason(REASON_REPLACE) and e:GetHandler():GetCounter(0x1106)>0 end
@@ -66,11 +71,9 @@ function c170000174.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c170000174.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c170000174.filter,tp,LOCATION_MZONE,0,nil,0)
-	local tc=g:GetFirst()
-	while tc do
+	g:ForEach(function(tc)
 		tc:AddCounter(0x1106,1)
-		tc=g:GetNext()
-	end
+	end)
 end
 function c170000174.con(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
@@ -83,10 +86,8 @@ function c170000174.op(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
 	if not d then return end
-	local g=Group.FromCards(a,d)
-	g=g:Filter(c170000174.filter,nil,1)
-	local tc=g:GetFirst()
-	while tc do
+	local g=Group.FromCards(a,d):Filter(c170000174.filter,nil,1)
+	g:ForEach(function(tc)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
@@ -95,8 +96,7 @@ function c170000174.op(e,tp,eg,ep,ev,re,r,rp)
 		else
 			e1:SetValue(a:GetAttack())
 		end
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_DAMAGE)
 		tc:RegisterEffect(e1)
-		tc=g:GetNext()
-	end
+	end)
 end

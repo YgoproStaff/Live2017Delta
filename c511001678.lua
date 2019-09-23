@@ -1,4 +1,6 @@
+--ワンダブル
 --Pooch Party
+--fixed by Larry126
 function c511001678.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -18,21 +20,43 @@ end
 function c511001678.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)>1 and not Duel.IsPlayerAffectedByEffect(tp,59822133) 
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,511001679,0,0x4011,0,0,1,RACE_BEAST,ATTRIBUTE_EARTH) then
+		local c=e:GetHandler()
+		local fid=c:GetFieldID()
+		local sg=Group.CreateGroup()
 		for i=1,2 do
 			local token=Duel.CreateToken(tp,511001679)
 			Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP)
-			local de=Effect.CreateEffect(e:GetHandler())
-			de:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-			de:SetRange(LOCATION_MZONE)
-			de:SetCode(EVENT_PHASE+PHASE_END)
-			de:SetCountLimit(1)
-			de:SetOperation(c511001678.desop)
-			de:SetReset(RESET_EVENT+0x1fe0000)
-			token:RegisterEffect(de)
+			token:RegisterFlagEffect(511001678,RESET_EVENT+RESETS_STANDARD,0,1,fid)
+			sg=sg+token
 		end
-		Duel.SpecialSummonComplete()
+		if Duel.SpecialSummonComplete() then
+			sg:KeepAlive()
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+			e1:SetCode(EVENT_PHASE+PHASE_END)
+			e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+			e1:SetCountLimit(1)
+			e1:SetLabel(fid)
+			e1:SetLabelObject(sg)
+			e1:SetCondition(c511001678.descon)
+			e1:SetOperation(c511001678.desop)
+			Duel.RegisterEffect(e1,tp)
+		end
 	end
 end
+function c511001678.desfilter(c,fid)
+	return c:GetFlagEffectLabel(511001678)==fid
+end
+function c511001678.descon(e,tp,eg,ep,ev,re,r,rp)
+	local g=e:GetLabelObject()
+	if not g:IsExists(c511001678.desfilter,1,nil,e:GetLabel()) then
+		g:DeleteGroup()
+		e:Reset()
+		return false
+	else return true end
+end
 function c511001678.desop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
+	local g=e:GetLabelObject()
+	local tg=g:Filter(c511001678.desfilter,nil,e:GetLabel())
+	Duel.Destroy(tg,REASON_EFFECT)
 end

@@ -1,7 +1,7 @@
 --TG ブレード・ガンナー
 function c513000015.initial_effect(c)
 	--synchro summon
-	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsType,TYPE_SYNCHRO),aux.NonTuner(Card.IsType,TYPE_SYNCHRO),1)
+	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsType,TYPE_SYNCHRO),1,1,aux.NonTuner(Card.IsType,TYPE_SYNCHRO),1,99)
 	c:EnableReviveLimit()
 	--opponent's turn synchro
 	local e1=Effect.CreateEffect(c)

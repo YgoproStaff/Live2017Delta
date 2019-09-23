@@ -2,11 +2,7 @@
 --fixed by MLD
 function c511008503.initial_effect(c)
 	--
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetTarget(c511008503.target)
-	c:RegisterEffect(e1)
+	aux.AddPersistentProcedure(c,nil,Card.IsFaceup)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_CANNOT_BE_XYZ_MATERIAL)
@@ -29,12 +25,7 @@ function c511008503.initial_effect(c)
 	e6:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
 	c:RegisterEffect(e6)
 end
-function c511008503.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.Hint(HINT_SELECTMSG,tp,HINGMSG_NUMBER)
-	local lv=Duel.AnnounceLevel(tp,0,63)
-	e:SetLabel(lv)
-end
 function c511008503.tg(e,c)
-	return c:GetLevel()==e:GetLabelObject():GetLabel()
+	local tc=e:GetHandler():GetCardTarget():GetFirst()
+	return tc and c:IsLevel(tc:GetLevel())
 end

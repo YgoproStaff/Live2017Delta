@@ -97,24 +97,35 @@ function c95000023.acop(e,tp,eg,ep,ev,re,r,rp)
 		local co=te:GetCost()
 		local tg=te:GetTarget()
 		local op=te:GetOperation()
+		local res,teg,tep,tev,tre,tr,trp
 		if te:GetCode()==EVENT_CHAINING then
 			local chain=Duel.GetCurrentChain()-1
 			local te2=Duel.GetChainInfo(chain,CHAININFO_TRIGGERING_EFFECT)
 			local tc=te2:GetHandler()
 			local g=Group.FromCards(tc)
 			local p=tc:GetControler()
-			if co then co(e,tp,g,p,chain,te2,REASON_EFFECT,p,1) end
-			if tg then tg(e,tp,g,p,chain,te2,REASON_EFFECT,p,1) end
-			if op then op(e,tp,g,p,chain,te2,REASON_EFFECT,p) end
+			teg,tep,tev,tre,tr,trp=g,p,chain,te2,REASON_EFFECT,p
 		elseif te:GetCode()==EVENT_SUMMON or te:GetCode()==EVENT_FLIP_SUMMON or te:GetCode()==EVENT_SPSUMMON or te:GetCode()==EVENT_FREE_CHAIN then
-			if co then co(e,tp,eg,ep,ev,re,r,rp,1) end
-			if tg then tg(e,tp,eg,ep,ev,re,r,rp,1) end
-			if op then op(e,tp,eg,ep,ev,re,r,rp) end
+			teg,tep,tev,tre,tr,trp=eg,ep,ev,re,r,rp
 		else
-			local res,teg,tep,tev,tre,tr,trp=Duel.CheckEvent(te:GetCode(),true)
-			if co then co(e,tp,teg,tep,tev,tre,tr,trp,1) end
-			if tg then tg(e,tp,teg,tep,tev,tre,tr,trp,1) end
-			if op then op(e,tp,teg,tep,tev,tre,tr,trp) end
+			res,teg,tep,tev,tre,tr,trp=Duel.CheckEvent(te:GetCode(),true)
+		end
+		e:GetHandler():CreateEffectRelation(te)
+		if co then co(e,tp,teg,tep,tev,tre,tr,trp,1) end
+		if tg then tg(e,tp,teg,tep,tev,tre,tr,trp,1) end
+		Duel.BreakEffect()
+		local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
+		local etc=g:GetFirst()
+		while etc do
+			etc:CreateEffectRelation(te)
+			etc=g:GetNext()
+		end
+		if op then op(e,tp,teg,tep,tev,tre,tr,trp) end
+		e:GetHandler():ReleaseEffectRelation(te)
+		etc=g:GetFirst()
+		while etc do
+			etc:ReleaseEffectRelation(te)
+			etc=g:GetNext()
 		end
 	end
 end

@@ -37,7 +37,7 @@ function c511000597.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	rg:Merge(rg2)
 	rg:Merge(rg3)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-3 and rg1:GetCount()>0 and rg2:GetCount()>0 and rg3:GetCount()>0 
-		and aux.SelectUnselectGroup(rg,e,tp,3,3,c511000597.rescon,0)
+		and aux.SelectUnselectGroup(rg,e,tp,3,3,c511000597.rescon,0) end
 	local g=aux.SelectUnselectGroup(rg,e,tp,3,3,c511000597.rescon,1,tp,HINTMSG_REMOVE)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end

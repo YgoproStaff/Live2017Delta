@@ -28,19 +28,13 @@ function c511010192.initial_effect(c)
 	local e6=Effect.CreateEffect(c)
 	e6:SetType(EFFECT_TYPE_SINGLE)
 	e6:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e6:SetValue(c511010192.indes)
+	e6:SetValue(aux.NOT(aux.TargetBoolFunction(Card.IsSetCard,0x48)))
 	c:RegisterEffect(e6)
+	aux.CallToken(47017574)
 	if not c511010192.global_check then
 		c511010192.global_check=true
 		c511010192[0]=0
 		c511010192[1]=0
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_ADJUST)
-		ge2:SetCountLimit(1)
-		ge2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
-		ge2:SetOperation(c511010192.numchk)
-		Duel.RegisterEffect(ge2,0)
 		local ge2=Effect.CreateEffect(c)
 		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		ge2:SetCode(EVENT_BATTLE_DAMAGE)
@@ -90,6 +84,14 @@ function c511010192.rankupregop(e,tp,eg,ep,ev,re,r,rp)
 	e4:SetOperation(c511010192.disop)
 	e4:SetReset(RESET_EVENT+0x1fe0000)
 	c:RegisterEffect(e4,false,1)
+	--Double Snare
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetCode(3682106)
+	e5:SetReset(RESET_EVENT+0x1fe0000)
+	c:RegisterEffect(e5)
 end
 function c511010192.reccon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
@@ -146,11 +148,4 @@ function c511010192.disop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 		tc=g2:GetNext()
 	end
-end
-function c511010192.numchk(e,tp,eg,ep,ev,re,r,rp)
-	Duel.CreateToken(tp,47017574)
-	Duel.CreateToken(1-tp,47017574)
-end
-function c511010192.indes(e,c)
-	return not c:IsSetCard(0x48)
 end

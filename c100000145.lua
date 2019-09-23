@@ -39,15 +39,15 @@ end
 function c100000145.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.PayLPCost(tp,1000)
 end
-function c100000145.lvfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_SYNCHRO)
+function c100000145.lvfilter(c,lv)
+	return c:IsFaceup() and c:IsType(TYPE_SYNCHRO) and c:GetLevel()~=lv
 end
 function c100000145.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c100000145.lvfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c100000145.lvfilter,tp,LOCATION_MZONE,0,1,e:GetHandler()) 
+	if chk==0 then return Duel.IsExistingTarget(c100000145.lvfilter,tp,LOCATION_MZONE,0,1,e:GetHandler(),e:GetHandler():GetLevel())  
 		and e:GetHandler():GetLevel()>0 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,c100000145.lvfilter,tp,LOCATION_MZONE,0,1,1,e:GetHandler())
+	Duel.SelectTarget(tp,c100000145.lvfilter,tp,LOCATION_MZONE,0,1,1,e:GetHandler(),e:GetHandler():GetLevel())
 end
 function c100000145.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

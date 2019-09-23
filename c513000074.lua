@@ -1,7 +1,7 @@
 --Ｓｉｎ パラドクス・ドラゴン
 function c513000074.initial_effect(c)
 	--synchro summon
-	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x23),aux.NonTuner(Card.IsSetCard,0x23),1)
+	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x23),1,1,aux.NonTuner(Card.IsSetCard,0x23),1,99)
 	c:EnableReviveLimit()
 	--special summon
 	local e1=Effect.CreateEffect(c)

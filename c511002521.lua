@@ -7,59 +7,25 @@ function c511002521.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e1:SetCode(511002521)
-	e1:SetCost(c511002521.cost)
 	e1:SetTarget(c511002521.target)
 	e1:SetOperation(c511002521.activate)
 	c:RegisterEffect(e1)
-	if not c511002521.global_check then
-		c511002521.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD)
-		ge1:SetCode(EFFECT_CANNOT_LOSE_LP)
-		ge1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-		ge1:SetTargetRange(1,0)
-		ge1:SetLabel(0)
-		ge1:SetCondition(c511002521.con2)
-		Duel.RegisterEffect(ge1,0)
-		local ge2=ge1:Clone()
-		ge2:SetLabel(1)
-		Duel.RegisterEffect(ge2,1)
-		local ge3=Effect.CreateEffect(c)
-		ge3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge3:SetCode(EVENT_ADJUST)
-		ge3:SetOperation(c511002521.op)
-		Duel.RegisterEffect(ge3,0)
-	end
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e2:SetTargetRange(1,0)
+	e2:SetCode(511000793)
+	e2:SetLabel(0)
+	e2:SetLabelObject(e1)
+	e2:SetCondition(c511002521.econ)
+	Duel.RegisterEffect(e2,0)
+	local e3=e2:Clone()
+	e3:SetLabel(1)
+	Duel.RegisterEffect(e3,1)
+	aux.CallToken(419)
 end
-function c511002521.con2(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFlagEffect(e:GetLabel(),511002521)>0
-end
-function c511002521.op(e,tp,eg,ep,ev,re,r,rp)
-	local ph=Duel.GetCurrentPhase()
-	if Duel.GetLP(0)<=0 and ph~=PHASE_DAMAGE then
-		Duel.RaiseEvent(Duel.GetMatchingGroup(nil,0,0xff,0,nil),511002521,e,0,0,0,0)
-		Duel.ResetFlagEffect(0,511002521)
-	end
-	if Duel.GetLP(1)<=0 and ph~=PHASE_DAMAGE then
-		Duel.RaiseEvent(Duel.GetMatchingGroup(nil,1,0xff,0,nil),511002521,e,0,0,0,0)
-		Duel.ResetFlagEffect(1,511002521)
-	end
-	if Duel.GetLP(0)>0 and Duel.GetFlagEffect(0,511002521)==0 then
-		Duel.RegisterFlagEffect(0,511002521,0,0,1)
-	end
-	if Duel.GetLP(1)>0 and Duel.GetFlagEffect(1,511002521)==0 then
-		Duel.RegisterFlagEffect(1,511002521,0,0,1)
-	end
-end
-function c511002521.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetTargetRange(1,0)
-	e1:SetReset(RESET_CHAIN)
-	e1:SetCode(EFFECT_CANNOT_LOSE_LP)
-	Duel.RegisterEffect(e1,e:GetHandlerPlayer())
+function c511002521.econ(e)
+	return e:GetLabelObject():IsActivatable(e:GetLabel())
 end
 function c511002521.filter(c,e,tp)
 	return c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -67,6 +33,13 @@ end
 function c511002521.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c511002521.filter,tp,LOCATION_HAND,0,1,nil,e,tp) end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetTargetRange(1,0)
+	e1:SetReset(RESET_CHAIN)
+	e1:SetCode(EFFECT_CANNOT_LOSE_LP)
+	Duel.RegisterEffect(e1,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function c511002521.activate(e,tp,eg,ep,ev,re,r,rp)
@@ -133,7 +106,7 @@ function c511002521.con(e)
 	return false
 end
 function c511002521.matcon(e,tp,eg,ep,ev,re,r,rp)
-	return r==REASON_SYNCHRO or r==REASON_XYZ or r==REASON_FUSION
+	return r&(REASON_SYNCHRO+REASON_XYZ+REASON_FUSION)>0
 end
 function c511002521.matop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

@@ -18,13 +18,13 @@
 
 
 local isloc=Card.IsLocation
-  	Card.IsLocation=function(c,loc)
+	Card.IsLocation=function(c,loc)
 		if (Duel.GetMasterRule()<4 and isloc(c,LOCATION_MZONE) and c:GetSequence()==5) or (Duel.GetMasterRule()>=4 and isloc(c,LOCATION_SZONE) and c:GetSequence()==6) then
 			return bit.band(loc,0x400)==0x400
 		else
 			return isloc(c,loc)
 		end
- 	end
+	end
 local dmzonechk=function(c) 
 	return (Duel.GetMasterRule()<4 and isloc(c,LOCATION_MZONE) and c:GetSequence()==5) or (Duel.GetMasterRule()>=4 and isloc(c,LOCATION_SZONE) and c:GetSequence()==6)
 end
@@ -166,38 +166,24 @@ function c300.initial_effect(c)
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_FIELD)
 		e2:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
+		e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 		e2:SetTargetRange(0xff,0xff)
 		e2:SetTarget(aux.TargetBoolFunction(Card.IsLocation,0x400))
 		Duel.RegisterEffect(e2,0)
-		local e3=Effect.CreateEffect(c)
-		e3:SetType(EFFECT_TYPE_FIELD)
-		e3:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
-		e3:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-		e3:SetValue(aux.TargetBoolFunction(Card.IsLocation,0x400))
+		local e3=e2:Clone()
+		e3:SetCode(EFFECT_IGNORE_BATTLE_TARGET)
 		Duel.RegisterEffect(e3,0)
-		local e4=Effect.CreateEffect(c)
-		e4:SetType(EFFECT_TYPE_FIELD)
-		e4:SetCode(EFFECT_DIRECT_ATTACK)
-		e4:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-		e4:SetTarget(c300.dirtg)
-		Duel.RegisterEffect(e4,0)
-		local e5=Effect.CreateEffect(c)
-		e5:SetType(EFFECT_TYPE_FIELD)
-		e5:SetCode(EFFECT_IMMUNE_EFFECT)
-		e5:SetTargetRange(0xff,0xff)
-		e5:SetTarget(aux.TargetBoolFunction(Card.IsLocation,0x400))
-		e5:SetValue(c300.efilter)
-		Duel.RegisterEffect(e5,0)
-		--cannot release
-		local e4=Effect.CreateEffect(c)
-		e4:SetType(EFFECT_TYPE_FIELD)
-		e4:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+		local e4=e2:Clone()
 		e4:SetCode(EFFECT_UNRELEASABLE_SUM)
 		e4:SetValue(c300.sumval)
 		Duel.RegisterEffect(e4,0)
 		local e5=e4:Clone()
 		e5:SetCode(EFFECT_UNRELEASABLE_NONSUM)
 		Duel.RegisterEffect(e5,0)
+		local e6=e2:Clone()
+		e6:SetCode(EFFECT_IMMUNE_EFFECT)
+		e6:SetValue(c300.efilter)
+		Duel.RegisterEffect(e6,0)
 	end
 end
 function c300.sumval(e,c)
@@ -206,14 +192,8 @@ end
 function c300.efilter(e,te)
 	return te:GetHandler()~=e:GetOwner()
 end
-function c300.bttg(e,c)
-	return c:IsLocation(0x400)
-end
-function c300.dirtg(e,c)
-	return Duel.GetFieldGroupCount(1-c:GetControler(),LOCATION_MZONE)==0
-end
 function c300.con(e,tp,eg,ep,ev,re,r,rp)
-    return Duel.GetTurnCount()==1
+	return Duel.GetTurnCount()==1
 end
 function c300.op(e,tp,eg,ep,ev,re,r,rp)
 	local g1=getmatchg(function(c) return c.dm and not c.dm_no_activable end,0,0xff,0,nil)
@@ -335,7 +315,7 @@ function c300.loseop2(e,tp,eg,ep,ev,re,r,rp)
 	elseif c1==0 and c2==0 and f2==0 and f1==0  then
 		Duel.Win(PLAYER_NONE,WIN_REASON_DM)
 	elseif c1>0 and c2==0 and f2==0 then
-		Duel.Win(tp,WIN_REASON_DM)	
+		Duel.Win(tp,WIN_REASON_DM)  
 	end
 end
 
@@ -458,5 +438,4 @@ tableDm = {
 511000573,
 511000574,
 511000575,
-
 }

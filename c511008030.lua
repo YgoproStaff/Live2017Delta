@@ -1,5 +1,6 @@
 --Returning Light
 --	by Snrk
+--fixed by GameMaster
 local self=c511008030
 
 function self.initial_effect(c)
@@ -9,6 +10,7 @@ function self.initial_effect(c)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetTarget(self.tg)
 	e1:SetOperation(self.op)
+	e1:SetCondition(self.spcon)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
@@ -23,6 +25,16 @@ function self.initial_effect(c)
 	e3:SetLabelObject(e2)
 	c:RegisterEffect(e3)
 end
+
+
+function self.spfilter(c,sp)
+return c:GetSummonPlayer()==sp
+end
+
+function self.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(self.spfilter,1,nil,1-tp)
+end
+
 
 function self.exist(e,p) return Duel.IsExistingMatchingCard(self.ssf,p,LOCATION_GRAVE,0,1,nil,e,p) end
 function self.ssf(c,e,p) return c:IsCanBeSpecialSummoned(e,0,p,false,false) and c:IsAttribute(ATTRIBUTE_LIGHT) end

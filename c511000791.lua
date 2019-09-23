@@ -17,7 +17,7 @@ function c511000791.filter(c,e,tp)
 end
 function c511000791.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDestructable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler()) 
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(c511000791.filter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,e,tp) end
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(c511000791.filter,tp,LOCATION_HAND,0,1,nil,e,tp) end
 	local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
@@ -29,7 +29,7 @@ function c511000791.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(g,REASON_EFFECT)
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local sp=Duel.SelectMatchingCard(tp,c511000791.filter,tp,LOCATION_HAND+LOCATION_DECK,0,1,1,nil,e,tp)
+		local sp=Duel.SelectMatchingCard(tp,c511000791.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
 		if sp:GetCount()>0 then
 			Duel.SpecialSummon(sp,0,tp,tp,false,false,POS_FACEUP)
 		end

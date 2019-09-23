@@ -12,30 +12,27 @@ function c511002409.initial_effect(c)
 	c:RegisterEffect(e1)
 	aux.CallToken(420)
 end
-function c511002409.cfilter(c,tp)
-	return c:IsMotor() and c:IsReason(REASON_DESTROY) and c:GetPreviousControler()==tp
-		and c:GetPreviousLocation()==LOCATION_MZONE and c:GetPreviousPosition()&POS_FACEUP~=0
+function c511002409.cfilter(c)
+	return c:IsMotor() and c:GetPreviousLocation()==LOCATION_MZONE and c:GetPreviousPosition()&POS_FACEUP~=0
 end
 function c511002409.condition(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c511002409.cfilter,1,nil,tp)
+	return eg:IsExists(c511002409.cfilter,1,nil)
 end
 function c511002409.filter(c,e,tp)
 	return c:IsMotor() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c511002409.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c511002409.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
+	local g=Duel.GetMatchingGroup(c511002409.filter,tp,LOCATION_GRAVE,0,nil)
+	if chk==0 then return g:GetCount()>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>=g:GetCount() end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,g:GetCount(),0,0)
 end
 function c511002409.activate(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(c511002409.filter,tp,LOCATION_GRAVE,0,nil)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft<=0 then return end
-	if Duel.IsPlayerAffectedByEffect(tp,59822133) then ft=1 end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c511002409.filter,tp,LOCATION_GRAVE,0,ft,ft,nil,e,tp)
-	local tc=g:GetFirst()
-	while tc do
-		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK)
+	if Duel.IsPlayerAffectedByEffect(tp,59822133) then ft=math.min(ft,1) end
+	if ft<g:GetCount() then return end
+	g:ForEach(function(tc)
+		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
@@ -45,7 +42,6 @@ function c511002409.activate(e,tp,eg,ep,ev,re,r,rp)
 		local e2=e1:Clone()
 		e2:SetCode(EFFECT_SET_DEFENSE_FINAL)
 		tc:RegisterEffect(e2)
-		tc=g:GetNext()
-	end
+	end)
 	Duel.SpecialSummonComplete()
 end

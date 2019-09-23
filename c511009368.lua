@@ -1,6 +1,7 @@
 --Performapal Gatling Ghoul
 --Fixed by TheOnePharaoh
---fixed by MLD
+--Fixed by MLD
+--Fixed by Larry126
 function c511009368.initial_effect(c)
 	--fusion material
 	aux.AddFusionProcMix(c,true,true,c511009368.ffilter,aux.FilterBoolFunction(Card.IsFusionSetCard,0x9f))
@@ -57,7 +58,8 @@ function c511009368.damop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c511009368.regcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsSummonType(SUMMON_TYPE_FUSION) and c:GetMaterial() and c:GetMaterial():IsExists(Card.IsType,1,nil,TYPE_PENDULUM)
+	return c:IsSummonType(SUMMON_TYPE_FUSION) and c:GetMaterial()
+		and c:GetMaterial():IsExists(Card.IsType,1,nil,TYPE_PENDULUM,c,SUMMON_TYPE_FUSION)
 end
 function c511009368.regop(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():RegisterFlagEffect(511009368,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)

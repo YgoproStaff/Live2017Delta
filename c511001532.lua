@@ -17,9 +17,7 @@ function c511001532.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c511001532.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
-	if chk==0 then return true end
-	
-	if chk==0 then return  end
+	return true
 end
 function c511001532.filter(c,e,tp)
 	return c:IsType(TYPE_XYZ) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:GetFlagEffect(511001531)>0
@@ -29,7 +27,8 @@ function c511001532.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()~=1 then return false end
 		e:SetLabel(0)
-		return sg:GetCount()>0 and sg:FilterCount(Card.IsReleasable,nil)==sg:GetCount() and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		return e:IsHasType(EFFECT_TYPE_ACTIVATE) and sg:GetCount()>0 and sg:FilterCount(Card.IsReleasable,nil)==sg:GetCount() 
+			and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 			and Duel.IsExistingMatchingCard(c511001532.filter,tp,LOCATION_REMOVED,LOCATION_REMOVED,1,nil,e,tp)  end
 	local ct=Duel.Release(sg,REASON_COST)
 	Duel.SetTargetParam(ct+1)
@@ -56,6 +55,7 @@ function c511001532.activate(e,tp,eg,ep,ev,re,r,rp)
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 				g=g:Select(tp,ct,ct,nil)
 			end
+			Duel.BreakEffect()
 			Duel.Overlay(tc,g)
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_SINGLE)

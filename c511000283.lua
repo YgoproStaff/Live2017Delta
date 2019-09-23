@@ -1,8 +1,11 @@
+--清廉な墓地の魔力
 --Purity of the Cemetery
+--fixed by Larry126
 function c511000283.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCondition(c511000283.condition)
 	c:RegisterEffect(e1)
 	--counter
 	local e2=Effect.CreateEffect(c)
@@ -24,6 +27,9 @@ function c511000283.initial_effect(c)
 	e3:SetCode(EFFECT_SELF_DESTROY)
 	e3:SetCondition(c511000283.sdcon2)
 	c:RegisterEffect(e3)
+end
+function c511000283.condition(e,tp,eg,ep,ev,re,r,rp)
+	return not Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_GRAVE,0,1,nil,TYPE_MONSTER)
 end
 function c511000283.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp

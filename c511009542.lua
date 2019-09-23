@@ -1,12 +1,11 @@
---Abyss Script - Abyss Entertainment
---fixed by MLD
+--Abyss Script - Abyss Entertainment (anime)
 function c511009542.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--damage
+	--set
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(511000105,0))
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -18,8 +17,8 @@ function c511009542.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c511009542.setcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,nil,0x10ec) end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,nil,0x10ec)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,Card.IsSetCard,1,false,nil,nil,0x10ec) end
+	local g=Duel.SelectReleaseGroupCost(tp,Card.IsSetCard,1,1,false,nil,nil,0x10ec)
 	Duel.Release(g,REASON_COST)
 end
 function c511009542.cfilter(c)

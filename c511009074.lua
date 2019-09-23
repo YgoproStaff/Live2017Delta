@@ -28,6 +28,13 @@ function c511009074.initial_effect(c)
 	e2:SetTarget(c511009074.distg)
 	e2:SetOperation(c511009074.disop)
 	c:RegisterEffect(e2,false,1)
+	--Double Snare
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCode(3682106)
+	c:RegisterEffect(e3)
 end
 function c511009074.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

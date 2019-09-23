@@ -1,5 +1,7 @@
 --威光魔人
-function c33746252.initial_effect(c)
+--Majesty's Fiend
+local s,id=GetID()
+function s.initial_effect(c)
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -13,9 +15,9 @@ function c33746252.initial_effect(c)
 	e2:SetCode(EFFECT_CANNOT_ACTIVATE)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetTargetRange(1,1)
-	e2:SetValue(c33746252.aclimit)
+	e2:SetValue(s.aclimit)
 	c:RegisterEffect(e2)
 end
-function c33746252.aclimit(e,re,tp)
-	return re:IsActiveType(TYPE_MONSTER) and not re:GetHandler():IsImmuneToEffect(e)
+function s.aclimit(e,re,tp)
+	return re:IsActiveType(TYPE_MONSTER)
 end

@@ -28,8 +28,8 @@ function c511023013.filter(c)
 	return c:IsFaceup() and c:IsCode(74711057)
 end
 function c511023013.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c511023013.cfilter,1,nil,tp) end
-	local g=Duel.SelectReleaseGroup(tp,c511023013.cfilter,1,1,nil,tp)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,c511023013.cfilter,1,false,nil,nil,tp) end
+	local g=Duel.SelectReleaseGroupCost(tp,c511023013.cfilter,1,1,false,nil,nil,tp)
 	e:SetLabel(g:GetFirst():GetAttack())
 	e:GetLabelObject():SetLabel(g:GetFirst():GetDefense())
 	Duel.Release(g,REASON_COST)

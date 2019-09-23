@@ -15,7 +15,7 @@ function c511010053.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e2:SetValue(c511010053.indes)
+	e2:SetValue(aux.NOT(aux.TargetBoolFunction(Card.IsSetCard,0x48)))
 	c:RegisterEffect(e2)
 	--equip
 	local e3=Effect.CreateEffect(c)
@@ -82,23 +82,11 @@ function c511010053.initial_effect(c)
 	e8:SetTarget(c511010053.xyztg)
 	e8:SetOperation(c511010053.xyzop)
 	c:RegisterEffect(e8)
-	if not c511010053.global_check then
-		c511010053.global_check=true
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_ADJUST)
-		ge2:SetCountLimit(1)
-		ge2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
-		ge2:SetOperation(c511010053.numchk)
-		Duel.RegisterEffect(ge2,0)
-	end
+	aux.CallToken(23998625)
 end
 c511010053.xyz_number=53
 function c511010053.efilter(e,re)
 	return e:GetHandlerPlayer()~=re:GetHandlerPlayer()
-end
-function c511010053.indes(e,c)
-	return not c:IsSetCard(0x48)
 end
 function c511010053.eqfilter(c)
 	return c:IsType(TYPE_MONSTER) and not c:IsForbidden()
@@ -112,14 +100,14 @@ function c511010053.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,g,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
 end
-function c511010053.equipop(c,e,tp,tc)
+function c511010053.equipop(c,e,tp,tc,a)
+	if not aux.EquipByEffectAndLimitRegister(c,e,tp,tc,511010053,true) or not a then return end
 	local atk=a:GetAttack()
 	if atk<0 then atk=0 end
-	if not aux.EquipByEffectAndLimitRegister(c,e,tp,tc,511010053,true) then return end
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_EQUIP)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
-	e2:SetReset(RESET_EVENT+0x1fe0000)
+	e2:SetReset(RESET_EVENT+RESETS_STANDARD)
 	e2:SetValue(atk)
 	tc:RegisterEffect(e2)
 end
@@ -128,7 +116,7 @@ function c511010053.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	local a=Duel.GetAttacker()
 	if tc and tc:IsRelateToEffect(e) and c:IsFaceup() and c:IsRelateToEffect(e) and a and a:IsRelateToBattle() then
-		c511010053.equipop(c,e,tp,tc)
+		c511010053.equipop(c,e,tp,tc,a)
 	end
 end
 function c511010053.repfilter(c,ec)
@@ -197,19 +185,23 @@ end
 function c511010053.xyzcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetOverlayCount()==0
 end
-function c511010053.xyzfilter(c,e,tp)
-	return e:GetHandler():IsCanBeXyzMaterial(c,tp) and c:IsCode(97403510)
+function c511010053.xyzfilter(c,e,tp,pg)
+	return e:GetHandler():IsCanBeXyzMaterial(c,tp) and c:IsCode(97403510) and (pg:GetCount()<=0 or pg:IsContains(e:GetHandler())) 
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false) and Duel.GetLocationCountFromEx(tp,tp,e:GetHandler(),c)>0
 end
 function c511010053.xyztg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.IsExistingMatchingCard(c511010053.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
+	if chk==0 then
+		local pg=aux.GetMustBeMaterialGroup(tp,Group.CreateGroup(),tp,nil,nil,REASON_XYZ)
+		return pg:GetCount()<=1 and Duel.IsExistingMatchingCard(c511010053.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,pg)
+	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function c511010053.xyzop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsFacedown() or not c:IsRelateToEffect(e) or c:IsControler(1-tp) or c:IsImmuneToEffect(e) then return end
+	local pg=aux.GetMustBeMaterialGroup(tp,Group.FromCards(c),tp,nil,nil,REASON_XYZ)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c511010053.xyzfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,c511010053.xyzfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,pg)
 	local sc=g:GetFirst()
 	if sc then
 		local mg=c:GetOverlayGroup()
@@ -221,8 +213,4 @@ function c511010053.xyzop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 		sc:CompleteProcedure()
 	end
-end
-function c511010053.numchk(e,tp,eg,ep,ev,re,r,rp)
-	Duel.CreateToken(tp,23998625)
-	Duel.CreateToken(1-tp,23998625)
 end

@@ -15,7 +15,7 @@ function c100000355.initial_effect(c)
 	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
-	e2:SetOperation(c100000355.operation)
+	e2:SetOperation(c100000355.op)
 	c:RegisterEffect(e2)
 	--battle des rep
 	local e3=Effect.CreateEffect(c)
@@ -27,17 +27,19 @@ function c100000355.initial_effect(c)
 end
 function c100000355.spcon(e,c)
 	if c==nil then return true end
-	return Duel.CheckReleaseGroup(c:GetControler(),nil,2,nil)
+	local tp=c:GetControler()
+	local rg=Duel.GetReleaseGroup(tp)
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-2 and rg:GetCount()>1 and aux.SelectUnselectGroup(rg,e,tp,2,2,aux.ChkfMMZ(1),0)
 end
 function c100000355.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.SelectReleaseGroup(c:GetControler(),nil,2,2,nil)
-	Duel.Release(g,REASON_COST)
+	local rg=Duel.GetReleaseGroup(tp)
+	local sg=aux.SelectUnselectGroup(rg,e,tp,2,2,aux.ChkfMMZ(1),1,tp,HINTMSG_RELEASE)
+	Duel.Release(sg,REASON_COST)
 end
-function c100000355.operation(e,tp,eg,ep,ev,re,r,rp)
+function c100000355.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateAttack()
 end
 function c100000355.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReason(REASON_BATTLE) end
 	return true
 end
-

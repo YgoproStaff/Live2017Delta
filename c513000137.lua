@@ -5,6 +5,7 @@
 --credit to TPD & Cybercatman
 --updated by Larry126
 function c513000137.initial_effect(c)
+	aux.CallToken(421)
 	--summon with 3 tribute
 	local e1=Effect.CreateEffect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -30,25 +31,6 @@ function c513000137.initial_effect(c)
 	e3:SetCode(EFFECT_SET_DEFENSE_FINAL)
 	e3:SetValue(c513000137.defval)
 	c:RegisterEffect(e3)
-	if not c513000137.global_check then
-		c513000137.global_check=true
-	--register
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_ADJUST)
-		ge1:SetCountLimit(1)
-		ge1:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
-		ge1:SetOperation(c513000137.chk)
-		Duel.RegisterEffect(ge1,0)
-	end
-end
-function c513000137.chk(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetFlagEffect(tp,421)==0 and Duel.GetFlagEffect(1-tp,421)==0 then
-		Duel.CreateToken(tp,421)
-		Duel.CreateToken(1-tp,421)
-		Duel.RegisterFlagEffect(tp,421,nil,0,1)
-		Duel.RegisterFlagEffect(1-tp,421,nil,0,1)
-	end
 end
 -------------------------------------------------------------------
 function c513000137.ttcon(e,c)
@@ -61,7 +43,7 @@ function c513000137.ttop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Release(g,REASON_SUMMON+REASON_MATERIAL)
 end
 function c513000137.atktg(e,c)
-	return c~=e:GetHandler()
+	return c~=e:GetHandler() and not c:IsAttribute(ATTRIBUTE_DEVINE)
 end
 function c513000137.atkval(e,c)
 	return c:GetAttack()/2

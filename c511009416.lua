@@ -1,4 +1,5 @@
---Junk Warrior (Anime)
+--ジャンク・ウォリアー
+--fixed by MLD
 function c511009416.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,c511009416.tfilter,1,1,aux.NonTuner(nil),1,99)
@@ -18,7 +19,7 @@ function c511009416.tfilter(c)
 	return c:IsCode(63977008) or c:IsHasEffect(20932152)
 end
 function c511009416.con(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_SYNCHRO)
 end
 function c511009416.filter(c)
 	return c:IsFaceup() and c:IsLevelBelow(2)
@@ -26,7 +27,7 @@ end
 function c511009416.value(e,c)
 	local atk=0
 	local g=Duel.GetMatchingGroup(c511009416.filter,c:GetControler(),LOCATION_MZONE,0,c)
-	local tc=wg:GetFirst()
+	local tc=g:GetFirst()
 	while tc do
 		atk=atk+tc:GetAttack()
 		tc=g:GetNext()

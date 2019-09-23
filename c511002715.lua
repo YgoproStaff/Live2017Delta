@@ -28,5 +28,6 @@ function c511002715.op(e,tp,eg,ep,ev,re,r,rp)
 	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		Duel.RaiseEvent(tc,EVENT_SPSUMMON_SUCCESS,e,REASON_EFFECT,tp,tc:GetControler(),ev)
 		Duel.RaiseSingleEvent(tc,EVENT_SPSUMMON_SUCCESS,e,REASON_EFFECT,tp,tc:GetControler(),ev)
+		tc:SetStatus(STATUS_SPSUMMON_TURN,true)
 	end
 end

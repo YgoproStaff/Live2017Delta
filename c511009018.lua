@@ -1,80 +1,64 @@
---Automatic Gearspring Machine
+--Gouki The Solid Ogre
+--fixed by MLD
 function c511009018.initial_effect(c)
-	c:EnableCounterPermit(0x108)
-	--Activate
+	--link summon
+	aux.AddLinkProcedure(c,c511009018.matfilter,2)
+	c:EnableReviveLimit()
+	--indes
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_COUNTER)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetTarget(c511009018.target)
-	e1:SetOperation(c511009018.activate)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e1:SetCondition(c511009018.incon)
+	e1:SetValue(1)
 	c:RegisterEffect(e1)
-	--counter
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_PHASE+PHASE_STANDBY)
-	e2:SetRange(LOCATION_SZONE)
-	e2:SetCountLimit(1)
-	e2:SetCondition(c511009018.addcon)
-	e2:SetOperation(c511009018.addop)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	c:RegisterEffect(e2)
-	--spsummon
+	--move
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(61156777,1))
-	e3:SetCategory(CATEGORY_COUNTER)
-	e3:SetType(EFFECT_TYPE_IGNITION)
+	e3:SetDescription(aux.Stringid(92204263,0))
+	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetCode(EVENT_FREE_CHAIN)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCost(c511009018.spcost)
-	e3:SetTarget(c511009018.sptg)
-	e3:SetOperation(c511009018.spop)
+	e3:SetCountLimit(1)
+	e3:SetTarget(c511009018.seqtg)
+	e3:SetOperation(c511009018.seqop)
 	c:RegisterEffect(e3)
 end
-function c511009018.addcon(e,tp,eg,ep,ev,re,r,rp)
-	return tp==Duel.GetTurnPlayer()
+function c511009018.matfilter(c)
+	return c:IsLinkSetCard(0xfc)
 end
-function c511009018.addop(e,tp,eg,ep,ev,re,r,rp)
+function c511009018.indesfil(c)
+	return c:IsFaceup() and c:IsSetCard(0xfc)
+end
+function c511009018.incon(e)
+	return e:GetHandler():GetLinkedGroupCount()>0 
+	and e:GetHandler():GetLinkedGroup():IsExists(c511009018.indesfil,1,nil)
+end
+function c511009018.seqfilter(c,zone)
+	return c:IsFaceup() and c:IsSetCard(0xfc) and c:GetSequence()<5 
+		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE,c:GetControler(),LOCATION_REASON_CONTROL,zone)>0
+end
+function c511009018.seqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
-	c:AddCounter(0x108,1)
-	Duel.RaiseEvent(c,95100633,e,0,tp,0,0)
+	local zone=c:GetLinkedZone(tp)&0x1f
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c511009018.seqfilter(chkc,zone) end
+	if chk==0 then return Duel.IsExistingTarget(c511009018.seqfilter,tp,LOCATION_MZONE,0,1,nil,zone) end
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(92204263,1))
+	Duel.SelectTarget(tp,c511009018.seqfilter,tp,LOCATION_MZONE,0,1,1,nil,zone)
 end
-function c511009018.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_COUNTER,nil,2,0,0x108)
-end
-function c511009018.activate(e,tp,eg,ep,ev,re,r,rp)
+function c511009018.seqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		c:AddCounter(0x108,2)
-		Duel.RaiseEvent(c,95100633,e,0,tp,0,0)
-	end
-end
-
-function c511009018.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
-	e:SetLabel(e:GetHandler():GetCounter(0x108))
-	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
-end
-function c511009018.filter(c,e,tp)
-	return c:IsFaceup() and c:IsCanAddCounter(0x108,1)
-end
-function c511009018.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then
-		local c=e:GetHandler()
-		local ct=c:GetCounter(0x108)
-		return ct>0 and Duel.IsExistingMatchingCard(Card.IsCanAddCounter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c,0x108,ct)
-	end
-	Duel.SetTargetParam(e:GetLabel())
-	e:SetLabel(0)
-	Duel.SetOperationInfo(0,CATEGORY_COUNTER,nil,ct,0,0x108)
-end
-function c511009018.spop(e,tp,eg,ep,ev,re,r,rp)
-	local ct=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
-	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(73853830,1))
-	local g=Duel.SelectMatchingCard(tp,Card.IsCanAddCounter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil,0x108,ct)
-	local tc=g:GetFirst()
-	if tc then
-		Duel.HintSelection(g)
-		tc:AddCounter(0x108,ct)
-		Duel.RaiseEvent(tc,95100633,e,0,tp,0,0)
-	end
+	local zone=c:GetLinkedZone(tp)&0x1f
+	local tc=Duel.GetFirstTarget()
+	if not tc or not tc:IsRelateToEffect(e) or tc:IsControler(1-tp) or tc:IsImmuneToEffect(e) 
+		or Duel.GetLocationCount(tc:GetControler(),LOCATION_MZONE,tc:GetControler(),LOCATION_REASON_CONTROL,zone)<=0 then return end
+	local i=0
+	if not c:IsControler(tp) then i=16 end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOZONE)
+	local nseq=math.log(Duel.SelectDisableField(tp,1,LOCATION_MZONE,LOCATION_MZONE,~(zone<<i)),2)-i
+	Duel.MoveSequence(tc,nseq)
 end

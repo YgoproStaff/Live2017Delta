@@ -1,6 +1,7 @@
---無限光アイン・ソフ・オウル
+--無限光アイン・ソフ・オウル (Anime)
+--Infinite Light (Anime)
 function c513000051.initial_effect(c)
-	--Activate to Grave
+	--activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -61,8 +62,9 @@ function c513000051.initial_effect(c)
 		Duel.RegisterEffect(ge3,0)
 	end
 end
+c513000051.listed_names={36894320}
 function c513000051.costfilter(c)
-	return c:IsFaceup() and c:IsCode(100000013) and c:IsAbleToGraveAsCost()
+	return c:IsFaceup() and c:IsCode(36894320) and c:IsAbleToGraveAsCost()
 end
 function c513000051.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c513000051.costfilter,tp,LOCATION_SZONE,0,1,nil) end
@@ -106,10 +108,10 @@ function c513000051.accon(e)
 end
 function c513000051.aclimit(e,re,tp)
 	local rc=re:GetHandler()
-	return re:GetActivateLocation()==LOCATION_MZONE and (rc:IsSetCard(0x4a) or rc:IsCode(74530899)) and not rc:IsImmuneToEffect(e)
+	return re:GetActivateLocation()==LOCATION_MZONE and rc:IsSetCard(0x4a) and not rc:IsImmuneToEffect(e)
 end
 function c513000051.cfilter(c,tp)
-	return (c:IsSetCard(0x4a) or c:IsCode(74530899) or c:IsCode(8967776)) and c:IsFaceup() and c:GetSummonPlayer()==tp
+	return c:IsSetCard(0x4a) and c:IsFaceup() and c:GetSummonPlayer()==tp
 end
 function c513000051.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local g1=eg:Filter(c513000051.cfilter,nil,tp)

@@ -13,14 +13,15 @@ function c511001014.initial_effect(c)
 end
 function c511001014.filter(c,e,tp,tid)
 	local rk=c:GetRank()
-	return c:GetTurnID()==tid and c:GetReason()&REASON_BATTLE~=0
+	local pg=aux.GetMustBeMaterialGroup(tp,Group.FromCards(c),tp,nil,nil,REASON_XYZ)
+	return pg:GetCount()<=1 and c:GetTurnID()==tid and c:GetReason()&REASON_BATTLE~=0
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and (rk>0 or c:IsStatus(STATUS_NO_LEVEL)) 
-		and Duel.IsExistingMatchingCard(c511001014.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,rk,c)
+		and Duel.IsExistingMatchingCard(c511001014.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,rk,c,pg)
 end
-function c511001014.spfilter(c,e,tp,rk,mc)
+function c511001014.spfilter(c,e,tp,rk,mc,pg)
 	if c.rum_limit and not c.rum_limit(mc,e) then return false end
-	return c:IsType(TYPE_XYZ) and mc:IsType(TYPE_XYZ,c,SUMMON_TYPE_XYZ,tp) and c:IsRank(rk+1) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
-		and c:IsSetCard(0xba) and mc:IsCanBeXyzMaterial(c,tp)
+	return c:IsType(TYPE_XYZ) and mc:IsType(TYPE_XYZ,c,SUMMON_TYPE_XYZ,tp) and c:IsRank(rk+1) and c:IsSetCard(0xba) and mc:IsCanBeXyzMaterial(c,tp)
+		and (pg:GetCount()<=0 or pg:IsContains(mc)) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function c511001014.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tid=Duel.GetTurnCount()
@@ -34,8 +35,9 @@ end
 function c511001014.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then
+		local pg=aux.GetMustBeMaterialGroup(tp,Group.FromCards(tc),tp,nil,nil,REASON_XYZ)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g2=Duel.SelectMatchingCard(tp,c511001014.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc:GetRank(),tc)
+		local g2=Duel.SelectMatchingCard(tp,c511001014.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc:GetRank(),tc,pg)
 		local tc2=g2:GetFirst()
 		if tc2 then
 			Duel.BreakEffect()

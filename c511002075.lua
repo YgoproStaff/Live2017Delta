@@ -24,21 +24,19 @@ function c511002075.filter(c,e,tp)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function c511002075.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCountFromEx(tp)>0
-		and Duel.IsExistingMatchingCard(c511002075.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
+	if chk==0 then
+		local pg=aux.GetMustBeMaterialGroup(tp,Group.CreateGroup(),tp,nil,nil,REASON_XYZ)
+		return pg:GetCount()<=0 and Duel.GetLocationCountFromEx(tp)>0
+			and Duel.IsExistingMatchingCard(c511002075.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp)
+	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function c511002075.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCountFromEx(tp)<=0 then return end
+	local pg=aux.GetMustBeMaterialGroup(tp,Group.CreateGroup(),tp,nil,nil,REASON_XYZ)
+	if pg:GetCount()>0 or Duel.GetLocationCountFromEx(tp)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local tc=Duel.SelectMatchingCard(tp,c511002075.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp):GetFirst()
-	if tc then
-		Duel.SpecialSummon(tc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
+	if tc and Duel.SpecialSummon(tc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)>0 then
 		tc:CompleteProcedure()
-	else
-		local cg=Duel.GetFieldGroup(tp,LOCATION_EXTRA,0)
-		if cg and cg:GetCount()>0 then
-			Duel.ConfirmCards(1-tp,cg)
-		end
 	end
 end

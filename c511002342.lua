@@ -13,9 +13,12 @@ function c511002342.initial_effect(c)
 end
 function c511002342.spcon(e,c)
 	if c==nil then return true end
-	return Duel.CheckReleaseGroup(c:GetControler(),Card.IsPapillon,2,nil)
+	local tp=c:GetControler()
+	local rg=Duel.GetReleaseGroup(tp):Filter(Card.IsPapillon,nil)
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-2 and rg:GetCount()>1 and aux.SelectUnselectGroup(rg,e,tp,2,2,aux.ChkfMMZ(1),0)
 end
 function c511002342.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.SelectReleaseGroup(tp,Card.IsPapillon,2,2,nil)
+	local rg=Duel.GetReleaseGroup(tp):Filter(Card.IsPapillon,nil)
+	local sg=aux.SelectUnselectGroup(rg,e,tp,2,2,aux.ChkfMMZ(1),1,tp,HINTMSG_RELEASE)
 	Duel.Release(g,REASON_COST)
 end

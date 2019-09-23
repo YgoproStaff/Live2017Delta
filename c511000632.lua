@@ -42,38 +42,24 @@ function c511000632.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c511000632.spfilter(c,e,tp)
-	return c:GetAttack()<=2000 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
-function c511000632.spfilter2(c,e,tp,atk)
-	return c:GetAttack()<=atk and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsAttackBelow(2000) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_ATTACK)
 end
 function c511000632.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c511000632.spfilter,tp,LOCATION_HAND,0,1,e:GetHandler(),e,tp) end
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if e:GetHandler():GetSequence()<5 then ft=ft+1 end
+	if chk==0 then return ft>0 and Duel.IsExistingMatchingCard(c511000632.spfilter,tp,LOCATION_HAND,0,1,e:GetHandler(),e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
+end
+function c511000632.rescon(sg,e,tp,mg)
+	return sg:GetSum(Card.GetAttack)<=2000
 end
 function c511000632.spop(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if Duel.IsPlayerAffectedByEffect(tp,59822133) then ft=math.min(ft,1) end
 	if ft<=0 then return end
-	local sg=Duel.GetMatchingGroup(c511000632.spfilter,tp,LOCATION_HAND,0,nil,e,tp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=sg:Select(tp,1,1,nil)
-	local spg=Group.CreateGroup()
-	sg:Sub(g)
-	spg:Merge(g)
-	local atk=2000
-	if g:GetFirst():GetAttack()==2000 then
-		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_ATTACK)
+	local g=Duel.GetMatchingGroup(c511000632.spfilter,tp,LOCATION_HAND,0,nil,e,tp)
+	local sg=aux.SelectUnselectGroup(g,e,tp,nil,ft,c511000632.rescon,1,tp,HINTMSG_SPSUMMON,c511000632.rescon)
+	if sg:GetCount()>0 then
+		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP_ATTACK)
 	end
-	ft=ft-1
-	atk=atk-g:GetFirst():GetAttack()
-	sg=sg:Filter(c511000632.spfilter2,nil,e,tp,atk)
-	while ft>0 and atk>0 and sg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(511000632,2)) do
-		g=sg:Select(tp,1,1,nil)
-		sg:Sub(g)
-		spg:Merge(g)
-		atk=atk-g:GetFirst():GetAttack()
-		ft=ft-1
-		sg=sg:Filter(c511000632.spfilter2,nil,e,tp,atk)
-	end
-	Duel.SpecialSummon(spg,0,tp,tp,false,false,POS_FACEUP_ATTACK)
 end

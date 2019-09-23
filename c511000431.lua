@@ -1,4 +1,5 @@
---Cinderella
+--シンデレラ (Anime)
+--Prinzessin (Anime)
 function c511000431.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
@@ -24,8 +25,9 @@ function c511000431.initial_effect(c)
 	e4:SetOperation(c511000431.gainop)
 	c:RegisterEffect(e4)
 end
+c511000431.listed_names={14512825,9677699}
 function c511000431.filter(c,e,tp)
-	return c:IsCode(511000432) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsCode(14512825) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c511000431.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -33,7 +35,7 @@ function c511000431.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_HAND+LOCATION_GRAVE)
 end
 function c511000431.acfilter(c)
-	return c:IsCode(511000433) and c:CheckActivateEffect(false,false,false)~=nil
+	return c:IsCode(9677699) and c:CheckActivateEffect(false,false,false)~=nil
 end
 function c511000431.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -79,7 +81,7 @@ function c511000431.spop(e,tp,eg,ep,ev,re,r,rp)
 				Duel.Equip(tp,tc,g:GetFirst())
 			end
 			tc:ReleaseEffectRelation(te)
-			if etc then	
+			if etc then 
 				etc=g:GetFirst()
 				while etc do
 					etc:ReleaseEffectRelation(te)
@@ -90,7 +92,7 @@ function c511000431.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c511000431.gaincon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(Card.IsCode,1,nil,511000433)
+	return eg:IsExists(Card.IsCode,1,nil,9677699)
 end
 function c511000431.gainop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

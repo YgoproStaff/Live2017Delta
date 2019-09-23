@@ -11,13 +11,20 @@ function c511001116.initial_effect(c)
 	e1:SetOperation(c511001116.activate)
 	c:RegisterEffect(e1)
 end
+function c511001116.chk(sg,tp,exg,dg)
+	return dg:IsExists(aux.TRUE,2,sg)
+end
 function c511001116.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,2,nil) end
-	local rg=Duel.SelectReleaseGroup(tp,nil,2,2,nil)
+	local dg=Duel.GetMatchingGroup(c511001116.filter,tp,0,LOCATION_MZONE,nil,e)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,nil,2,false,c511001116.chk,nil,dg) end
+	local rg=Duel.SelectReleaseGroupCost(tp,nil,2,2,false,c511001116.chk,nil,dg)
 	Duel.Release(rg,REASON_COST)
 end
+function c511001116.filter(c,e)
+	return c:IsAbleToChangeControler() and (not e or c:IsCanBeEffectTarget(e))
+end
 function c511001116.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetLocation()==LOCATION_MZONE and chkc:GetControler()~=tp and chkc:IsControlerCanBeChanged() end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsControlerCanBeChanged() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsControlerCanBeChanged,tp,0,LOCATION_MZONE,2,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
 	local g=Duel.SelectTarget(tp,Card.IsControlerCanBeChanged,tp,0,LOCATION_MZONE,2,2,nil)

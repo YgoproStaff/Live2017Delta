@@ -26,9 +26,9 @@ function c511001640.matfilter(c,e,tp)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCode(EFFECT_MUST_BE_MATERIAL)
-	e3:SetValue(function(c,sumtype,sc)return sumtype==SUMMON_TYPE_SYNCHRO end)
+	e3:SetValue(REASON_SYNCHRO)
 	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE)
-	if c:IsControler(tp) 
+	if c:IsControler(tp) then
 		e3:SetTargetRange(1,0)
 	else
 		e3:SetTargetRange(0,1)
@@ -53,12 +53,10 @@ function c511001640.filter(c,e,tp)
 	return res
 end
 function c511001640.sctg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 
-		and Duel.IsExistingMatchingCard(c511001640.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c511001640.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function c511001640.scop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=-1 then return end
 	local g=Duel.GetMatchingGroup(c511001640.filter,tp,LOCATION_EXTRA,0,nil,e,tp)
 	if g:GetCount()>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

@@ -31,7 +31,7 @@ function c511015134.chkfilter(c,g,sg,e,tp)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_XYZ_LEVEL)
-	e1:SetValue(tc:GetRank()+1)
+	e1:SetValue(c:GetRank()+1)
 	e1:SetReset(RESET_CHAIN)
 	c:RegisterEffect(e1)
 	local e2=nil
@@ -56,6 +56,8 @@ function c511015134.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return mg:IsExists(c511015134.chkfilter,1,nil,mg,sg,e,tp) end
 	local reset={}
 	local tc
+	local e1
+	local e2
 	::start::
 		local cancel=sg:GetCount()>0 and Duel.IsExistingMatchingCard(c511015134.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,sg,e,tp)
 		local tg=mg:Filter(c511015134.chkfilter,sg,mg,sg,e,tp)
@@ -73,14 +75,14 @@ function c511015134.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		else
 			sg:AddCard(tc)
 			reset[tc]={}
-			local e1=Effect.CreateEffect(e:GetHandler())
+			e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_XYZ_LEVEL)
 			e1:SetValue(tc:GetRank()+1)
 			e1:SetReset(RESET_CHAIN)
 			tc:RegisterEffect(e1)
 			reset[tc][0]=e1
-			local e2=nil
+			e2=nil
 			if tc:IsControler(1-tp) then
 				e2=Effect.CreateEffect(e:GetHandler())
 				e2:SetType(EFFECT_TYPE_SINGLE)

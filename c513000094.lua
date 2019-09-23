@@ -8,6 +8,16 @@ function c513000094.initial_effect(c)
 	e1:SetTarget(c513000094.target)
 	e1:SetOperation(c513000094.activate)
 	c:RegisterEffect(e1)
+	--Destroy
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
+	e2:SetCode(EVENT_LEAVE_FIELD)
+	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	e2:SetCondition(c513000094.descon)
+	e2:SetOperation(c513000094.desop)
+	c:RegisterEffect(e2)
+	if not AshBlossomTable then AshBlossomTable={} end
+	table.insert(AshBlossomTable,e1)
 end
 function c513000094.filter1(c,e)
 	return c:IsCanBeFusionMaterial() and c:IsAbleToGrave()
@@ -87,9 +97,35 @@ function c513000094.activate(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e2:SetCode(EFFECT_CANNOT_ATTACK)
 		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-		tc:RegisterEffect(e2)
+		tc:RegisterEffect(e2,true)
+		local e3=Effect.CreateEffect(c)
+		e3:SetType(EFFECT_TYPE_SINGLE)
+		e3:SetCode(EFFECT_UNRELEASABLE_SUM)
+		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e3:SetValue(1)
+		e3:SetReset(RESET_EVENT+0x1fe0000)
+		tc:RegisterEffect(e3,true)
+		local e4=e3:Clone()
+		e4:SetCode(EFFECT_UNRELEASABLE_NONSUM)
+		tc:RegisterEffect(e4,true)
+		local e5=e3:Clone()
+		e5:SetCode(EFFECT_UNRELEASABLE_EFFECT)
+		tc:RegisterEffect(e5,true)
+		tc:RegisterFlagEffect(513000094,RESET_EVENT+0x1fe0000,0,0)
 	end
 end
 function c513000094.eqlimit(e,c)
 	return e:GetLabelObject()==c
+end
+
+
+function c513000094.descon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c and c:IsReason(REASON_DESTROY)
+end
+function c513000094.desop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=e:GetHandler():GetEquipTarget()
+	if tc and tc:IsLocation(LOCATION_MZONE) and tc:GetFlagEffect(513000094)~=0 then
+		Duel.Destroy(tc,REASON_EFFECT)
+	end
 end

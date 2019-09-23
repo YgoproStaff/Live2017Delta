@@ -15,14 +15,15 @@ function c511002930.cfilter(c,tp)
 end
 function c511002930.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
-	if chk==0 then return true end
+	return true
 end
 function c511002930.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()~=1 then return false end
 		e:SetLabel(0)
-		return Duel.CheckReleaseGroup(tp,c511002930.cfilter,1,nil,tp) end
-	local tc=Duel.SelectReleaseGroup(tp,c511002930.cfilter,1,1,nil,tp):GetFirst()
+		return Duel.CheckReleaseGroupCost(tp,c511002930.cfilter,1,false,nil,nil,tp)
+	end
+	local tc=Duel.SelectReleaseGroupCost(tp,c511002930.cfilter,1,1,false,nil,nil,tp):GetFirst()
 	local atk=tc:GetAttack()
 	Duel.Release(tc,REASON_COST)
 	Duel.SetTargetParam(atk)

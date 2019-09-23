@@ -42,17 +42,20 @@ function c511002809.operation(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 	end
 end
+function c511002809.matfilter(c,sc)
+	return c:IsLocation(LOCATION_ONFIELD) and c:IsControler(sc:GetControler())
+		and c:IsRace(RACE_SPELLCASTER,c,SUMMON_TYPE_FUSION) and c:IsLevelBelow(2147483647)
+end
 function c511002809.valcheck(e,c)
-	local g=c:GetMaterial()
+	local mg=c:GetMaterial():Filter(c511002809.matfilter,nil,c)
 	local flag=0
-	if g:GetCount()==2 then
-		local lg2=g:Filter(Card.IsRace,nil,RACE_SPELLCASTER)
-		local lv=lg2:GetFirst():GetOriginalLevel()
-		if lv==5 or lv==6 then
-			flag=0x2
-		elseif lv>6 then
+	if mg:GetCount()>0 then
+		local lv=mg:GetFirst():GetOriginalLevel()
+		if lv>=7 then
 			flag=0x4
-		elseif lv>0 then
+		elseif lv>=5 then
+			flag=0x2
+		elseif lv>=0 then
 			flag=0x1
 		end
 	end

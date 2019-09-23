@@ -1,4 +1,5 @@
---銀河暴竜
+--銀河暴竜 (Anime)
+--Galaxy Tyranno (Anime)
 function c511002848.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
@@ -12,6 +13,7 @@ function c511002848.initial_effect(c)
 	e1:SetOperation(c511002848.operation)
 	c:RegisterEffect(e1)
 end
+c511002848.listed_names={93717133}
 function c511002848.condition(e,tp,eg,ep,ev,re,r,rp)
 	local at=Duel.GetAttackTarget()
 	return at:IsFaceup() and at:IsControler(tp) and at:IsCode(93717133)

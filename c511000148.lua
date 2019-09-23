@@ -10,24 +10,30 @@ function c511000148.initial_effect(c)
 	e1:SetOperation(c511000148.activate)
 	c:RegisterEffect(e1)
 end
-function c511000148.cfilter(c)
-	return c:GetLevel()==5
+function c511000148.cfilter(c,ft,tp)
+	return c:IsLevel(5) and (ft>4 or (c:IsControler(tp) and c:GetSequence()<5)) and (c:IsControler(tp) or c:IsFaceup())
 end
 function c511000148.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c511000148.cfilter,1,nil) end
-	local rg=Duel.SelectReleaseGroup(tp,c511000148.cfilter,1,1,nil)
+	e:SetLabel(1)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if chk==0 then return ft>3 and Duel.CheckReleaseGroupCost(tp,c511000148.cfilter,1,false,nil,nil,ft,tp) end
+	local rg=Duel.SelectReleaseGroupCost(tp,c511000148.cfilter,1,1,false,nil,nil,ft,tp)
 	Duel.Release(rg,REASON_COST)
 end
 function c511000148.filter(c,e,tp,code)
 	return c:IsCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c511000148.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>3 and not Duel.IsPlayerAffectedByEffect(tp,59822133) 
-		and Duel.IsExistingMatchingCard(c511000148.filter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil,e,tp,40640057) 
-		and Duel.IsExistingMatchingCard(c511000148.filter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil,e,tp,511000153) 
-		and Duel.IsExistingMatchingCard(c511000148.filter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil,e,tp,511000151) 
-		and Duel.IsExistingMatchingCard(c511000148.filter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil,e,tp,511000152) 
-		and Duel.IsExistingMatchingCard(c511000148.filter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil,e,tp,511000154) end
+	if chk==0 then
+		if e:GetLabel()==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)<=4 then return false end
+		e:SetLabel(0)
+		return not Duel.IsPlayerAffectedByEffect(tp,59822133) 
+			and Duel.IsExistingMatchingCard(c511000148.filter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil,e,tp,40640057) 
+			and Duel.IsExistingMatchingCard(c511000148.filter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil,e,tp,511000153) 
+			and Duel.IsExistingMatchingCard(c511000148.filter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil,e,tp,511000151) 
+			and Duel.IsExistingMatchingCard(c511000148.filter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil,e,tp,511000152) 
+			and Duel.IsExistingMatchingCard(c511000148.filter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil,e,tp,511000154)
+	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,5,tp,LOCATION_DECK+LOCATION_HAND)
 end
 function c511000148.activate(e,tp,eg,ep,ev,re,r,rp)

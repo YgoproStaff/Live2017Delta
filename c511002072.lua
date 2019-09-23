@@ -18,7 +18,7 @@ function c511002072.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c511002072.cfilter(c)
-	return c:IsFaceup() and c:IsCode(511002072)
+	return c:IsFaceup() and c:IsCode(98881931)
 end
 function c511002072.spcon(e,c)
 	if c==nil then return true end

@@ -26,12 +26,12 @@ function c511001779.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c511001779.filter(c)
-	local g=c:GetMaterial()
-	g=g:Filter(c511001779.mfilter,nil)
+	local g=c:GetMaterial():Filter(Card.IsLocation,nil,LOCATION_GRAVE)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ) and g:GetCount()>0
 end
 function c511001779.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c511001779.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler()) end
+	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,nil,1,tp,LOCATION_GRAVE)
 end
 function c511001779.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)

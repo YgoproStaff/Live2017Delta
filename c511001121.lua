@@ -1,3 +1,4 @@
+--Trap Hole of Spikes (Anime)
 --Chasm of Spikes
 function c511001121.initial_effect(c)
 	--Activate
@@ -11,18 +12,21 @@ function c511001121.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c511001121.condition(e,tp,eg,ep,ev,re,r,rp)
-	return tp~=Duel.GetTurnPlayer()
+	return Duel.GetAttacker():IsControler(1-tp)
 end
 function c511001121.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local tg=Duel.GetAttacker()
-	if chk==0 then return tg:IsOnField() end
-	Duel.SetTargetCard(tg)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,tg,1,0,0)
+	local at=Duel.GetAttacker()
+	if chk==0 then return at:IsRelateToBattle() end
+	local dam=math.max(at:GetAttack()/4,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,at,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,dam)
 end
 function c511001121.activate(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) and tc:IsAttackable() and not tc:IsStatus(STATUS_ATTACK_CANCELED) then
-		Duel.Destroy(tc,REASON_EFFECT)
-		Duel.Damage(1-tp,tc:GetAttack()/4,REASON_EFFECT)
+	local at=Duel.GetAttacker()
+	if at:IsRelateToBattle() and Duel.Destroy(at,REASON_EFFECT)~=0 then
+		local atk=at:GetPreviousAttackOnField()/4
+		if atk>0 then
+			Duel.Damage(1-tp,atk,REASON_EFFECT)
+		end
 	end
 end

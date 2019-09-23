@@ -13,7 +13,7 @@ function c511000150.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCost(c511000150.spcost)
+	e2:SetCost(aux.bfgcost)
 	e2:SetTarget(c511000150.sptg)
 	e2:SetOperation(c511000150.spop)
 	c:RegisterEffect(e2)
@@ -60,15 +60,13 @@ function c511000150.atkop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_EVENT+0x1ff0000)
 	c:RegisterEffect(e1)
 end
-function c511000150.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
-	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
-end
 function c511000150.filter(c,e,tp,code)
 	return c:IsCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c511000150.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>3 and not Duel.IsPlayerAffectedByEffect(tp,59822133) 
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if e:GetHandler():GetSequence()<5 then ft=ft+1 end
+	if chk==0 then return ft>4 and not Duel.IsPlayerAffectedByEffect(tp,59822133) 
 		and Duel.IsExistingMatchingCard(c511000150.filter,tp,LOCATION_REMOVED,0,1,nil,e,tp,40640057) 
 		and Duel.IsExistingMatchingCard(c511000150.filter,tp,LOCATION_REMOVED,0,1,nil,e,tp,511000153) 
 		and Duel.IsExistingMatchingCard(c511000150.filter,tp,LOCATION_REMOVED,0,1,nil,e,tp,511000151) 

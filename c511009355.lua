@@ -12,7 +12,7 @@ function c511009355.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c511009355.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,0)==0
+	return Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,0)==0 and Duel.IsExistingMatchingCard(c511009355.tgfilter,tp,LOCATION_HAND,0,1,nil)
 end
 function c511009355.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) end

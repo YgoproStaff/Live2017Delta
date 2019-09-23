@@ -1,4 +1,5 @@
 --ガガガマンサー
+--Gagaga Mancer
 --fixed by MLD
 function c511020004.initial_effect(c)
 	--SpecialSummon
@@ -53,15 +54,18 @@ function c511020004.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker():IsSetCard(0x54) and Duel.GetAttackTarget() and Duel.GetAttackTarget():IsControler(1-tp)
 end
 function c511020004.atkop(e,tp,eg,ep,ev,re,r,rp)
-	local e2=Effect.CreateEffect(e:GetHandler())
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_UPDATE_ATTACK)
-	e2:SetCondition(c511020004.atkcon2)
-	e2:SetValue(500)
-	e2:SetReset(RESET_PHASE+PHASE_DAMAGE)
-	Duel.GetAttacker():RegisterEffect(e2)
+	local tc=Duel.GetAttacker()
+	if tc then
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_UPDATE_ATTACK)
+		e1:SetCondition(c511020004.atkcon2)
+		e1:SetValue(500)
+		e1:SetReset(RESET_PHASE+PHASE_DAMAGE)
+		tc:RegisterEffect(e1)
+	end
 end
 function c511020004.atkcon2(e)
-	return Duel.GetCurrentPhase()==PHASE_DAMAGE_CAL and Duel.GetAttackTarget() 
+	return Duel.GetCurrentPhase()==PHASE_DAMAGE_CAL and Duel.GetAttackTarget()
 		and Duel.GetAttackTarget():IsControler(1-tp)
 end

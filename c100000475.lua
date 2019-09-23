@@ -76,7 +76,7 @@ function c100000475.activate(e,tp,eg,ep,ev,re,r,rp)
 			res=2
 			e1:SetLabel(Duel.GetTurnCount()-1)
 		end
-		e:SetValue(4)
+		e1:SetValue(4)
 		e1:SetCondition(c100000475.thcon)
 		e1:SetTarget(c100000475.thtg)
 		e1:SetOperation(c100000475.thop)

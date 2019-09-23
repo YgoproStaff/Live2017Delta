@@ -15,7 +15,7 @@ function c511010196.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e2:SetValue(c511010196.indes)
+	e2:SetValue(aux.NOT(aux.TargetBoolFunction(Card.IsSetCard,0x48)))
 	c:RegisterEffect(e2)
 	--
 	local e3=Effect.CreateEffect(c)
@@ -24,22 +24,13 @@ function c511010196.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetOperation(c511010196.damop)
 	c:RegisterEffect(e3)
-	if not c511010196.global_check then
-		c511010196.global_check=true
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_ADJUST)
-		ge2:SetCountLimit(1)
-		ge2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
-		ge2:SetOperation(c511010196.numchk)
-		Duel.RegisterEffect(ge2,0)
-	end
+	aux.CallToken(77205367)
 end
 c511010196.xyz_number=96
 function c511010196.damop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	if not c:IsHasEffect(81674782) and bc then
+	if not c:IsHasEffect(EFFECT_TO_GRAVE_REDIRECT) and bc then
 		if c:IsHasEffect(EFFECT_INDESTRUCTABLE_BATTLE) then
 			local tcind={c:GetCardEffect(EFFECT_INDESTRUCTABLE_BATTLE)}
 			for i=1,#tcind do
@@ -153,11 +144,4 @@ function c511010196.atkop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetReset(RESET_EVENT+0x1fe0000)
 		c:RegisterEffect(e2)
 	end
-end
-function c511010196.numchk(e,tp,eg,ep,ev,re,r,rp)
-	Duel.CreateToken(tp,77205367)
-	Duel.CreateToken(1-tp,77205367)
-end
-function c511010196.indes(e,c)
-	return not c:IsSetCard(0x48)
 end

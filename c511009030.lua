@@ -17,16 +17,16 @@ function c511009030.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c511009030.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=Duel.GetFieldGroupCount(1-tp,LOCATION_MZONE,0)
-	if chk==0 then return Duel.IsPlayerCanSpecialSummonMonster(tp,511009031,0,0x4011,1,1,1,RACE_WARRIOR,ATTRIBUTE_DARK) 
-		and ct>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>=ct end
+	if chk==0 then return ct>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>=ct and (ct==1 or not Duel.IsPlayerAffectedByEffect(tp,59822133))
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,511009031,0,0x4011,1,1,1,RACE_WARRIOR,ATTRIBUTE_DARK) end
 	local ct=Duel.GetFieldGroupCount(1-tp,LOCATION_MZONE,0)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,ct,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,ct,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,ct,tp,0)
 end
 function c511009030.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ct=Duel.GetFieldGroupCount(1-tp,LOCATION_MZONE,0)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<ct then return end
-	if not Duel.IsPlayerCanSpecialSummonMonster(tp,511009031,0,0x4011,1,1,1,RACE_WARRIOR,ATTRIBUTE_DARK) then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<ct or (ct>1 and Duel.IsPlayerAffectedByEffect(tp,59822133))
+		or not Duel.IsPlayerCanSpecialSummonMonster(tp,511009031,0,0x4011,1,1,1,RACE_WARRIOR,ATTRIBUTE_DARK) then return end
 	local fid=e:GetHandler():GetFieldID()
 	local g=Group.CreateGroup()
 	for i=1,ct do

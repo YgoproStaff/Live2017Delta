@@ -110,12 +110,12 @@ function c511001791.desop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Damage(1-tp,sum,REASON_EFFECT)
 	end
 end
-function c511001791.matfilter(c)
-	return c:IsType(TYPE_XYZ) and c:IsXyzLevel(c,7)
+function c511001791.matfilter(c,sc)
+	return c:IsType(TYPE_XYZ,sc,SUMMON_TYPE_XYZ) and c:IsXyzLevel(c,7)
 end
 function c511001791.valcheck(e,c)
 	local g=c:GetMaterial()
-	if g:IsExists(c511001791.matfilter,1,nil) then
+	if g:IsExists(c511001791.matfilter,1,nil,c) then
 		e:GetLabelObject():SetLabel(1)
 	else
 		e:GetLabelObject():SetLabel(0)
@@ -144,7 +144,7 @@ function c511001791.atkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c511001791.pencon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsPreviousPosition(POS_FACEUP) and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
+	return e:GetHandler():IsPreviousPosition(POS_FACEUP) and e:GetHandler():IsPreviousLocation(LOCATION_MZONE)
 end
 function c511001791.pentg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local lsc=Duel.GetFieldCard(tp,LOCATION_PZONE,0)

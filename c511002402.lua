@@ -25,7 +25,7 @@ function c511002402.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SINGLE_RANGE)
 	e3:SetCode(1082946)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetOperation(c511002334.resetop)
+	e3:SetOperation(c511002402.resetop)
 	c:RegisterEffect(e3)
 end
 function c511002402.regcon(e,tp,eg,ep,ev,re,r,rp)
@@ -42,12 +42,14 @@ function c511002402.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c511002402.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if e:GetHandler():GetSequence()<5 then ft=ft+1 end
+	if chk==0 then return ft>0
 		and Duel.IsExistingMatchingCard(c511002402.filter,tp,0x13,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,0x13)
 end
 function c511002402.filter(c,e,tp)
-	return c:IsCode(511002331) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsRace(RACE_REPTILE) and c:IsSetCard(0x508) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c511002402.spop(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
@@ -60,7 +62,7 @@ function c511002402.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-function c511002334.resetop(e,tp,eg,ep,ev,re,r,rp)
+function c511002402.resetop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	c:RegisterFlagEffect(511002402,RESET_EVENT+0x1fe0000,0,0)
 	local ct=c:GetFlagEffect(511002402)

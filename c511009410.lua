@@ -53,6 +53,13 @@ function c511009410.initial_effect(c)
 	e7:SetTarget(c511009410.destg)
 	e7:SetOperation(c511009410.desop)
 	c:RegisterEffect(e7)
+	--Double Snare
+	local e8=Effect.CreateEffect(c)
+	e8:SetType(EFFECT_TYPE_SINGLE)
+	e8:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
+	e8:SetRange(LOCATION_SZONE)
+	e8:SetCode(3682106)
+	c:RegisterEffect(e8)
 end
 function c511009410.disop(e,tp,eg,ep,ev,re,r,rp)
 	local tl=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)

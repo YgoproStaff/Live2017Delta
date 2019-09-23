@@ -10,28 +10,31 @@ function c511000007.initial_effect(c)
 	e1:SetOperation(c511000007.operation)
 	c:RegisterEffect(e1)
 end
-function c511000007.afilter(c, code)
-	return c:IsCode(511000005) and c:IsFaceup()
+function c511000007.cfilter(c,ft,tp)
+	return c:IsFaceup() and c:IsCode(511000005) and (ft>0 or (c:IsControler(tp) and c:GetSequence()<5))
 end
-function c511000007.bfilter(c,e,tp)
+function c511000007.filter(c,e,tp)
 	return c:IsCode(511000006) and c:IsCanBeSpecialSummoned(e,0,tp,true,true)
 end
 function c511000007.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c511000007.afilter,1,nil) end
-	local g=Duel.SelectReleaseGroup(tp,c511000007.afilter,1,1,nil)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if chk==0 then return ft>-1 and Duel.CheckReleaseGroupCost(tp,c511000007.cfilter,1,false,nil,nil,ft,tp) end
+	local g=Duel.SelectReleaseGroupCost(tp,c511000007.cfilter,1,1,false,nil,nil,ft,tp)
 	Duel.Release(g,REASON_COST)
 end
 function c511000007.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-		and Duel.IsExistingMatchingCard(c511000007.bfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,e,tp) end
+	if chk==0 then
+		if e:GetLabel()==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return false end
+		e:SetLabel(0)
+		return Duel.IsExistingMatchingCard(c511000007.filter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,e,tp)
+	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_DECK)
 end
 function c511000007.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c511000007.bfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,1,nil,e,tp)
-	local tc=g:GetFirst()
-	if tc then
-		Duel.SpecialSummon(tc,0,tp,tp,true,true,POS_FACEUP)	
+	local g=Duel.SelectMatchingCard(tp,c511000007.filter,tp,LOCATION_HAND+LOCATION_DECK,0,1,1,nil,e,tp)
+	if g:GetCount()>0 then
+		Duel.SpecialSummon(g,0,tp,tp,true,true,POS_FACEUP)
 	end
 end

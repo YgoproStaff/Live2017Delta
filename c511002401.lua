@@ -23,9 +23,9 @@ function c511002401.spfilter(c,e,tp)
 end
 function c511002401.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local mg=Duel.GetFieldGroup(tp,LOCATION_MZONE,0)
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)+mg:GetCount()
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)+mg:FilterCount(aux.MZFilter,nil,tp)
 	local sg=Duel.GetMatchingGroup(c511002401.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
-	if chk==0 then return mg:GetCount()>0 and mg:FilterCount(Card.IsAbleToGrave,nil)==mg:GetCount() 
+	if chk==0 then return ft>0 and mg:GetCount()>0 and mg:FilterCount(Card.IsAbleToGrave,nil)==mg:GetCount() 
 		and sg:CheckWithSumEqual(Card.GetAttack,mg:GetSum(Card.GetAttack)/2,1,ft) end
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,mg,mg:GetCount(),0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)

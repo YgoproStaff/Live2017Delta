@@ -12,18 +12,19 @@ function c511000367.initial_effect(c)
 	e1:SetOperation(c511000367.operation)
 	c:RegisterEffect(e1)
 end
-function c511000367.filter(c)
-	return c:IsFacedown() and c:IsDestructable()
+function c511000367.cfilter(c,tp)
+	return Duel.IsExistingTarget(Card.IsFacedown,tp,0,LOCATION_ONFIELD,1,nil)
 end
 function c511000367.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,1,nil) end
-	local g=Duel.SelectReleaseGroup(tp,nil,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,c511000367.cfilter,1,false,nil,nil,tp) end
+	local g=Duel.SelectReleaseGroupCost(tp,c511000367.cfilter,1,1,false,nil,nil,tp)
 	Duel.Release(g,REASON_COST)
 end
-function c511000367.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingTarget(c511000367.filter,tp,0,LOCATION_ONFIELD,1,nil) end
+function c511000367.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and chkc:IsFacedown() end
+	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,c511000367.filter,tp,0,LOCATION_ONFIELD,1,1,nil)
+	local g=Duel.SelectTarget(tp,Card.IsFacedown,tp,0,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function c511000367.operation(e,tp,eg,ep,ev,re,r,rp)

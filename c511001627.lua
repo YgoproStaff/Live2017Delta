@@ -17,7 +17,7 @@ function c511001627.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function c511001627.filter(c,tp)
-	return not c:IsType(TYPE_TOKEN) and c:IsType(TYPE_MONSTER) and c:IsControler(tp)
+	return not c:IsType(TYPE_TOKEN) and c:IsType(TYPE_MONSTER) and c:IsControler(tp) and c:IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c511001627.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local g=eg:Filter(c511001627.filter,nil,tp)

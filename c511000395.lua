@@ -47,7 +47,7 @@ function c511000395.activate(e,tp,eg,ep,ev,re,r,rp)
 		and mg:FilterCount(aux.NecroValleyFilter(c511000395.mgfilter),nil,e,tp,tc,mg)==ct
 		and not Duel.IsPlayerAffectedByEffect(tp,59822133) then
 		Duel.BreakEffect()
-		Duel.SpecialSummon(mg,0,tp,tp,false,false,POS_FACEUP)
+		Duel.SpecialSummon(mg,0,tp,1-tp,false,false,POS_FACEUP)
 		local mgc=mg:GetFirst()
 		while mgc do
 			mgc:AddCounter(0x1015,1)

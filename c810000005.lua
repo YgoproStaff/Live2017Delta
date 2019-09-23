@@ -1,5 +1,6 @@
 -- Hero's Rule 1: Five Freedoms
 -- scripted by: UnknownGuest
+--fixed by MLD
 function c810000005.initial_effect(c)
 	-- Activate
 	local e1=Effect.CreateEffect(c)
@@ -22,6 +23,6 @@ function c810000005.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,5,0,0)
 end
 function c810000005.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
+	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 	Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 end

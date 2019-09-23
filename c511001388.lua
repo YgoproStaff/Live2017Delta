@@ -32,40 +32,35 @@ function c511001388.initial_effect(c)
 end
 function c511001388.spcon(e,c)
 	if c==nil then return true end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-3
-		and Duel.CheckReleaseGroup(c:GetControler(),nil,3,nil)
+	local tp=c:GetControler()
+	local rg=Duel.GetReleaseGroup(tp)
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-3 and rg:GetCount()>2 and aux.SelectUnselectGroup(rg,e,tp,3,3,aux.ChkfMMZ(1),0)
 end
 function c511001388.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.SelectReleaseGroup(c:GetControler(),nil,3,3,nil)
-	Duel.Release(g,REASON_COST)
+	local rg=Duel.GetReleaseGroup(tp)
+	local sg=aux.SelectUnselectGroup(rg,e,tp,3,3,aux.ChkfMMZ(1),1,tp,HINTMSG_RELEASE)
+	Duel.Release(sg,REASON_COST)
 end
 function c511001388.cfilter(c,tp)
 	local tpe=0
-	if c:IsType(TYPE_MONSTER) then
-		tpe=TYPE_MONSTER
-	elseif c:IsType(TYPE_SPELL) then
-		tpe=TYPE_SPELL
-	else
-		tpe=TYPE_TRAP
-	end
-	return c:IsAbleToGraveAsCost()
-		and Duel.IsExistingTarget(c511001388.banfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,tpe)
+	if c:IsType(TYPE_MONSTER) then tpe=tpe|TYPE_MONSTER end
+	if c:IsType(TYPE_SPELL) then tpe=tpe|TYPE_SPELL end
+	if c:IsType(TYPE_TRAP) then tpe=tpe|TYPE_TRAP end
+	return c:IsAbleToGraveAsCost() and Duel.IsExistingTarget(c511001388.banfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,tpe)
 end
 function c511001388.banfilter(c,tpe)
-	return c:IsType(tpe) and c:IsAbleToRemove() and (c:IsType(TYPE_MONSTER) or c:IsFaceup())
+	return c:IsType(tpe) and c:IsAbleToRemove() and (c:IsFaceup() or tpe&TYPE_MONSTER>0)
 end
 function c511001388.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c511001388.cfilter,tp,LOCATION_HAND,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local tc=Duel.SelectMatchingCard(tp,c511001388.cfilter,tp,LOCATION_HAND,0,1,1,nil,tp):GetFirst()
 	Duel.SendtoGrave(tc,REASON_COST)
-	if tc:IsType(TYPE_MONSTER) then
-		e:SetLabel(TYPE_MONSTER)
-	elseif tc:IsType(TYPE_SPELL) then
-		e:SetLabel(TYPE_SPELL)
-	else
-		e:SetLabel(TYPE_TRAP)
-	end
+	local tpe=0
+	if tc:IsType(TYPE_MONSTER) then tpe=tpe|TYPE_MONSTER end
+	if tc:IsType(TYPE_SPELL) then tpe=tpe|TYPE_SPELL end
+	if tc:IsType(TYPE_TRAP) then tpe=tpe|TYPE_TRAP end
+	e:SetLabel(tpe)
 end
 function c511001388.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end

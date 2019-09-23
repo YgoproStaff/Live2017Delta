@@ -1,4 +1,5 @@
---Graverobber
+--墓荒らし (Anime)
+--Graverobber (Anime)
 function c511001122.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -14,6 +15,26 @@ function c511001122.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetCode(511001408)
 	c:RegisterEffect(e2)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e3:SetCode(EFFECT_TRAP_ACT_IN_HAND)
+	e3:SetCondition(c511001122.handcon)
+	c:RegisterEffect(e3)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e4:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+	c:RegisterEffect(e4)
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e5:SetCode(EFFECT_ADD_TYPE)
+	e5:SetValue(TYPE_SPELL)
+	c:RegisterEffect(e5)
+end
+function c511001122.handcon(e)
+	return Duel.GetTurnPlayer()==e:GetHandlerPlayer()
 end
 function c511001122.cfilter(c,e,tp,eg,ep,ev,re,r,rp,chain)
 	if not c:IsType(TYPE_MONSTER) and c:GetActivateEffect() and (c:IsHasEffect(511001283) or c:IsHasEffect(511001408)) then return false end
@@ -162,7 +183,7 @@ function c511001122.operation(e,tp,eg,ep,ev,re,r,rp)
 				Duel.Equip(tp,tc,g:GetFirst())
 			end
 			tc:ReleaseEffectRelation(te)
-			if etc then	
+			if etc then 
 				etc=g:GetFirst()
 				while etc do
 					etc:ReleaseEffectRelation(te)

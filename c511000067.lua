@@ -37,19 +37,17 @@ function c511000067.initial_effect(c)
 end
 function c511000067.regop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=eg:FilterCount(aux.FilterEqualFunction(Card.GetSummonPlayer,1-tp),nil)
-	local te=re~=nil and re or e
 	for i=1,ct do
-		Duel.RaiseSingleEvent(e:GetHandler(),511000067,te,r,rp,ep,ev)
+		Duel.RaiseSingleEvent(e:GetHandler(),511000067,re,r,rp,ep,ev)
 	end
 end
 function c511000067.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,0)
 end
 function c511000067.spop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	if Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
+	if e:GetHandler():IsRelateToEffect(e) and Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
 		and Duel.IsPlayerCanSpecialSummonMonster(1-tp,511000068,0,0x4011,0,0,1,RACE_ROCK,ATTRIBUTE_LIGHT) then
 		local token=Duel.CreateToken(tp,511000068)
 		Duel.SpecialSummonStep(token,0,tp,1-tp,false,false,POS_FACEUP_DEFENSE)

@@ -2,7 +2,7 @@
 function c511002403.initial_effect(c)
 	--Activate
 	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_DICE+CATEGORY_DAMAGE)
+	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_DICE)
 	e2:SetType(EFFECT_TYPE_ACTIVATE)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetTarget(c511002403.target)
@@ -48,8 +48,5 @@ function c511002403.activate(e,tp,eg,ep,ev,re,r,rp)
 		local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_MZONE,0,nil)
 		g:AddCard(e:GetHandler())
 		Duel.Destroy(g,REASON_EFFECT)
-		local dg=Duel.GetOperatedGroup()
-		local sum=dg:GetSum(Card.GetAttack)
-		Duel.Damage(tp,sum/2,REASON_EFFECT)
 	end
 end

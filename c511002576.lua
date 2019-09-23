@@ -13,8 +13,8 @@ function c511002576.costfilter(c)
 	return c:IsAttribute(ATTRIBUTE_DARK) and c:IsRace(RACE_MACHINE)
 end
 function c511002576.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c511002576.costfilter,1,nil) end
-	local g=Duel.SelectReleaseGroup(tp,c511002576.costfilter,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,c511002576.costfilter,1,false,nil,nil) end
+	local g=Duel.SelectReleaseGroupCost(tp,c511002576.costfilter,1,1,false,nil,nil)
 	Duel.Release(g,REASON_COST)
 end
 function c511002576.tcfilter(tc,ec,tp,eg,ep,ev,re,r,rp)
@@ -26,7 +26,7 @@ function c511002576.tcfilter(tc,ec,tp,eg,ep,ev,re,r,rp)
 	return false
 end
 function c511002576.ecfilter(c,tp,eg,ep,ev,re,r,rp)
-	return c:GetType()==TYPE_SPELL+TYPE_CONTINUOUS and c:GetCardTargetCount()==1 
+	return c:GetType()&TYPE_SPELL+TYPE_CONTINUOUS==TYPE_SPELL+TYPE_CONTINUOUS and c:GetCardTargetCount()==1 
 		and Duel.IsExistingMatchingCard(c511002576.tcfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,c:GetFirstCardTarget(),c,tp,eg,ep,ev,re,r,rp)
 end
 function c511002576.target(e,tp,eg,ep,ev,re,r,rp,chk)

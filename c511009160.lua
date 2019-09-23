@@ -22,10 +22,12 @@ function c511009160.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c511009160.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,e)
 	local atk=g:GetSum(Card.GetAttack)
 	Duel.Destroy(g,REASON_EFFECT)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_UPDATE_ATTACK)
-	e1:SetReset(RESET_EVENT+0x1fe0000)
-	e1:SetValue(atk)
-	e:GetHandler():GetEquipTarget():RegisterEffect(e1)
+	if e:GetHandler():GetEquipTarget() and atk>0 then
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_UPDATE_ATTACK)
+		e1:SetReset(RESET_EVENT+0x1fe0000)
+		e1:SetValue(atk)
+		e:GetHandler():GetEquipTarget():RegisterEffect(e1)
+	end
 end

@@ -15,8 +15,8 @@ function c511000823.costfilter(c)
 	return c:IsAttribute(ATTRIBUTE_DARK) and c:IsAttackBelow(1000)
 end
 function c511000823.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c511000823.costfilter,1,nil) end
-	local g=Duel.SelectReleaseGroup(tp,c511000823.costfilter,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,c511000823.costfilter,1,false,nil,nil) end
+	local g=Duel.SelectReleaseGroupCost(tp,c511000823.costfilter,1,1,false,nil,nil)
 	Duel.Release(g,REASON_COST)
 end
 function c511000823.tgfilter(c)
@@ -90,6 +90,6 @@ function c511000823.turnop(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():SetTurnCounter(ct)
 	if ct==3 then
 		e:GetLabelObject():Reset()
-		if re and re.Reset then re:Reset() end
+		if re then re:Reset() end
 	end
 end

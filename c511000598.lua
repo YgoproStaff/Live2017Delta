@@ -15,12 +15,17 @@ function c511000598.cfilter(c,tp)
 end
 function c511000598.condition(e,tp,eg,ep,ev,re,r,rp)
 	local g=eg:Filter(c511000598.cfilter,nil,tp)
-	return g:GetCount()==1 and g:GetFirst():IsFaceup()
+	if g:GetCount()==1 and g:GetFirst():IsFaceup() then
+		e:SetLabelObject(g:GetFirst())
+		return true
+	end
+	return false
 end
 function c511000598.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=e:GetLabelObject()
 	if chk==0 then return true end
 	Duel.SetTargetCard(tc)
+	e:SetLabelObject(nil)
 end
 function c511000598.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -107,6 +112,6 @@ function c511000598.turnop(e,tp,eg,ep,ev,re,r,rp)
 				break
 			end
 		end
-		if re and re.Reset then re:Reset() end
+		if re then re:Reset() end
 	end
 end

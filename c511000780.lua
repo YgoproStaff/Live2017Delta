@@ -42,7 +42,7 @@ function c511000780.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g1,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g1)
 	end
-	if not e:IsHasType(EFFECT_TYPE_ACTIVATE) then return end'
+	if not e:IsHasType(EFFECT_TYPE_ACTIVATE) then return end
 	local c=e:GetHandler()
 	local res
 	local e1=Effect.CreateEffect(c)
@@ -101,6 +101,6 @@ function c511000780.turnop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if ct==3 then
 		e:GetLabelObject():Reset()
-		if re and re.Reset then re:Reset() end
+		if re then re:Reset() end
 	end
 end

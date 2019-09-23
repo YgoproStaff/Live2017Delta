@@ -1,17 +1,21 @@
---No.93 希望皇ホープ・カイザー
-function c511001608.initial_effect(c)
+--No.93 希望皇ホープ・カイザー (Manga)
+--Number 93: Utopia Kaiser (Manga)
+local s,id,alias=GetID()
+function s.initial_effect(c)
+	alias=c:GetOriginalCodeRule()
+	aux.CallToken(alias)
 	--xyz summon
 	aux.AddXyzProcedure(c,nil,12,2)
 	c:EnableReviveLimit()
 	--spsummon
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(511001608,0))
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetTarget(c511001608.sptg)
-	e1:SetOperation(c511001608.spop)
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
 	--
 	local e2=Effect.CreateEffect(c)
@@ -19,7 +23,7 @@ function c511001608.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e2:SetCondition(c511001608.indcon)
+	e2:SetCondition(s.indcon)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
@@ -30,8 +34,8 @@ function c511001608.initial_effect(c)
 	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCode(EFFECT_IMMUNE_EFFECT)
-	e4:SetCondition(c511001608.indcon)
-	e4:SetValue(c511001608.efilter)
+	e4:SetCondition(s.indcon)
+	e4:SetValue(s.efilter)
 	c:RegisterEffect(e4)
 	--no damage
 	local e5=Effect.CreateEffect(c)
@@ -40,8 +44,8 @@ function c511001608.initial_effect(c)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e5:SetTargetRange(1,0)
-	e5:SetCondition(c511001608.indcon)
-	e5:SetValue(c511001608.damval)
+	e5:SetCondition(s.indcon)
+	e5:SetValue(s.damval)
 	c:RegisterEffect(e5)
 	--destroy
 	local e6=Effect.CreateEffect(c)
@@ -50,142 +54,130 @@ function c511001608.initial_effect(c)
 	e6:SetCode(EVENT_PHASE+PHASE_END)
 	e6:SetRange(LOCATION_MZONE)
 	e6:SetCountLimit(1)
-	e6:SetCondition(c511001608.descon)
-	e6:SetTarget(c511001608.destg)
-	e6:SetOperation(c511001608.desop)
+	e6:SetCondition(s.descon)
+	e6:SetTarget(s.destg)
+	e6:SetOperation(s.desop)
 	c:RegisterEffect(e6)
 	--control
 	local e7=Effect.CreateEffect(c)
-	e7:SetDescription(aux.Stringid(511001608,1))
+	e7:SetDescription(aux.Stringid(id,1))
 	e7:SetCategory(CATEGORY_CONTROL)
 	e7:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e7:SetCode(EVENT_DESTROYED)
-	e7:SetCondition(c511001608.ctcon)
-	e7:SetTarget(c511001608.cttg)
-	e7:SetOperation(c511001608.ctop)
+	e7:SetCondition(s.ctcon)
+	e7:SetTarget(s.cttg)
+	e7:SetOperation(s.ctop)
 	c:RegisterEffect(e7)
 	--battle indestructable
 	local e8=Effect.CreateEffect(c)
 	e8:SetType(EFFECT_TYPE_SINGLE)
 	e8:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e8:SetValue(c511001608.indes)
+	e8:SetValue(s.indes)
 	c:RegisterEffect(e8)
-	if not c511001608.global_check then
-		c511001608.global_check=true
-		c511001608[0]=0
-		c511001608[1]=0
+	if not s.global_check then
+		s.global_check=true
+		s[0]=0
+		s[1]=0
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		ge1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-		ge1:SetCode(EVENT_DESTROY)
-		ge1:SetOperation(c511001608.regop)
+		ge1:SetCode(EVENT_DESTROYED)
+		ge1:SetOperation(s.regop)
 		Duel.RegisterEffect(ge1,0)
 		local ge2=Effect.CreateEffect(c)
 		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_ADJUST)
-		ge2:SetCountLimit(1)
-		ge2:SetOperation(c511001608.clear)
+		ge2:SetCode(EVENT_TURN_END)
+		ge2:SetOperation(s.clear)
 		Duel.RegisterEffect(ge2,0)
-		local ge3=Effect.CreateEffect(c)
-		ge3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge3:SetCode(EVENT_ADJUST)
-		ge3:SetCountLimit(1)
-		ge3:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
-		ge3:SetOperation(c511001608.numchk)
-		Duel.RegisterEffect(ge3,0)
 	end
 end
-c511001608.xyz_number=93
-function c511001608.chkfilter(c,tp,re)
-	return c:IsSetCard(0x48) and c:IsPreviousLocation(LOCATION_MZONE) and c:GetPreviousControler()==tp
+s.xyz_number=93
+function s.chkfilter(c,tp,re)
+	return c:IsPreviousSetCard(0x48) and c:IsPreviousLocation(LOCATION_MZONE) and c:GetPreviousControler()==tp
 end
-function c511001608.regop(e,tp,eg,ep,ev,re,r,rp)
-	local g1=eg:Filter(c511001608.chkfilter,nil,tp)
-	local g2=eg:Filter(c511001608.chkfilter,nil,1-tp)
-	c511001608[tp]=c511001608[tp]+g1:GetCount()
-	c511001608[1-tp]=c511001608[1-tp]+g2:GetCount()
+function s.regop(e,tp,eg,ep,ev,re,r,rp)
+	s[tp]=s[tp]+eg:FilterCount(s.chkfilter,nil,tp)
+	s[1-tp]=s[1-tp]+eg:FilterCount(s.chkfilter,nil,1-tp)
 end
-function c511001608.clear(e,tp,eg,ep,ev,re,r,rp)
-	c511001608[0]=0
-	c511001608[1]=0
+function s.clear(e,tp,eg,ep,ev,re,r,rp)
+	s[0]=0
+	s[1]=0
 end
-function c511001608.filter(c,e,tp)
+function s.filter(c,e,tp)
 	return c:IsSetCard(0x48) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function c511001608.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local ct=e:GetHandler():GetOverlayCount()
-	local ect=c29724053 and Duel.IsPlayerAffectedByEffect(tp,29724053) and c29724053[tp]
+	local ect=calias and Duel.IsPlayerAffectedByEffect(tp,alias) and calias[tp]
 	if chk==0 then return (not ect or ect>=ct) and ct>0 and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_EFFECT) 
-		and Duel.GetLocationCountFromEx(tp)>=ct and Duel.IsExistingMatchingCard(c511001608.filter,tp,LOCATION_EXTRA,0,ct,nil,e,tp) 
-		and (not Duel.IsPlayerAffectedByEffect(tp,59822133) or ct<2) end
+		and Duel.GetLocationCountFromEx(tp)>=ct and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_EXTRA,0,ct,nil,e,tp) 
+		and (not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) or ct<2) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,ct,tp,LOCATION_EXTRA)
 end
-function c511001608.spop(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local ct=c:GetOverlayCount()
 	local ft=Duel.GetLocationCountFromEx(tp)
 	if ct>ft then return end
-	if ct>1 and Duel.IsPlayerAffectedByEffect(tp,59822133) then return end
-	local ect=c29724053 and Duel.IsPlayerAffectedByEffect(tp,29724053) and c29724053[tp]
+	if ct>1 and Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then return end
+	local ect=calias and Duel.IsPlayerAffectedByEffect(tp,alias) and calias[tp]
 	if ect~=nil and ct>ect then return end
-	local g=Duel.GetMatchingGroup(c511001608.filter,tp,LOCATION_EXTRA,0,nil,e,tp)
+	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_EXTRA,0,nil,e,tp)
 	if g:GetCount()<ct then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sg=g:Select(tp,ct,ct,nil)
-	local tc=sg:GetFirst()
-	while tc do
-		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
+	for sc in aux.Next(sg) do
+		Duel.SpecialSummonStep(sc,0,tp,tp,false,false,POS_FACEUP)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_DISABLE)
 		e1:SetReset(RESET_EVENT+0xfe0000)
-		tc:RegisterEffect(e1)
+		sc:RegisterEffect(e1)
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetCode(EFFECT_DISABLE_EFFECT)
 		e2:SetReset(RESET_EVENT+0xfe0000)
-		tc:RegisterEffect(e2)
-		tc=sg:GetNext()
+		sc:RegisterEffect(e2)
 	end
 	Duel.SpecialSummonComplete()
 	c:RemoveOverlayCard(tp,1,1,REASON_EFFECT)
 end
-function c511001608.cfilter(c)
+function s.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x48)
 end
-function c511001608.indcon(e)
-	return Duel.IsExistingMatchingCard(c511001608.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,e:GetHandler())
+function s.indcon(e)
+	return Duel.IsExistingMatchingCard(s.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,e:GetHandler())
 end
-function c511001608.efilter(e,re)
+function s.efilter(e,re)
 	return e:GetOwnerPlayer()~=re:GetOwnerPlayer()
 end
-function c511001608.damval(e,re,val,r,rp,rc)
+function s.damval(e,re,val,r,rp,rc)
 	return 0
 end
-function c511001608.descon(e,tp,eg,ep,ev,re,r,rp)
+function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
 end
-function c511001608.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local sg=Duel.GetMatchingGroup(Card.IsDestructable,tp,0,LOCATION_MZONE,nil)
+	local sg=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_MZONE,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,sg,1,0,0)
 end
-function c511001608.desop(e,tp,eg,ep,ev,re,r,rp)
-	local ct=c511001608[tp]
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
+	local ct=s[tp]
 	if ct==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectMatchingCard(tp,Card.IsDestructable,tp,0,LOCATION_MZONE,1,ct,nil)
+	local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,0,LOCATION_MZONE,1,ct,nil)
 	if g:GetCount()>0 then
 		Duel.HintSelection(g)
 		Duel.Destroy(g,REASON_EFFECT)
 	end
 end
-function c511001608.ctcon(e,tp,eg,ep,ev,re,r,rp)
+function s.ctcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsReason(REASON_EFFECT) and rp~=tp and c:GetPreviousControler()==tp and re 
 		and re:GetHandler():IsType(TYPE_MONSTER)
 end
-function c511001608.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local tc=re:GetHandler()
 	if re and tc:IsLocation(LOCATION_MZONE) and tc:IsControlerCanBeChanged() then
@@ -193,16 +185,12 @@ function c511001608.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.SetOperationInfo(0,CATEGORY_CONTROL,tc,1,0,0)
 	end
 end
-function c511001608.ctop(e,tp,eg,ep,ev,re,r,rp)
+function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
 		Duel.GetControl(tc,tp)
 	end
 end
-function c511001608.numchk(e,tp,eg,ep,ev,re,r,rp)
-	Duel.CreateToken(tp,23187256)
-	Duel.CreateToken(1-tp,23187256)
-end
-function c511001608.indes(e,c)
+function s.indes(e,c)
 	return not c:IsSetCard(0x48)
 end

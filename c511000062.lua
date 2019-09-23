@@ -3,7 +3,6 @@ function c511000062.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_SPECIAL_SUMMON)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCondition(c511000062.condition)
@@ -11,28 +10,8 @@ function c511000062.initial_effect(c)
 	e1:SetOperation(c511000062.operation)
 	c:RegisterEffect(e1)
 end
-function c511000062.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(Card.IsDestructable,tp,0,LOCATION_MZONE,2,nil)
-end
-function c511000062.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.GetCurrentPhase()~=PHASE_MAIN2 
-	and Duel.IsExistingTarget(Card.IsDestructable,tp,0,LOCATION_MZONE,2,nil) end
-	local g1=Duel.SelectTarget(1-tp,Card.IsDestructable,1-tp,LOCATION_MZONE,0,1,1,nil)
-	local g2=Duel.SelectTarget(tp,Card.IsDestructable,tp,0,LOCATION_MZONE,1,1,g1:GetFirst())
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g2,1,0,0)
-end
-function c511000062.filter(c,tp,eg,ep,ev,re,r,rp)
-	return c:IsLocation(LOCATION_GRAVE) and c:IsType(TYPE_MONSTER) and c:IsPreviousLocation(LOCATION_ONFIELD)
-end
-function c511000062.operation(e,tp,eg,ep,ev,re,r,rp)
-	local ex1,dg=Duel.GetOperationInfo(0,CATEGORY_DESTROY)
-	local dc=dg:GetFirst()
-	if dc:IsRelateToEffect(e) and Duel.Destroy(dc,REASON_EFFECT) then
-		if dc:IsCanBeSpecialSummoned(e,0,tp,false,false) and c511000062.filter(dc) then
-			Duel.BreakEffect()
-			Duel.SpecialSummon(dc,0,tp,tp,false,false,POS_FACEUP_ATTACK)
-		end
-	end
+function c511000062.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetCurrentPhase()~=PHASE_MAIN2 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_BP)
@@ -40,4 +19,37 @@ function c511000062.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTargetRange(1,0)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
+end
+function c511000062.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)>1
+end
+function c511000062.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 
+		and Duel.IsExistingMatchingCard(aux.TRUE,tp,0,LOCATION_MZONE,2,nil) end
+	local g=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_MZONE,nil)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,0,tp,LOCATION_GRAVE)
+end
+function c511000062.operation(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	local g=Duel.SelectMatchingCard(1-tp,aux.TRUE,tp,0,LOCATION_MZONE,1,1,nil)
+	if g:GetCount()>0 then
+		Duel.HintSelection(g)
+		local dg=Duel.SelectMatchingCard(tp,aux.TRUE,tp,0,LOCATION_MZONE,1,1,g)
+		local tc=dg:GetFirst()
+		if tc then
+			Duel.HintSelection(dg)
+			if Duel.Destroy(tc,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_GRAVE) and tc:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_ATTACK) and aux.nvfilter(tc) then
+				Duel.BreakEffect()
+				Duel.SpecialSummon(dc,0,tp,tp,false,false,POS_FACEUP_ATTACK)
+			end
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetType(EFFECT_TYPE_FIELD)
+			e1:SetCode(EFFECT_CANNOT_BP)
+			e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+			e1:SetTargetRange(1,0)
+			e1:SetReset(RESET_PHASE+PHASE_END)
+			Duel.RegisterEffect(e1,tp)
+		end
+	end
 end

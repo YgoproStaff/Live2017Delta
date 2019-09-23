@@ -10,7 +10,7 @@ function c511000539.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
 	e1:SetCode(71625222)
 	e1:SetCondition(c511000539.spcon)
-	e1:SetCost(c511000539.cost)
+	e1:SetCost(c511000539.spcost)
 	e1:SetTarget(c511000539.sptg)
 	e1:SetOperation(c511000539.spop)
 	c:RegisterEffect(e1)
@@ -18,14 +18,17 @@ end
 function c511000539.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return ep==tp
 end
-function c511000539.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsCode,1,nil,88819587) end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsCode,1,1,nil,88819587)
+function c511000539.cfilter(c,ft,tp)
+	return c:IsCode(88819587) and (ft>0 or (c:IsControler(tp) and c:GetSequence()<5)) and (c:IsControler(tp) or c:IsFaceup())
+end
+function c511000539.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if chk==0 then return ft>-1 and Duel.CheckReleaseGroup(tp,c511000539.cfilter,1,nil,ft,tp) end
+	local g=Duel.SelectReleaseGroup(tp,c511000539.cfilter,1,1,nil,ft,tp)
 	Duel.Release(g,REASON_COST)
 end
 function c511000539.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,true,false) end
+	if chk==0 then return e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,true,false) end
 	if e:GetHandler():IsLocation(LOCATION_DECK) then
 		Duel.ConfirmCards(1-tp,e:GetHandler())
 	end

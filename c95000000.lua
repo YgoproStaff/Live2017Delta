@@ -132,7 +132,7 @@ function c95000000.stcon(e,tp,eg,ep,ev,re,r,rp)
     return Duel.GetTurnCount()==1
 end
 function c95000000.stfilter(c)
-    return not c:IsSetCard(0xbde)
+    return not c:IsSetCard(0x602)
 end
 function c95000000.afilter0(c)
     return c.mark and c.mark==0

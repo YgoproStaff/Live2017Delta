@@ -23,13 +23,15 @@ function c100100124.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,Card.IsFaceup,tp,0,LOCATION_MZONE,1,1,nil)
 	if g:GetCount()>0 then
 		Duel.HintSelection(g)
-		local atk=g:GetFirst():GetAttack()/2
+		local tc=g:GetFirst()
+		local atk=tc:GetAttack()/2
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
 		e1:SetValue(atk)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
-		if g:GetFirst():RegisterEffect(e1) then
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		tc:RegisterEffect(e1)
+		if not tc:IsImmuneToEffect(e) then
 			Duel.Recover(tp,atk,REASON_EFFECT)
 		end
 	end

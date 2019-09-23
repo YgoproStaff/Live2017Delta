@@ -15,13 +15,13 @@ function c511002837.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker():IsControler(1-tp)
 end
 function c511002837.cost(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,1,nil) end
-	local g=Duel.SelectReleaseGroup(tp,nil,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,nil,1,false,nil,Duel.GetAttacker()) end
+	local g=Duel.SelectReleaseGroupCost(tp,nil,1,1,false,nil,Duel.GetAttacker())
 	Duel.Release(g,REASON_COST)
 end
 function c511002837.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local a=Duel.GetAttacker()
-	if chk==0 then return a:IsOnField() and a:IsDestructable() end
+	if chk==0 then return a:IsOnField() end
 	Duel.SetTargetCard(a)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,a,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,a:GetAttack())

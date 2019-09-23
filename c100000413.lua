@@ -10,12 +10,13 @@ function c100000413.initial_effect(c)
 	e1:SetTarget(c100000413.target)
 	e1:SetOperation(c100000413.activate)
 	c:RegisterEffect(e1)
+	aux.CallToken(420)
 end
 function c100000413.condition(e,tp,eg,ep,ev,re,r,rp)
 	return tp~=Duel.GetTurnPlayer()
 end
 function c100000413.cosfilter(c)
-	return c:IsRace(RACE_PLANT) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true)
+	return c:IsRose() and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true)
 end
 function c100000413.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c100000413.cosfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,nil) end

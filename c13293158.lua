@@ -1,5 +1,6 @@
 --E－HERO ワイルド・サイクロン
-function c13293158.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
 	aux.AddFusionProcMix(c,true,true,21844576,86188410)
@@ -8,7 +9,7 @@ function c13293158.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(c13293158.splimit)
+	e1:SetValue(aux.EvilHeroLimit)
 	c:RegisterEffect(e1)
 	--actlimit
 	local e2=Effect.CreateEffect(c)
@@ -17,40 +18,41 @@ function c13293158.initial_effect(c)
 	e2:SetCode(EFFECT_CANNOT_ACTIVATE)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetTargetRange(0,1)
-	e2:SetValue(c13293158.aclimit)
-	e2:SetCondition(c13293158.actcon)
+	e2:SetValue(s.aclimit)
+	e2:SetCondition(s.actcon)
 	c:RegisterEffect(e2)
 	--destroy
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(13293158,0))
+	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_DESTROY)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_BATTLE_DAMAGE)
-	e3:SetCondition(c13293158.condition)
-	e3:SetTarget(c13293158.target)
-	e3:SetOperation(c13293158.activate)
+	e3:SetCondition(s.condition)
+	e3:SetTarget(s.target)
+	e3:SetOperation(s.activate)
 	c:RegisterEffect(e3)
 end
-c13293158.material_setcode={0x8,0x3008}
-c13293158.dark_calling=true
-function c13293158.splimit(e,se,sp,st)
+s.material_setcode={0x8,0x3008}
+s.dark_calling=true
+s.listed_names={CARD_DARK_FUSION,21844576,86188410}
+function s.splimit(e,se,sp,st)
 	return st==SUMMON_TYPE_FUSION+0x10
 end
-function c13293158.aclimit(e,re,tp)
+function s.aclimit(e,re,tp)
 	return re:IsHasType(EFFECT_TYPE_ACTIVATE)
 end
-function c13293158.actcon(e)
+function s.actcon(e)
 	return Duel.GetAttacker()==e:GetHandler()
 end
-function c13293158.condition(e,tp,eg,ep,ev,re,r,rp)
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp
 end
-function c13293158.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local g=Duel.GetMatchingGroup(Card.IsFacedown,tp,0,LOCATION_SZONE,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
-function c13293158.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsFacedown,tp,0,LOCATION_SZONE,nil)
 	Duel.Destroy(g,REASON_EFFECT)
 end

@@ -1,4 +1,5 @@
 --テイク・オーバー５
+--Take Over 5
 function c100005001.initial_effect(c)
 	--discard deck
 	local e1=Effect.CreateEffect(c)
@@ -44,9 +45,14 @@ end
 function c100005001.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
 end
+function c100005001.filter(c,code)
+	return c:IsCode(code) and c:IsAbleToRemoveAsCost()
+end
 function c100005001.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
-	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
+	local code=e:GetHandler():GetCode()
+	if chk==0 then return Duel.IsExistingMatchingCard(c100005001.filter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,nil,code) end
+	local cg=Duel.SelectMatchingCard(tp,c100005001.filter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,code) 
+	Duel.Remove(cg,POS_FACEUP,REASON_COST)
 end
 function c100005001.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
@@ -59,11 +65,11 @@ function c100005001.drop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Draw(p,d,REASON_EFFECT)
 end
 function c100005001.negcon(e,tp,eg,ep,ev,re,r,rp)
-	if not Duel.IsChainDisablable(ev) then return false end
-	local ex,tg,tc,p,cv=Duel.GetOperationInfo(ev,CATEGORY_DECKDES)
-	if re:IsHasCategory(CATEGORY_DECKDES) and (not ex or p~=1-tp) then return true end
-	ex,tg,tc,p,cv=Duel.GetOperationInfo(ev,CATEGORY_TOGRAVE)
-	return (cv==LOCATION_DECK and (not ex or p~=1-tp)) or (tg and tg:IsExists(Card.IsLocation,1,nil,LOCATION_DECK) and (not ex or p~=1-tp))
+	if not Duel.IsChainDisablable(ev) or rp~=tp then return false end
+	if re:IsHasCategory(CATEGORY_DECKDES) or Duel.GetOperationInfo(ev,CATEGORY_DECKDES) then return true end
+	local ex,tg,tc,p,cv=Duel.GetOperationInfo(ev,CATEGORY_TOGRAVE)
+	return ex and (cv&LOCATION_DECK==LOCATION_DECK
+		or (tg and tg:IsExists(Card.IsLocation,1,nil,LOCATION_DECK)))
 end
 function c100005001.negop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateEffect(ev)

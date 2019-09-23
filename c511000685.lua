@@ -23,14 +23,18 @@ end
 function c511000685.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c511000685.filter1(chkc,e,tp) end
 	local ect=c29724053 and Duel.IsPlayerAffectedByEffect(tp,29724053) and c29724053[tp]
-	if chk==0 then return not Duel.IsPlayerAffectedByEffect(tp,59822133) and (not ect or ect>=2)
-		and Duel.IsExistingTarget(c511000685.filter1,tp,LOCATION_MZONE,0,1,nil,e,tp) end
+	if chk==0 then
+		local pg=aux.GetMustBeMaterialGroup(tp,Group.CreateGroup(),tp,nil,nil,REASON_XYZ)
+		return pg:GetCount()<=0 and not Duel.IsPlayerAffectedByEffect(tp,59822133) and (not ect or ect>=2)
+			and Duel.IsExistingTarget(c511000685.filter1,tp,LOCATION_MZONE,0,1,nil,e,tp)
+	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local g=Duel.SelectTarget(tp,c511000685.filter1,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_EXTRA)
 end
 function c511000685.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.IsPlayerAffectedByEffect(tp,59822133) then return end
+	local pg=aux.GetMustBeMaterialGroup(tp,Group.CreateGroup(),tp,nil,nil,REASON_XYZ)
+	if pg:GetCount()>0 or Duel.IsPlayerAffectedByEffect(tp,59822133) then return end
 	local ect=c29724053 and Duel.IsPlayerAffectedByEffect(tp,29724053) and c29724053[tp]
 	if ect~=nil and ect<2 then return end
 	local tc=Duel.GetFirstTarget()

@@ -9,14 +9,14 @@ function c511000294.initial_effect(c)
 	e1:SetCode(EFFECT_DISABLE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(0,LOCATION_MZONE)
-	e1:SetTarget(aux.TargetBoolFunction(Card.IsC))
+	e1:SetTarget(c511000294.filter)--aux.TargetBoolFunction(Card.IsC))
 	c:RegisterEffect(e1)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetCode(EFFECT_CANNOT_ATTACK)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetTargetRange(0,LOCATION_MZONE)
-	e3:SetTarget(aux.TargetBoolFunction(Card.IsC))
+	e3:SetTarget(c511000294.filter)--aux.TargetBoolFunction(Card.IsC))
 	c:RegisterEffect(e3)
 	--Destroy replace
 	local e4=Effect.CreateEffect(c)
@@ -56,24 +56,11 @@ function c511000294.initial_effect(c)
 	e7:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 	e7:SetValue(c511000294.indes)
 	c:RegisterEffect(e7)
-	if not c511000294.global_check then
-		c511000294.global_check=true
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_ADJUST)
-		ge2:SetCountLimit(1)
-		ge2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
-		ge2:SetOperation(c511000294.archchk)
-		Duel.RegisterEffect(ge2,0)
-	end
+	aux.CallToken(420)
 end
 c511000294.xyz_number=1000
-function c511000294.archchk(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetFlagEffect(0,420)==0 then 
-		Duel.CreateToken(tp,420)
-		Duel.CreateToken(1-tp,420)
-		Duel.RegisterFlagEffect(0,420,0,0,0)
-	end
+function c511000294.filter(e,c)
+	return c:IsC()
 end
 function c511000294.repfilter(c)
 	return not c:IsStatus(STATUS_DESTROY_CONFIRMED+STATUS_BATTLE_DESTROYED)

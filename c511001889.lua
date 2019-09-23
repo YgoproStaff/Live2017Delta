@@ -19,13 +19,12 @@ function c511001889.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,511001890,0,0x4011,-2,-2,4,RACE_WARRIOR,ATTRIBUTE_EARTH) end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,0)
 end
 function c511001889.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 
-		or not Duel.IsPlayerCanSpecialSummonMonster(tp,511001890,0,0x4011,-2,-2,4,RACE_WARRIOR,ATTRIBUTE_EARTH) then return end
-	if Duel.NegateAttack() then
+	if Duel.NegateAttack() and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,511001890,0,0x4011,-2,-2,4,RACE_WARRIOR,ATTRIBUTE_EARTH) then
 		local token=Duel.CreateToken(tp,511001890)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -45,12 +44,13 @@ function c511001889.activate(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 		e3:SetReset(RESET_EVENT+0x0fe0000)
 		e3:SetOperation(c511001889.sumop)
+		e3:SetOwnerPlayer(tp)
 		token:RegisterEffect(e3)
 		Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
 function c511001889.val(e,c)
-	return Duel.GetLP(e:GetHandler():GetOwner())
+	return Duel.GetLP(e:GetOwnerPlayer())
 end
 function c511001889.sumop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SetLP(tp,Duel.GetLP(tp)/2)

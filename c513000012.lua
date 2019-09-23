@@ -3,13 +3,13 @@
 --fixed by Larry126
 function c513000012.initial_effect(c)
 	--synchro summon
-	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsType,TYPE_SYNCHRO),1,1,aux.FilterBoolFunction(Card.IsCode,44508094),1,1)
+	aux.AddSynchroProcedure(c,aux.FilterBoolFunctionEx(Card.IsType,TYPE_SYNCHRO),1,1,aux.FilterBoolFunction(Card.IsCode,44508094),1,1)
 	c:EnableReviveLimit()
 	--opponent's turn synchro
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(575512,0))
 	e1:SetHintTiming(0,TIMING_END_PHASE+TIMING_MAIN_END)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetRange(LOCATION_EXTRA)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -87,9 +87,17 @@ function c513000012.mtop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_EXTRA_ATTACK_MONSTER)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_END)
+		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		e1:SetValue(ct-1)
 		c:RegisterEffect(e1)
+	elseif ct==0 then
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
+		e2:SetValue(1)
+		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+		c:RegisterEffect(e2)
 	end
 end
 function c513000012.discon(e,tp,eg,ep,ev,re,r,rp)

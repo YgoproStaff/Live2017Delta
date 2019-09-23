@@ -2,48 +2,43 @@
 function c511000071.initial_effect(c)
 	--Cannot Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_ACTIVATE+EFFECT_TYPE_CONTINUOUS)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,TIMING_END_PHASE)
-	e1:SetOperation(c511000071.op)
 	c:RegisterEffect(e1)
-	--Set Card
+	--
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(511000071,0))
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetCode(EVENT_PHASE+PHASE_END)
-	e2:SetProperty(EFFECT_FLAG_REPEAT)
-	e2:SetCountLimit(1)
-	e2:SetCondition(c511000071.setcon)
-	e2:SetTarget(c511000071.settg)
-	e2:SetOperation(c511000071.setop)
+	e2:SetCode(EFFECT_CANNOT_ACTIVATE)
+	e2:SetTargetRange(1,0)
+	e2:SetValue(c511000071.aclimit)
 	c:RegisterEffect(e2)
-	--Damage LP
+	--Set Card
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(511000071,1))
-	e3:SetCategory(CATEGORY_DAMAGE)
-	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetDescription(aux.Stringid(73468603,0))
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e3:SetRange(LOCATION_SZONE)
-	e3:SetCode(EVENT_FREE_CHAIN)
+	e3:SetCode(EVENT_PHASE+PHASE_END)
 	e3:SetCountLimit(1)
-	e3:SetCondition(c511000071.damcon)
-	--e3:SetTarget(c511000071.damtg)
-	e3:SetOperation(c511000071.damop)
+	e3:SetCondition(c511000071.setcon)
+	e3:SetTarget(c511000071.settg)
+	e3:SetOperation(c511000071.setop)
 	c:RegisterEffect(e3)
-end
-function c511000071.op(e,tp,eg,ep,ev,re,r,rp)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetRange(LOCATION_SZONE)
-	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
-	e1:SetTargetRange(1,0)
-	e1:SetValue(c511000071.aclimit)
-	e1:SetReset(RESET_EVENT+0x1fe0000)
-	e:GetHandler():RegisterEffect(e1)
+	--Damage LP
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(45591967,0))
+	e4:SetCategory(CATEGORY_DAMAGE)
+	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e4:SetType(EFFECT_TYPE_QUICK_O)
+	e4:SetRange(LOCATION_SZONE)
+	e4:SetCode(EVENT_FREE_CHAIN)
+	e4:SetCondition(c511000071.damcon)
+	e4:SetCost(c511000071.damcost)
+	e4:SetTarget(c511000071.damtg)
+	e4:SetOperation(c511000071.damop)
+	c:RegisterEffect(e4)
 end
 function c511000071.setcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp
@@ -52,54 +47,49 @@ function c511000071.aclimit(e,re,tp)
 	return re:IsHasType(EFFECT_TYPE_ACTIVATE)
 end
 function c511000071.filter(c)
-	return (c:IsType(TYPE_TRAP) or c:IsType(TYPE_SPELL)) and c:IsSSetable()
+	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSSetable()
 end
 function c511000071.settg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 
 		and Duel.IsExistingMatchingCard(c511000071.filter,tp,LOCATION_DECK,0,1,nil) end
 end
 function c511000071.setop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local g=Duel.SelectMatchingCard(tp,c511000071.filter,tp,LOCATION_DECK,0,1,1,nil)
-	local tc=g:GetFirst()
-	if g:GetCount()>0 then
+	local tc=Duel.SelectMatchingCard(tp,c511000071.filter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
+	if tc then
 		Duel.ConfirmCards(1-tp,tc)
-		Duel.SSet(tp,g:GetFirst())
+		Duel.SSet(tp,tc)
 		c:SetCardTarget(tc)
 	end
 end
 function c511000071.damcon(e,tp,eg,ep,ev,re,r,rp)
-	local tn=Duel.GetTurnPlayer()
-	local ph=Duel.GetCurrentPhase()
-	return (tn==tp and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2))
+	return Duel.GetTurnPlayer()==tp and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2)
 end
-function c511000071.damfilter(c,rc)
-	return rc:GetCardTarget():IsContains(c)
+function c511000071.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	local g=c:GetCardTarget()
+	local ct=g:GetCount()
+	if chk==0 then return c:IsAbleToGraveAsCost() and ct>0 and g:FilterCount(Card.IsAbleToGraveAsCost,nil)==ct end
+	g:AddCard(c)
+	local dam=0
+	if ct==2 then dam=500
+	elseif ct==3 then dam=1500
+	elseif ct==4 then dam=3000
+	elseif ct==5 then dam=6000
+	end
+	e:SetLabel(dam)
 end
 function c511000071.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local dg=Duel.GetMatchingGroup(c511000071.damfilter,tp,LOCATION_SZONE,LOCATION_SZONE,nil,c)
-	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() 
-	and Duel.IsExistingTarget(c511000071.damfilter,tp,LOCATION_SZONE,LOCATION_SZONE,1,nil,e,tp) 
-	and dg:IsAbleToGraveAsCost() end
+	if chk==0 then return true end
+	local dam=e:GetLabel()
+	Duel.SetTargetPlayer(1-tp)
+	Duel.SetTargetParam(dam)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,dam)
+	e:SetLabel(0)
 end
 function c511000071.damop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:GetCardTargetCount()>0 then
-		local dg=Duel.GetMatchingGroup(c511000071.damfilter,tp,LOCATION_SZONE,LOCATION_SZONE,nil,c)
-		Duel.SendtoGrave(e:GetHandler(),REASON_EFFECT)
-		local ct=Duel.SendtoGrave(dg,REASON_EFFECT)
-		if ct==1 then
-			Duel.Damage(1-tp,500,REASON_EFFECT)
-		end	
-		if ct==2 then
-			Duel.Damage(1-tp,1500,REASON_EFFECT)
-		end	
-		if ct==3 then
-			Duel.Damage(1-tp,3000,REASON_EFFECT)
-		end
-		if ct==4 then
-			Duel.Damage(1-tp,6000,REASON_EFFECT)
-		end
-	end
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	Duel.Damage(p,d,REASON_EFFECT)
 end

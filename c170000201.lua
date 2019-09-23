@@ -1,20 +1,20 @@
 --Legend of Heart
 function c170000201.initial_effect(c)
-    --Activate
-    local e1=Effect.CreateEffect(c)
+	--Activate
+	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-    e1:SetCost(c170000201.cost)
-    e1:SetTarget(c170000201.target)
-    e1:SetOperation(c170000201.operation)
+	e1:SetCost(c170000201.cost)
+	e1:SetTarget(c170000201.target)
+	e1:SetOperation(c170000201.operation)
 	c:RegisterEffect(e1)
 end
 function c170000201.costfilter(c,code)
 	return c:IsCode(code) and c:IsAbleToRemoveAsCost()
 end
 function c170000201.rescon(ct)
-	return	function(sg,e,tp,mg)
+	return  function(sg,e,tp,mg)
 				return aux.ChkfMMZ(3-ct)(sg,e,tp,mg) and sg:IsExists(c170000201.chk,1,nil,sg,Group.CreateGroup(),1784686,46232525,11082056)
 			end
 end
@@ -45,11 +45,12 @@ function c170000201.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=g1:Clone()
 	g:Merge(g2)
 	g:Merge(g3)
-    if chk==0 then return ft>-4 and Duel.CheckLPCost(tp,1000) and g1:GetCount()>0 and g2:GetCount()>0 and g3:GetCount()>0 
-		and Duel.CheckReleaseGroup(tp,c170000201.cfilter,1,nil,ft,e,tp,g) end
-    Duel.PayLPCost(tp,1000)
-	local rg=Duel.SelectReleaseGroup(tp,c170000201.cfilter,1,1,nil,ft,e,tp,g)
+	if chk==0 then return ft>-4 and Duel.CheckLPCost(tp,1000) and g1:GetCount()>0 and g2:GetCount()>0 and g3:GetCount()>0 
+		and Duel.CheckReleaseGroupCost(tp,c170000201.cfilter,1,false,nil,nil,ft,e,tp,g) end
+	Duel.PayLPCost(tp,1000)
+	local rg=Duel.SelectReleaseGroupCost(tp,c170000201.cfilter,1,1,false,nil,nil,ft,e,tp,g)
 	g:Sub(rg)
+	local c=rg:GetFirst()
 	local ct=(c:GetSequence()<5 and c:IsControler(tp)) and 1 or 0
 	local sg=aux.SelectUnselectGroup(g,e,tp,3,3,c170000201.rescon(ct),1,tp,HINTMSG_REMOVE)
 	Duel.Release(rg,REASON_COST)

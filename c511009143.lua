@@ -1,4 +1,4 @@
---promotion
+--Promotion
 function c511009143.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -11,8 +11,8 @@ function c511009143.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c511009143.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsCode,1,nil,511002633) end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsCode,1,1,nil,511002633)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,Card.IsCode,1,false,nil,nil,511002633) end
+	local g=Duel.SelectReleaseGroupCost(tp,Card.IsCode,1,1,false,nil,nil,511002633)
 	Duel.Release(g,REASON_COST)
 end
 function c511009143.filter(c,e,tp)

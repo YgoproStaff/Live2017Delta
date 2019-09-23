@@ -63,7 +63,7 @@ function c511002517.equipop(c,e,tp,tc)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_EQUIP)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
-	e2:SetReset(RESET_EVENT+0x1fe0000)
+	e2:SetReset(RESET_EVENT+RESETS_STANDARD)
 	e2:SetValue(atk)
 	tc:RegisterEffect(e2)
 end
@@ -101,8 +101,11 @@ function c511002517.damop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Damage(p,d,REASON_EFFECT)
 end
+function c511002517.filter(c)
+	return c:IsSetCard(0x557) or c:IsSetCard(0x507) or c:IsSetCard(0x525) or c:IsSetCard(0x50d)
+end
 function c511002517.cfilter(c)
-	return c:IsSetCard(0x300) and not c:IsSetCard(0x13) and c:IsAbleToGraveAsCost()
+	return c511002517.filter(c) and c:IsAbleToGraveAsCost()
 end
 function c511002517.effcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c511002517.cfilter,tp,LOCATION_HAND,0,1,nil) end
@@ -120,11 +123,11 @@ function c511002517.effop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and tc then
-		c:CopyEffect(tc:GetOriginalCode(),RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,1)
+		c:CopyEffect(tc:GetOriginalCode(),RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,1)
 	end
 end
 function c511002517.repfilter(c)
-	return c:IsSetCard(0x300) and not c:IsSetCard(0x13) and c:IsAbleToRemove() and aux.SpElimFilter(c,true)
+	return c511002517.filter(c) and c:IsAbleToRemove() and aux.SpElimFilter(c,true)
 end
 function c511002517.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

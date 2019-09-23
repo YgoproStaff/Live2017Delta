@@ -1,5 +1,8 @@
---Galaxy-eyes Full Armor Photon Dragon (anime)
+--ギャラクシーアイズ ＦＡ・フォトン・ドラゴン (Manga)
+--Galaxy Eyes Full Armor Photon Dragon (Manga)
+--fixed by MLD
 function c511009480.initial_effect(c)
+	aux.AddXyzProcedure(c,nil,8,3)
 	c:EnableReviveLimit()
 	--xyz summon
 	local e1=Effect.CreateEffect(c)
@@ -59,55 +62,35 @@ function c511009480.initial_effect(c)
 		Duel.RegisterEffect(ge,0)
 	end
 end
-function c511009480.ovfilter(c,tp,xyzc)
-	return c:IsFaceup() and c:IsCode(93717133) and c:GetEquipCount()==2
+c511009480.listed_names={93717133}
+function c511009480.ovfilter(c,tp,xyz)
+	return c:IsFaceup() and c:IsCode(93717133) and c:GetEquipCount()==2 and Duel.GetLocationCountFromEx(tp,tp,c,xyz)>0
 end
 function c511009480.xyzcon(e,c,og)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	local ct=-ft
-	if 2<=ct then return false end
-	if ct<1 and not og and Duel.IsExistingMatchingCard(c511009480.ovfilter,tp,LOCATION_MZONE,0,1,nil,tp,c) then
-		return true
-	end
-	return Duel.CheckXyzMaterial(c,nil,8,3,3,og)
+	if og then return false end
+	local mg=Duel.GetFieldGroup(tp,LOCATION_MZONE,0)
+	local mustg=aux.GetMustBeMaterialGroup(tp,Group.CreateGroup(),tp,c,mg,REASON_XYZ)
+	if mustg:GetCount()>0 or (min and min>1) then return false end
+	return mg:IsExists(c511009480.ovfilter,1,nil,tp,c)
 end
 function c511009480.xyzop(e,tp,eg,ep,ev,re,r,rp,c,og)
-	if og then
-		c:SetMaterial(og)
-		Duel.Overlay(c,og)
-	else
-		local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-		local ct=-ft
-		local b1=Duel.CheckXyzMaterial(c,nil,8,3,3,og)
-		local b2=ct<1 and Duel.IsExistingMatchingCard(c511009480.ovfilter,tp,LOCATION_MZONE,0,1,nil,tp,c)
-		if b2 and (not b1 or Duel.SelectYesNo(tp,aux.Stringid(511009480,0))) then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
-			local mg=Duel.SelectMatchingCard(tp,c511009480.ovfilter,tp,LOCATION_MZONE,0,1,1,nil,tp,c)
-			local mg2=mg:GetFirst():GetEquipGroup()
-			if mg2:GetCount()~=0 then
-				Duel.Overlay(c,mg2)
-			end
-			Duel.Release(mg,REASON_COST)
-		else
-			local mg=Duel.SelectXyzMaterial(tp,c,nil,8,3,3)
-			c:SetMaterial(mg)
-			Duel.Overlay(c,mg)
-		end
-	end
+	local mg=Duel.GetFieldGroup(tp,LOCATION_MZONE,0)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
+	local g=mg:FilterSelect(tp,c511009480.ovfilter,1,1,nil,tp,c)
+	local eqg=g:GetFirst():GetEquipGroup()
+	c:SetMaterial(eqg)
+	Duel.Overlay(c,eqg)
+	Duel.Release(g,REASON_COST)
 end
---------------------------------------------
 function c511009480.descon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==1
+	return not Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_MZONE,0,1,e:GetHandler())
 end
 function c511009480.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
-end
-function c511009480.desfilter(c)
-	return c:IsFaceup()
 end
 function c511009480.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp)  end
@@ -118,11 +101,10 @@ function c511009480.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c511009480.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
+	if tc and tc:IsRelateToEffect(e) then
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end
-------------------------------------------
 function c511009480.mtcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetBattledGroupCount()>0 and e:GetHandler():GetFlagEffect(511009480)~=0
 end
@@ -144,8 +126,6 @@ function c511009480.mtop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Overlay(c,g)
 	end
 end
-----------------------------------------
-
 function c511009480.rmcon(e,tp,eg,ep,ev,re,r,rp,chk)
 	local loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and ep~=tp
@@ -165,7 +145,6 @@ function c511009480.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,c511009480.rmfilter,tp,0,LOCATION_MZONE,1,1,nil)
 	local g2=Group.FromCards(c,g)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g2,2,0,0)
-	
 end
 function c511009480.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -207,7 +186,6 @@ function c511009480.retop(e,tp,eg,ep,ev,re,r,rp)
 		tc=sg:GetNext()
 	end
 end
---------------------------
 function c511009480.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	

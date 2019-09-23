@@ -16,35 +16,42 @@ function c511000897.initial_effect(c)
 	e2:SetCode(EVENT_LEAVE_FIELD)
 	e2:SetOperation(c511000897.desop)
 	c:RegisterEffect(e2)
-	--sp summon tributed monster
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(511000897,0))
-	e3:SetType(EFFECT_TYPE_QUICK_O)
-	e3:SetCode(EVENT_FREE_CHAIN)
-	e3:SetRange(LOCATION_SZONE)
-	e3:SetCost(c511000897.spcost)
-	e3:SetTarget(c511000897.sptg)
-	e3:SetOperation(c511000897.spop)
-	e3:SetLabelObject(e1)
-	c:RegisterEffect(e3)
 end
-function c511000897.cfilter(c)
-	return c:IsFaceup() and c:GetLevel()>=8 and c:IsType(TYPE_SYNCHRO)
+function c511000897.cfilter(c,ft,tp)
+	return c:IsFaceup() and c:IsLevelAbove(8) and c:IsType(TYPE_SYNCHRO) and (ft>0 or (c:IsControler(tp) and c:GetSequence()<5)) 
+		and (c:IsControler(tp) or c:IsFaceup())
 end
 function c511000897.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c511000897.cfilter,1,nil) end
-	local g=Duel.SelectReleaseGroup(tp,c511000897.cfilter,1,1,nil)
-	g:KeepAlive()
-	e:SetLabelObject(g)
-	Duel.Release(g,REASON_COST)
+	e:SetLabel(1)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if chk==0 then return ft>-1 and Duel.CheckReleaseGroup(tp,c511000897.cfilter,1,nil,ft,tp) end
+	local tc=Duel.SelectReleaseGroup(tp,c511000897.cfilter,1,1,nil,ft,tp):GetFirst()
+	Duel.Release(tc,REASON_COST)
+	if e:IsHasType(EFFECT_TYPE_ACTIVATE) then
+		tc:RegisterFlagEffect(511000897,RESET_EVENT+0x1fe0000,0,0)
+		local e3=Effect.CreateEffect(e:GetHandler())
+		e3:SetDescription(aux.Stringid(102380,0))
+		e3:SetType(EFFECT_TYPE_QUICK_O)
+		e3:SetCode(EVENT_FREE_CHAIN)
+		e3:SetRange(LOCATION_SZONE)
+		e3:SetCost(c511000897.spcost)
+		e3:SetTarget(c511000897.sptg)
+		e3:SetOperation(c511000897.spop)
+		e3:SetLabelObject(tc)
+		e3:SetReset(RESET_EVENT+0x1fe0000)
+		e:GetHandler():RegisterEffect(e3)
+	end
 end
 function c511000897.spfilter(c,e,tp)
-	return c:IsCode(70902743) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsCode(70902743) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_ATTACK)
 end
 function c511000897.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c511000897.spfilter(chkc,e,tp) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-		and Duel.IsExistingTarget(c511000897.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
+	if chk==0 then
+		if e:GetLabel()==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return false end
+		e:SetLabel(0)
+		return Duel.IsExistingTarget(c511000897.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
+	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,c511000897.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
@@ -53,8 +60,7 @@ end
 function c511000897.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) then
-		if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK)==0 then return end
+	if c:IsRelateToEffect(e) and tc and tc:IsRelateToEffect(e) and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK)>0 then
 		Duel.Equip(tp,c,tc)
 		--Add Equip limit
 		local e1=Effect.CreateEffect(c)
@@ -62,12 +68,13 @@ function c511000897.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_EQUIP_LIMIT)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
+		e1:SetLabelObject(tc)
 		e1:SetValue(c511000897.eqlimit)
 		c:RegisterEffect(e1)
 	end
 end
 function c511000897.eqlimit(e,c)
-	return c:GetControler()==e:GetOwnerPlayer()
+	return e:GetLabelObject()==c
 end
 function c511000897.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetHandler():GetFirstCardTarget()
@@ -86,12 +93,15 @@ function c511000897.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(cg,REASON_COST)
 end
 function c511000897.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local tc=e:GetLabelObject():GetLabelObject():GetFirst()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 and tc:IsLocation(LOCATION_GRAVE) 
-		and tc:IsCanBeSpecialSummoned(e,0,tp,false,false) and tc:IsType(TYPE_SYNCHRO) end
+	local tc=e:GetLabelObject()
+	if chk==0 then return tc and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and tc:GetFlagEffect(511000897)>0 
+		and tc:IsType(TYPE_SYNCHRO) and tc:IsLocation(LOCATION_GRAVE) and tc:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetTargetCard(tc)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,tc,1,tp,LOCATION_GRAVE)
 end
 function c511000897.spop(e,tp,eg,ep,ev,re,r,rp,chk)
-	local tc=e:GetLabelObject():GetLabelObject():GetFirst()
-	Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+	local tc=Duel.GetFirstTarget()
+	if tc and tc:GetFlagEffect(511000897)>0 and tc:IsRelateToEffect(e) then
+		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+	end
 end

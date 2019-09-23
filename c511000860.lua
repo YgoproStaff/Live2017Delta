@@ -1,42 +1,49 @@
+--サモン・タックス
 --Summon Tax
-function c511000860.initial_effect(c)
+--fixed by Larry126
+local s,id=GetID()
+function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,TIMING_DRAW_PHASE)
-	e1:SetTarget(c511000860.tg)
+	e1:SetTarget(s.tg)
 	c:RegisterEffect(e1)
 	--Damage
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(511000860,0))
+	e2:SetDescription(aux.Stringid(1127737,0))
 	e2:SetCategory(CATEGORY_DAMAGE)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetTarget(c511000860.target)
-	e2:SetOperation(c511000860.operation)
+	e2:SetTarget(s.target)
+	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
+	local e3=e2:Clone()
+	e3:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+	c:RegisterEffect(e3)
 	local e4=e2:Clone()
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e4)
 end
-function c511000860.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
+function s.filter(c,e)
+	return c:IsFaceup() and (not e or c:IsRelateToEffect(e))
+end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return eg:IsExists(s.filter,1,nil) end
 	Duel.SetTargetCard(eg)
-	tc=eg:GetFirst()
+	dam=eg:Filter(s.filter,nil):GetSum(Card.GetAttack)/2
 	Duel.SetTargetPlayer(ep)
-	Duel.SetTargetParam(tc:GetAttack()/2)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tc:GetControler(),tc:GetAttack()/2)
+	Duel.SetTargetParam(dam)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,ep,dam)
 end
-function c511000860.filter(c,e)
-	return c:IsFaceup() and c:IsRelateToEffect(e)
-end
-function c511000860.operation(e,tp,eg,ep,ev,re,r,rp)
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
+	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
+	local d=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(s.filter,nil,e):GetSum(Card.GetAttack)/2
 	Duel.Damage(p,d,REASON_EFFECT)
 end
-function c511000860.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local c=e:GetHandler()
 	c:SetTurnCounter(0)
@@ -47,17 +54,20 @@ function c511000860.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_SZONE)
-	e1:SetOperation(c511000860.desop)
-	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,2)
+	e1:SetCondition(s.descon)
+	e1:SetOperation(s.desop)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,2)
 	c:RegisterEffect(e1)
 end
-function c511000860.desop(e,tp,eg,ep,ev,re,r,rp)
-	if tp~=Duel.GetTurnPlayer() then return end
+function s.descon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local ct=c:GetTurnCounter()
 	ct=ct+1
 	c:SetTurnCounter(ct)
 	if ct==2 then
-		Duel.Destroy(c,REASON_EFFECT)
+		Duel.Destroy(c,REASON_RULE)
 	end
 end

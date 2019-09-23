@@ -18,52 +18,69 @@ function c100100520.con(e,tp,eg,ep,ev,re,r,rp)
 	return tc and tc:GetCounter(0x91)>2
 end
 function c100100520.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	e:SetLabel(1)
+	e:SetLabel(9)
 	return true
 end
-function c100100520.filter(c,e)
-	return c:IsFaceup() and c:IsCanBeEffectTarget(e)
+function c100100520.filter1(c)
+	return c:IsFaceup() and c:IsCanChangePosition()
+end
+function c100100520.filter2(c)
+	return c:IsFaceup() and c:IsControlerCanBeChanged(true)
+end
+function c100100520.cfilter(c,tp)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE,tp,LOCATION_REASON_CONTROL)
+	if c:IsControler(tp) and c:GetSequence()<5 then ft=ft+1 end
+	return ft>0 and Duel.IsExistingTarget(c100100520.filter2,tp,0,LOCATION_MZONE,1,c)
 end
 function c100100520.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsFaceup() end
-	if chk==0 then		
-		e:SetLabel(0)
-		return Duel.IsExistingTarget(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil)
-	end
-	local g=Duel.GetMatchingGroup(c100100520.filter,tp,0,LOCATION_MZONE,nil,e)
-	local cg=nil
-	if e:GetLabel()==1 then cg=g:Filter(Card.IsAbleToChangeControler,nil)
-	else cg=g:Filter(Card.IsControlerCanBeChanged,nil) end
-	local sel=0
-	Duel.Hint(HINT_SELECTMSG,tp,550)
-	if cg:GetCount()==0 then
-		sel=Duel.SelectOption(tp,aux.Stringid(100100520,0))
-	elseif e:GetLabel()==1 and not Duel.CheckReleaseGroup(tp,nil,1,nil) then
-		sel=Duel.SelectOption(tp,aux.Stringid(100100520,0))
-	else
-		sel=Duel.SelectOption(tp,aux.Stringid(100100520,0),aux.Stringid(100100520,1))
-		if sel==1 and e:GetLabel()==1 then
-			local rg=Duel.SelectReleaseGroup(tp,nil,1,1,nil)
-			Duel.Release(rg,REASON_COST)
+	if chkc then
+		if e:GetLabel()==0 then
+			return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c100100520.filter1(chkc)
+		else
+			return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c100100520.filter2(chkc)
 		end
+	end
+	local b1=Duel.IsExistingTarget(c100100520.filter1,tp,0,LOCATION_MZONE,1,nil)
+	local b2=nil
+	if e:GetLabel()==9 then
+		b2=Duel.CheckReleaseGroupCost(tp,c100100520.cfilter,1,false,nil,nil,tp)
+	else
+		b2=Duel.GetLocationCount(tp,LOCATION_MZONE,tp,LOCATION_REASON_CONTROL)>0
+			and Duel.IsExistingTarget(c100100520.filter2,tp,0,LOCATION_MZONE,1,nil)
+	end
+	if chk==0 then
+		e:SetLabel(0)
+		return b1 or b2
+	end
+	local sel=0
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EFFECT)
+	if b1 and b2 then
+		sel=Duel.SelectOption(tp,aux.Stringid(98045062,0),aux.Stringid(98045062,1))
+	elseif b1 then
+		sel=Duel.SelectOption(tp,aux.Stringid(98045062,0))
+	else
+		sel=Duel.SelectOption(tp,aux.Stringid(98045062,1))+1
 	end
 	if sel==0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
-		local sg=g:Select(tp,1,1,nil)
-		Duel.SetTargetCard(sg)
+		local g=Duel.SelectTarget(tp,c100100520.filter1,tp,0,LOCATION_MZONE,1,1,nil)
 		Duel.SetOperationInfo(0,CATEGORY_POSITION,g,1,0,0)
 	else
+		if e:GetLabel()==9 then
+			local rg=Duel.SelectReleaseGroupCost(tp,c100100520.cfilter,1,1,false,nil,nil,tp)
+			Duel.Release(rg,REASON_COST)
+		end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
-		local sg=cg:Select(tp,1,1,nil)
-		Duel.SetTargetCard(sg)
+		local g=Duel.SelectTarget(tp,c100100520.filter2,tp,0,LOCATION_MZONE,1,1,nil)
 		Duel.SetOperationInfo(0,CATEGORY_CONTROL,g,1,0,0)
 	end
-	e:SetLabel(sel)
+	Duel.SetTargetParam(sel)
 end
 function c100100520.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
+	local label=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
 	if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		if e:GetLabel()==0 then
+		if label==0 then
 			Duel.ChangePosition(tc,POS_FACEUP_DEFENSE,0,POS_FACEUP_ATTACK,0)
 		else
 			Duel.GetControl(tc,tp,PHASE_END,1)

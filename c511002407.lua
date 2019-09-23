@@ -2,7 +2,7 @@
 function c511002407.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetCategory(CATEGORY_RELEASE+CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetTarget(c511002407.target)
@@ -26,21 +26,23 @@ function c511002407.checkop(e,tp,eg,ep,ev,re,r,rp)
 		tc=g:GetNext()
 	end
 end
-function c511002407.filter(c,e,tp)
+function c511002407.filter(c,e,tp,ft)
 	return c:IsReleasableByEffect() and c:GetFlagEffect(511002407+tp)>0
 		and Duel.IsExistingMatchingCard(c511002407.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp,c:GetRace())
-		and (Duel.GetLocationCount(tp,LOCATION_MZONE)>0 or c:IsControler(tp))
+		and (ft>0 or (c:IsControler(tp) and c:GetSequence()<5))
 end
 function c511002407.spfilter(c,e,tp,race)
-	return c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsRace(race)
+	return c:IsRace(race) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c511002407.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c511002407.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,e,tp) end
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if chk==0 then return ft>-1 and Duel.IsExistingMatchingCard(c511002407.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,e,tp,ft) end
+	Duel.SetOperationInfo(0,CATEGORY_RELEASE,nil,1,tp,LOCATION_MZONE)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function c511002407.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local tc=Duel.SelectMatchingCard(tp,c511002407.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,e,tp):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,c511002407.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,e,tp,ft):GetFirst()
 	if tc and Duel.Release(tc,REASON_EFFECT)>0 then
 		local race=tc:GetRace()
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end

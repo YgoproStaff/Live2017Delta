@@ -19,6 +19,9 @@ end
 function c511002433.filter(c)
 	return c:IsFaceup() and not c:IsRace(RACE_FIEND)
 end
+function c511002433.chkfilter(c)
+	return c511002433.filter(c) and c:IsAttackBelow(1000) and c:GetAttack()>0
+end
 function c511002433.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c1=Duel.GetFieldCard(0,LOCATION_SZONE,5)
 	local c2=Duel.GetFieldCard(1,LOCATION_SZONE,5)
@@ -26,6 +29,8 @@ function c511002433.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Group.CreateGroup()
 	if c1 then g:AddCard(c1) end
 	if c2 then g:AddCard(c2) end
+	local sg=Duel.GetMatchingGroup(c511002433.chkfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	g:Merge(sg)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,PLAYER_ALL,1000)
 end
@@ -42,14 +47,17 @@ function c511002433.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(tp,1000,REASON_EFFECT,true)
 	Duel.RDComplete()
 	local sg=Duel.GetMatchingGroup(c511002433.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	local tc=sg:GetFirst()
-	while tc do
+	local sg2=Duel.GetMatchingGroup(c511002433.chkfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	sg:ForEach(function(tc)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetValue(-1000)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		tc:RegisterEffect(e1)
-		tc=sg:GetNext()
+	end)
+	sg2=sg2:Filter(Card.IsAttackBelow,nil,0)
+	if sg2:GetCount()>0 then
+		Duel.Destroy(sg2,REASON_EFFECT)
 	end
 end

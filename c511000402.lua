@@ -1,5 +1,8 @@
+--Elimigate
 --アサシン・ゲート
+--updated by Larry126
 function c511000402.initial_effect(c)
+	aux.CallToken(420)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -28,7 +31,7 @@ function c511000402.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tg=Duel.GetAttacker()
 	if chkc then return chkc==tg end
 	if chk==0 then return tg:IsOnField() and tg:IsDestructable() and tg:IsCanBeEffectTarget(e) 
-	and not (tg:IsCode(28150174) or tg:IsCode(2191144) or tg:IsSetCard(0x6a)) end
+	and not tg:IsAssassin() end
 	Duel.SetTargetCard(tg)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,tg,1,0,0)
 end
@@ -42,7 +45,7 @@ function c511000402.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c511000402.exfilter(c)
-	return c:IsFaceup() and (c:IsCode(28150174) or c:IsCode(2191144) or c:IsSetCard(0x6a))
+	return c:IsFaceup() and c:IsAssassin()
 end
 function c511000402.sdcon(e)
 	return not Duel.IsExistingMatchingCard(c511000402.exfilter,e:GetHandler():GetControler(),LOCATION_MZONE,0,1,nil)

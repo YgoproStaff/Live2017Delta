@@ -4,31 +4,43 @@ function c511000447.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,TIMING_DRAW_PHASE)
+	e1:SetHintTiming(0,TIMING_BATTLE_START)
+	e1:SetTarget(c511000447.target)
 	c:RegisterEffect(e1)
 	--change pos
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(511000447,0))
+	e2:SetCategory(CATEGORY_POSITION)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetCategory(CATEGORY_POSITION)
-	e2:SetCode(EVENT_BATTLE_DESTROYED)
+	e2:SetCode(EVENT_BATTLE_DESTROYING)
 	e2:SetCondition(c511000447.poscon)
 	e2:SetTarget(c511000447.postg)
 	e2:SetOperation(c511000447.posop)
 	c:RegisterEffect(e2)
 end
-function c511000447.cfilter(c,tp)
-	return c:IsReason(REASON_BATTLE) and c:GetPreviousControler()==tp
+function c511000447.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	local res,teg,tep,tev,tre,tr,trp=Duel.CheckEvent(EVENT_BATTLE_DESTROYING,true)
+	if res and c511000447.poscon(e,tp,teg,tep,tev,tre,tr,trp) and c511000447.postg(e,tp,teg,tep,tev,tre,tr,trp,0) 
+		and Duel.SelectYesNo(tp,94) then
+		e:SetCategory(CATEGORY_POSITION)
+		e:SetOperation(c511000447.posop)
+		c511000447.postg(e,tp,teg,tep,tev,tre,tr,trp,1)
+	else
+		e:SetCategory(0)
+		e:SetOperation(nil)
+	end
 end
 function c511000447.poscon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c511000447.cfilter,1,nil,tp)
+	return eg:IsExists(Card.IsRelateToBattle,1,nil)
 end
 function c511000447.postg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_POSITION,Duel.GetAttacker(),1,0,0)
+	local g=eg:Filter(Card.IsRelateToBattle,nil)
+	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,g:GetCount(),0,0)
 end
 function c511000447.posop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetAttacker()
-	Duel.ChangePosition(tc,POS_FACEUP_DEFENSE,POS_FACEDOWN_DEFENSE,0,0)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
+	local g=eg:Filter(Card.IsRelateToBattle,nil)
+	Duel.ChangePosition(g,POS_FACEUP_DEFENSE,POS_FACEDOWN_DEFENSE,0,0)
 end

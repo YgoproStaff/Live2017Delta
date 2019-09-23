@@ -66,18 +66,16 @@ function c511001776.initial_effect(c)
 	local e7=Effect.CreateEffect(c)
 	e7:SetType(EFFECT_TYPE_SINGLE)
 	e7:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e7:SetValue(c511001776.indes)
+	e7:SetValue(aux.NOT(aux.TargetBoolFunction(Card.IsSetCard,0x48)))
 	c:RegisterEffect(e7)
-	if not c511001776.global_check then
-		c511001776.global_check=true
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_ADJUST)
-		ge2:SetCountLimit(1)
-		ge2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
-		ge2:SetOperation(c511001776.numchk)
-		Duel.RegisterEffect(ge2,0)
-	end
+	--Double Snare
+	local e8=Effect.CreateEffect(c)
+	e8:SetType(EFFECT_TYPE_SINGLE)
+	e8:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
+	e8:SetRange(LOCATION_MZONE)
+	e8:SetCode(3682106)
+	c:RegisterEffect(e8)
+	aux.CallToken(56051086)
 end
 c511001776.xyz_number=43
 function c511001776.eqval(ec,c,tp)
@@ -152,11 +150,4 @@ function c511001776.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c511001776.disop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateEffect(ev)
-end
-function c511001776.numchk(e,tp,eg,ep,ev,re,r,rp)
-	Duel.CreateToken(tp,56051086)
-	Duel.CreateToken(1-tp,56051086)
-end
-function c511001776.indes(e,c)
-	return not c:IsSetCard(0x48)
 end

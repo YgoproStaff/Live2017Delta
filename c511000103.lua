@@ -17,7 +17,7 @@ function c511000103.initial_effect(c)
 	--token
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(511000103,0))
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_QUICK_O)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetProperty(EFFECT_FLAG_BOTH_SIDE)
@@ -27,11 +27,8 @@ function c511000103.initial_effect(c)
 	e3:SetOperation(c511000103.tkop)
 	c:RegisterEffect(e3)
 	local e4=e3:Clone()
-	e4:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e4)
-	local e5=e3:Clone()
-	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
-	c:RegisterEffect(e5)
 end
 function c511000103.ctfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_PLANT)
@@ -43,17 +40,16 @@ function c511000103.cfilter(c,tp)
 	return c:IsFaceup() and c:IsRace(RACE_PLANT) and c:IsPreviousLocation(LOCATION_HAND) and c:GetSummonPlayer()==tp and c:IsControler(tp)
 end
 function c511000103.tkcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c511000103.cfilter,1,nil,tp) and not e:GetHandler():IsStatus(STATUS_CHAINING)
+	return eg:IsExists(c511000103.cfilter,1,nil,tp)
 end
 function c511000103.tktg(e,tp,eg,ep,ev,re,r,rp,chk)
     if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,511000104,0,0x4011,0,0,1,RACE_PLANT,ATTRIBUTE_EARTH) end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,0)
 end
 function c511000103.tkop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	if e:GetHandler():IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,511000104,0,0x4011,0,0,1,RACE_PLANT,ATTRIBUTE_EARTH) then
 		local token=Duel.CreateToken(tp,511000104)
 		Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)

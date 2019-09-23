@@ -19,7 +19,7 @@ function c511000600.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c511000600.con(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp
+	return eg:IsExists(aux.FilterEqualFunction(Card.GetSummonPlayer,1-tp),1,nil)
 end
 function c511000600.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end

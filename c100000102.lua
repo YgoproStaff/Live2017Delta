@@ -1,4 +1,5 @@
 --ネオス・スパイラル・フォース
+--Neos Spiral Force
 function c100000102.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -13,8 +14,9 @@ function c100000102.initial_effect(c)
 	c:RegisterEffect(e1)
 	Duel.AddCustomActivityCounter(100000102,ACTIVITY_ATTACK,c100000102.counterfilter)
 end
+c100000102.listed_names={89943723}
 function c100000102.counterfilter(c)
-    return not c:IsCode(89943723)
+	return not c:IsCode(89943723)
 end
 function c100000102.cfilter(c)
 	return c:IsFaceup() and c:IsCode(89943723)

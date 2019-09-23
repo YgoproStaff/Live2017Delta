@@ -130,7 +130,7 @@ function c511010507.zarcop(e,tp,eg,ep,ev,re,r,rp)
 		if not g or g:GetCount()<=0 then return false end
 		sg:Merge(g)
 	end
-	if Duel.Remove(sg1,POS_FACEUP,REASON_EFFECT)>3 and Duel.GetLocationCountFromEx(tp)>0 then
+	if Duel.Remove(sg,POS_FACEUP,REASON_EFFECT)>3 and Duel.GetLocationCountFromEx(tp)>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local tc=Duel.SelectMatchingCard(tp,c511010507.zarcspfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp):GetFirst()
 		if tc and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then

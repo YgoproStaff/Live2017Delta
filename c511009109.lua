@@ -1,8 +1,9 @@
---Shura the Conqueror Star
+--覇道星シュラ (Anime)
+--Shura the Combat Star (Anime)
 function c511009109.initial_effect(c)
-	--fusion material
+	--fusion summon
 	c:EnableReviveLimit()
-	aux.AddFusionProcMix(c,true,true,511002013,c511009109.ffilter)
+	aux.AddFusionProcMix(c,true,true,96220350,c511009109.ffilter)
 	--half atk
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD)
@@ -20,6 +21,7 @@ function c511009109.initial_effect(c)
 	e5:SetOperation(c511009109.atkop)
 	c:RegisterEffect(e5)
 end
+c511009109.listed_names={96220350}
 function c511009109.ffilter(c,fc,sumtype,tp)
 	return c:IsRace(RACE_WARRIOR,fc,sumtype,tp) and c:GetLevel()>=5
 end

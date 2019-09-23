@@ -14,8 +14,8 @@ function c100000110.initial_effect(c)
 	e4:SetCode(EFFECT_SPSUMMON_PROC)
 	e4:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e4:SetRange(LOCATION_HAND)
-	e4:SetCondition(c100000110.spcon3)
-	e4:SetOperation(c100000110.spop3)
+	e4:SetCondition(c100000110.spcon)
+	e4:SetOperation(c100000110.spop)
 	c:RegisterEffect(e4)
 	--atk/def up
 	local e5=Effect.CreateEffect(c)
@@ -40,14 +40,14 @@ function c100000110.initial_effect(c)
 		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e2:SetCode(EVENT_PHASE+PHASE_END)
 		e2:SetCountLimit(1)
-		e2:SetOperation(c100000110.spop)
+		e2:SetOperation(c100000110.endop)
 		Duel.RegisterEffect(e2,0)
 	end
 end
 function c100000110.spfilter1(c)
-	return c:IsFaceup() and c:GetLevel()==1 and c:IsType(TYPE_NORMAL)
+	return c:IsFaceup() and c:IsLevel(1) and c:IsType(TYPE_NORMAL)
 end
-function c100000110.spop(e,tp,c)
+function c100000110.endop(e,tp,c)
 	local c=e:GetHandler()
 	local g=Duel.GetMatchingGroup(c100000110.spfilter1,Duel.GetTurnPlayer(),LOCATION_MZONE,0,nil)
 	local rc=g:GetFirst()
@@ -59,21 +59,21 @@ function c100000110.spop(e,tp,c)
 			e1:SetCode(EVENT_PHASE_START+PHASE_STANDBY)
 			e1:SetCountLimit(1)
 			e1:SetRange(LOCATION_MZONE)
-			e1:SetCondition(c100000110.spcon1)
+			e1:SetCondition(c100000110.ctcon)
 			e1:SetLabel(0)
-			e1:SetOperation(c100000110.spop2)
+			e1:SetOperation(c100000110.ctop)
 			rc:RegisterEffect(e1)			
 			rc:RegisterFlagEffect(100000110,RESET_EVENT+0x1fe0000,0,1) 	
 		end
 		rc=g:GetNext()
 	end
 end
-function c100000110.spcon1(e,tp,eg,ep,ev,re,r,rp)
+function c100000110.ctcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
 end
-function c100000110.spop2(e,tp,c)
+function c100000110.ctop(e,tp,c)
 	local c=e:GetHandler()
-	if c:GetControler()~=Duel.GetTurnPlayer() then return end
+	if not c:IsControler(Duel.GetTurnPlayer()) then return end
 	local ct=e:GetLabel()
 	if c:GetFlagEffect(100000110)~=0 and ct==8 then 
 		c:RegisterFlagEffect(100000111,RESET_EVENT+0x1fe0000,0,1) 	
@@ -81,17 +81,18 @@ function c100000110.spop2(e,tp,c)
 		e:SetLabel(ct+1)
 	end
 end
-function c100000110.filter(c)
-	return  c:IsFaceup() and c:GetLevel()==1 and c:IsType(TYPE_NORMAL) and c:GetFlagEffect(100000111)~=0
+function c100000110.filter(c,ft,tp)
+	return  c:IsFaceup() and c:IsLevel(1) and c:IsType(TYPE_NORMAL) and c:GetFlagEffect(100000111)~=0 and (ft>0 or (c:IsControler(tp) and c:GetSequence()<5)) and (c:IsControler(tp) or c:IsFaceup())
 end
-function c100000110.spcon3(e,c)
+function c100000110.spcon(e,c)
 	local c=e:GetHandler()
 	if c==nil then return true end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
-		and Duel.CheckReleaseGroup(c:GetControler(),c100000110.filter,1,nil)
+	local tp=c:GetControler()
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	return ft>-1 and Duel.CheckReleaseGroup(tp,c100000110.filter,1,nil,ft,tp)
 end
-function c100000110.spop3(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.SelectReleaseGroup(tp,c100000110.filter,1,1,nil)
+function c100000110.spop(e,tp,eg,ep,ev,re,r,rp,c)
+	local g=Duel.SelectReleaseGroup(tp,c100000110.filter,1,1,nil,Duel.GetLocationCount(tp,LOCATION_MZONE),tp)
 	Duel.Release(g,REASON_COST)
 end
 function c100000110.atkup(e,tp,eg,ep,ev,re,r,rp)

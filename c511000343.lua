@@ -11,16 +11,20 @@ function c511000343.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c511000343.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsRace,2,nil,RACE_DRAGON) end
-	local rg=Duel.SelectReleaseGroup(tp,Card.IsRace,2,2,nil,RACE_DRAGON)
-	Duel.Release(rg,REASON_COST)
+	e:SetLabel(1)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,Card.IsRace,2,nil,aux.ReleaseCheckMMZ,nil,RACE_DRAGON) end
+	local sg=Duel.SelectReleaseGroupCost(tp,Card.IsRace,2,2,nil,aux.ReleaseCheckMMZ,nil,RACE_DRAGON)
+	Duel.Release(sg,REASON_COST)
 end
 function c511000343.spfilter(c,e,tp)
 	return c:IsRace(RACE_DRAGON) and c:IsLevelAbove(7) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c511000343.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-		and Duel.IsExistingMatchingCard(c511000343.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp) end
+	if chk==0 then
+		if e:GetLabel()==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return false end
+		e:SetLabel(0)
+		return Duel.IsExistingMatchingCard(c511000343.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp)
+	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function c511000343.activate(e,tp,eg,ep,ev,re,r,rp)

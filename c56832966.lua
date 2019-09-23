@@ -1,9 +1,11 @@
 --SNo.39 希望皇ホープ・ザ・ライトニング
-function c56832966.initial_effect(c)
+--Number S39: Utopia the Lightning
+local s,id=GetID()
+function s.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.FilterBoolFunctionEx(Card.IsAttribute,ATTRIBUTE_LIGHT),5,3,c56832966.ovfilter,aux.Stringid(56832966,0))
+	aux.AddXyzProcedure(c,aux.FilterBoolFunctionEx(Card.IsAttribute,ATTRIBUTE_LIGHT),5,3,s.ovfilter,aux.Stringid(id,0))
 	c:EnableReviveLimit()
-	--
+	--cannot be Xyz material
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -17,41 +19,38 @@ function c56832966.initial_effect(c)
 	e2:SetCode(EFFECT_CANNOT_ACTIVATE)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetTargetRange(0,1)
-	e2:SetValue(c56832966.aclimit)
-	e2:SetCondition(c56832966.actcon)
+	e2:SetValue(1)
+	e2:SetCondition(s.actcon)
 	c:RegisterEffect(e2)
 	--atk
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(56832966,1))
+	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_ATKCHANGE)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
-	e3:SetCondition(c56832966.atkcon)
-	e3:SetCost(c56832966.atkcost)
-	e3:SetOperation(c56832966.atkop)
+	e3:SetCondition(s.atkcon)
+	e3:SetCost(s.atkcost)
+	e3:SetOperation(s.atkop)
 	c:RegisterEffect(e3,false,1)
 end
-c56832966.xyz_number=39
-function c56832966.ovfilter(c,tp,xyzc)
+s.xyz_number=39
+function s.ovfilter(c,tp,xyzc)
 	return c:IsFaceup() and c:IsSetCard(0x107f) and c:IsType(TYPE_XYZ,xyzc,SUMMON_TYPE_XYZ,tp) and c:GetRank()==4
 end
-function c56832966.aclimit(e,re,tp)
-	return not re:GetHandler():IsImmuneToEffect(e)
-end
-function c56832966.actcon(e)
+function s.actcon(e)
 	return Duel.GetAttacker()==e:GetHandler() or Duel.GetAttackTarget()==e:GetHandler()
 end
-function c56832966.atkcon(e,tp,eg,ep,ev,re,r,rp)
+function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetBattleTarget()~=nil and e:GetHandler():GetOverlayGroup():IsExists(Card.IsSetCard,1,nil,0x107f)
 end
-function c56832966.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:CheckRemoveOverlayCard(tp,2,REASON_COST) and c:GetFlagEffect(56832966)==0 end
+	if chk==0 then return c:CheckRemoveOverlayCard(tp,2,REASON_COST) and c:GetFlagEffect(id)==0 end
 	c:RemoveOverlayCard(tp,2,2,REASON_COST)
-	c:RegisterFlagEffect(56832966,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE_CAL,0,1)
+	c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_DAMAGE_CAL,0,1)
 end
-function c56832966.atkop(e,tp,eg,ep,ev,re,r,rp)
+function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and c:IsFaceup() then
 		local e1=Effect.CreateEffect(c)

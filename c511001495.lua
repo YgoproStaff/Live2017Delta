@@ -23,8 +23,7 @@ function c511001495.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
 end
 function c511001495.atcon(e)
-	local c=e:GetHandler()
-	return Duel.IsExistingMatchingCard(c511001495.filter,c:GetControler(),LOCATION_MZONE,LOCATION_MZONE,1,c)
+	return Duel.IsExistingMatchingCard(c511001495.filter,0,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler())
 end
 function c511001495.con(e,tp,eg,ep,ev,re,r,rp)
 	local ex,cg,ct,cp,cv=Duel.GetOperationInfo(ev,CATEGORY_DAMAGE)
@@ -37,9 +36,8 @@ function c511001495.con(e,tp,eg,ep,ev,re,r,rp)
 end
 function c511001495.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local cp=e:GetLabel()
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsReleasable,cp,LOCATION_MZONE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g=Duel.SelectMatchingCard(tp,Card.IsReleasable,cp,LOCATION_MZONE,0,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,Card.IsControler,1,false,nil,nil,cp) end
+	local g=Duel.SelectReleaseGroupCost(tp,Card.IsControler,1,1,false,nil,nil,cp)
 	Duel.Release(g,REASON_COST)
 end
 function c511001495.op(e,tp,eg,ep,ev,re,r,rp,val,r,rc)
@@ -61,7 +59,7 @@ function c511001495.op(e,tp,eg,ep,ev,re,r,rp,val,r,rc)
 end
 function c511001495.refcon(e,re,val,r,rp,rc)
 	local cc=Duel.GetCurrentChain()
-	if cc==0 or bit.band(r,REASON_EFFECT)==0 then return end
+	if cc==0 or r&REASON_EFFECT==0 then return end
 	local cid=Duel.GetChainInfo(0,CHAININFO_CHAIN_ID)
 	if cid==e:GetLabel() then e:SetLabel(val) return 0
 	else return val end

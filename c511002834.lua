@@ -33,12 +33,13 @@ function c511002834.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=Duel.GetMatchingGroupCount(nil,tp,LOCATION_MZONE,0,e:GetHandler())
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,ct,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,ct,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,ct,tp,0)
 end
 function c511002834.spop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=Duel.GetMatchingGroupCount(nil,tp,LOCATION_MZONE,0,e:GetHandler())
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if ft>ct then ft=ct end
+	if Duel.IsPlayerAffectedByEffect(tp,59822133) then ft=math.min(ft,1) end
 	if ft<ct then return end
 	if not Duel.IsPlayerCanSpecialSummonMonster(tp,12958920,0x49,0x4011,500,500,4,RACE_FIEND,ATTRIBUTE_DARK) then return end
 	for i=1,ft do
@@ -55,7 +56,7 @@ function c511002834.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_ATTACK)
 	e1:SetProperty(EFFECT_FLAG_OATH+EFFECT_FLAG_IGNORE_IMMUNE)
-	e1:SetTarget(c511002834.atklimit)
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsCode,12958920))
 	e1:SetTargetRange(LOCATION_MZONE,0)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
@@ -65,9 +66,6 @@ function c511002834.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e2:SetCode(EFFECT_CANNOT_ATTACK)
 	e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 	c:RegisterEffect(e2,true)
-end
-function c511002834.atklimit(e,c)
-	return c:IsCode(12958920)
 end
 function c511002834.damfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x49) and c:IsRace(RACE_FIEND)

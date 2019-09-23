@@ -34,22 +34,38 @@ end
 function c511002602.spfilter2(c)
 	return c:IsFaceup() and not c:IsType(TYPE_TUNER) and c:IsAbleToRemove()
 end
+function c511002602.rescon(sg,e,tp,mg)
+	return aux.ChkfMMZ(1)(sg,e,tp,mg) and sg:IsExists(c511002602.chk,1,nil,sg,Group.CreateGroup(),c511002602.spfilter1,c511002602.spfilter2)
+end
+function c511002602.chk(c,sg,g,f,...)
+	if not f(c) then return false end
+	local res
+	if ... then
+		g:AddCard(c)
+		res=sg:IsExists(c511002602.chk,1,g,sg,g,...)
+		g:RemoveCard(c)
+	else
+		res=true
+	end
+	return res
+end
 function c511002602.spcon(e,c)
 	if c==nil then return true end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-2
-		and Duel.IsExistingMatchingCard(c511002602.spfilter1,c:GetControler(),LOCATION_MZONE,0,1,nil)
-		and Duel.IsExistingMatchingCard(c511002602.spfilter2,c:GetControler(),LOCATION_MZONE,0,1,nil)
+	local tp=c:GetControler()
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	local g1=Duel.GetMatchingGroup(c511002602.spfilter1,tp,LOCATION_MZONE,0,nil)
+	local g2=Duel.GetMatchingGroup(c511002602.spfilter2,tp,LOCATION_MZONE,0,nil)
+	local g=g1:Clone()
+	g:Merge(g2)
+	return ft>-2 and g1:GetCount()>0 and g2:GetCount()>0 and aux.SelectUnselectGroup(g,e,tp,2,2,c511002602.rescon,0)
 end
 function c511002602.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local lv=0
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g1=Duel.SelectMatchingCard(tp,c511002602.spfilter1,tp,LOCATION_MZONE,0,1,1,nil)
-	lv=g1:GetFirst():GetLevel()
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g2=Duel.SelectMatchingCard(tp,c511002602.spfilter2,tp,LOCATION_MZONE,0,1,1,nil)
-	lv=lv+g2:GetFirst():GetLevel()
+	local g1=Duel.GetMatchingGroup(c511002602.spfilter1,tp,LOCATION_MZONE,0,nil)
+	local g2=Duel.GetMatchingGroup(c511002602.spfilter2,tp,LOCATION_MZONE,0,nil)
 	g1:Merge(g2)
-	Duel.Remove(g1,POS_FACEUP,REASON_COST)
+	local sg=aux.SelectUnselectGroup(g1,e,tp,2,2,c511002602.rescon,1,tp,HINTMSG_REMOVE)
+	local lv=sg:GetSum(Card.GetLevel)
+	Duel.Remove(sg,POS_FACEUP,REASON_COST)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_CHANGE_LEVEL)
@@ -58,7 +74,7 @@ function c511002602.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	c:RegisterEffect(e1)
 end
 function c511002602.filter(c,lv)
-	return c:IsSetCard(0x33) and c:IsType(TYPE_SYNCHRO) and c:IsAbleToRemove() and c:GetLevel()==lv
+	return c:IsSetCard(0x33) and c:IsType(TYPE_SYNCHRO) and c:IsAbleToRemove() and c:IsLevel(lv)
 end
 function c511002602.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c511002602.filter,tp,LOCATION_EXTRA,0,1,nil,e:GetHandler():GetLevel()) end
@@ -71,12 +87,11 @@ function c511002602.operation(e,tp,eg,ep,ev,re,r,rp)
 	if tc and c:IsFaceup() and c:IsRelateToEffect(e) and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)>0 then
 		local code=tc:GetOriginalCode()
 		local ba=tc:GetBaseAttack()
-		local reset_flag=RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN
-		c:CopyEffect(code, reset_flag, 1)
+		c:CopyEffect(code,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN, 1)
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e2:SetReset(reset_flag)
+		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN)
 		e2:SetCode(EFFECT_SET_BASE_ATTACK)
 		e2:SetValue(ba)
 		c:RegisterEffect(e2)

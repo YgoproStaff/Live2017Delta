@@ -103,7 +103,7 @@ function c511000782.op(e,tp,eg,ep,ev,re,r,rp)
 end
 function c511000782.atkcon(e)
 	local tc=e:GetLabelObject()
-	return tc and c:GetFlagEffectLabel(51100783)==e:GetLabel()
+	return tc and tc:GetFlagEffectLabel(51100783)==e:GetLabel()
 end
 function c511000782.atkval(e,c)
 	return not c:IsImmuneToEffect(e) and c==e:GetLabelObject() and c:GetFlagEffectLabel(51100782)==e:GetLabel()

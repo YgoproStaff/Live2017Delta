@@ -1,6 +1,6 @@
 --アーマード・サイバーン
 function c511003055.initial_effect(c)
-	aux.AddUnionProcedure(c,c511003055.filter,true)
+	aux.AddUnionProcedure(c,c511003055.filter,true,false)
 	--destroy
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(67159705,2))

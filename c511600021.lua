@@ -1,6 +1,7 @@
 --Beltlink Wall Dragon
 --ベルトリンク・ウォール・ドラゴン
 --scripted by Larry126
+--fixed by MLD
 function c511600021.initial_effect(c)
 	c:EnableCounterPermit(0x48)
 	--spsummon
@@ -20,8 +21,9 @@ function c511600021.initial_effect(c)
 	e2:SetCategory(CATEGORY_COUNTER)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetTarget(c511600021.addct)
-	e2:SetOperation(c511600021.addc)
+	e2:SetLabel(2)
+	e2:SetTarget(c511600021.addctg)
+	e2:SetOperation(c511600021.addcop)
 	c:RegisterEffect(e2)
 	--add counter
 	local e3=Effect.CreateEffect(c)
@@ -31,8 +33,9 @@ function c511600021.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1)
 	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)
-	e3:SetCondition(c511600021.ctcon)
-	e3:SetOperation(c511600021.ctop)
+	e3:SetLabel(1)
+	e3:SetTarget(c511600021.addctg)
+	e3:SetOperation(c511600021.addcop)
 	c:RegisterEffect(e3)
 	--cannot attack
 	local e4=Effect.CreateEffect(c)
@@ -40,7 +43,7 @@ function c511600021.initial_effect(c)
 	e4:SetCode(EFFECT_CANNOT_ATTACK)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e4:SetTarget(c511600021.attg)
+	e4:SetTarget(aux.NOT(aux.TargetBoolFunction(Card.IsType,TYPE_LINK)))
 	c:RegisterEffect(e4)
 	--atk limit
 	local e5=Effect.CreateEffect(c)
@@ -56,7 +59,6 @@ function c511600021.initial_effect(c)
 	e6:SetRange(LOCATION_MZONE)
 	e6:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e6:SetCondition(c511600021.rmcon)
-	e6:SetTarget(c511600021.rmtg)
 	e6:SetOperation(c511600021.rmop)
 	c:RegisterEffect(e6)
 	--cannot summon
@@ -70,17 +72,13 @@ function c511600021.initial_effect(c)
 	c:RegisterEffect(e7)
 end
 function c511600021.sumlimit(e,c)
-	return c:GetLink()>e:GetHandler():GetCounter(0x48)
+	return c:IsType(TYPE_LINK) and c:GetLink()>e:GetHandler():GetCounter(0x48)
 end
---------------------------
 function c511600021.dfilter(c,tp,ct)
-	return c:IsFaceup() and c:GetSummonPlayer()==tp and c:IsRace(RACE_DRAGON) and c:IsType(TYPE_LINK) and c:IsSummonType(SUMMON_TYPE_LINK) and c:GetLink()<ct
+	return c:IsFaceup() and c:GetSummonPlayer()==tp and c:IsRace(RACE_DRAGON) and c:IsSummonType(SUMMON_TYPE_LINK) and c:GetLink()<ct
 end
 function c511600021.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c511600021.dfilter,1,nil,tp,e:GetHandler():GetCounter(0x48))
-end
-function c511600021.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
 end
 function c511600021.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=e:GetHandler():GetCounter(0x48)
@@ -88,32 +86,18 @@ function c511600021.rmop(e,tp,eg,ep,ev,re,r,rp)
 		e:GetHandler():RemoveCounter(tp,0x48,2,REASON_EFFECT)
 	end
 end
---------------------------
 function c511600021.atlimit(e,c)
 	return c~=e:GetHandler()
 end
---------------------------
-function c511600021.attg(e,c)
-	return not c:IsType(TYPE_LINK)
-end
---------------------------
-function c511600021.ctcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp
-end
-function c511600021.ctop(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():AddCounter(0x48,1)
-end
---------------------------
-function c511600021.addct(e,tp,eg,ep,ev,re,r,rp,chk)
+function c511600021.addctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_COUNTER,nil,1,0,0x48)
+	Duel.SetOperationInfo(0,CATEGORY_COUNTER,nil,e:GetLabel(),0,0x48)
 end
-function c511600021.addc(e,tp,eg,ep,ev,re,r,rp)
+function c511600021.addcop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
-		e:GetHandler():AddCounter(0x48,2)
+		e:GetHandler():AddCounter(0x48,e:GetLabel())
 	end
 end
---------------------------
 function c511600021.cfilter(c,tp)
 	return c:IsFaceup() and c:IsControler(tp) and c:IsRace(RACE_DRAGON) and c:IsType(TYPE_LINK)
 end

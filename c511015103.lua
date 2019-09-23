@@ -14,34 +14,6 @@ function c511015103.filter(c,e,tp)
 	return c:IsCanBeEffectTarget(e) and c:IsSetCard(0x10af) and c:IsType(TYPE_PENDULUM) and (c:IsLocation(LOCATION_GRAVE) or c:IsFaceup())
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function c511015103.mfilter(c,g,sg,tp,ft,ftex,ftt,ect,e,chk)
-	sg:AddCard(c)
-	if ftt<=0 then return false end
-	local ftt=ftt-1
-	local res
-	if c:IsLocation(LOCATION_EXTRA) then
-		if ftex<=0 then return false end
-		if ect then
-			if ect<=0 then return false end
-			ect=ect-1
-		end
-		ftex=ftex-1
-		local res=((not chk or ftt==0 or ect==0) and Duel.IsExistingMatchingCard(c511015103.xyzfilter,tp,LOCATION_EXTRA,0,1,sg,sg,e)) 
-			or g:IsExists(c511015103.mfilter,1,sg,g,sg,tp,ft,ftex,ftt,ect,e,chk)
-		ftex=ftex+1
-		if ect then
-			ect=ect+1
-		end
-	else
-		if ft<=0 then return false end
-		ft=ft-1
-		local res=((not chk or ftt==0 or ect==0) and Duel.IsExistingMatchingCard(c511015103.xyzfilter,tp,LOCATION_EXTRA,0,1,sg,sg,e)) 
-			or g:IsExists(c511015103.mfilter,1,sg,g,sg,tp,ft,ftex,ftt,ect,e,chk)
-		ft=ft+1
-	end
-	sg:RemoveCard(c)
-	return res
-end
 function c511015103.xyzfilter(c,sg,e)
 	local ct=sg:GetCount()
 	local mc=e:GetHandler()
@@ -53,10 +25,19 @@ function c511015103.xyzfilter(c,sg,e)
 		e1:SetCode(511002116)
 		e1:SetReset(RESET_CHAIN)
 		mc:RegisterEffect(e1)
+		sg:AddCard(mc)
 	end
 	local res=c:IsXyzSummonable(sg,ct,ct)
-	if e1 then e1:Reset() end
+	if e1 then e1:Reset() sg:RemoveCard(mc) end
 	return res
+end
+function c511015103.rescon(mft,exft,ft)
+	return	function(sg,e,tp,mg)
+				local exct=sg:FilterCount(Card.IsLocation,nil,LOCATION_EXTRA)
+				local mct=sg:FilterCount(aux.NOT(Card.IsLocation),nil,LOCATION_EXTRA)
+				return exft>=exct and mft>=mct and ft>=sg:GetCount() 
+					and Duel.IsExistingMatchingCard(c511015103.xyzfilter,tp,LOCATION_EXTRA,0,1,sg,sg,e)
+			end
 end
 function c511015103.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
@@ -65,98 +46,29 @@ function c511015103.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	local ftt=Duel.GetUsableMZoneCount(tp)
 	local ect=c29724053 and Duel.IsPlayerAffectedByEffect(tp,29724053) and c29724053[tp]-1
-	if Duel.IsPlayerAffectedByEffect(tp,59822133) and ftt>1 then ftt=1 end
-	local sg=Group.CreateGroup()
-	if chk==0 then return Duel.IsPlayerCanSpecialSummonCount(tp,2) 
-		and mg:IsExists(c511015103.mfilter,1,nil,mg,sg,tp,ft,ftex,ftt,ect,e) end
-	local tc
-	::start::
-		local cancel=sg:GetCount()>0 and Duel.IsExistingMatchingCard(c511015103.xyzfilter,tp,LOCATION_EXTRA,0,1,sg,sg,mc)
-		local tg=mg:Filter(c511015103.mfilter,sg,mg,sg,tp,ft,ftex,ftt,ect,e)
-		if tg:GetCount()<=0 then goto jump end
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		tc=Group.SelectUnselect(tg,sg,tp,cancel,cancel)
-		if not tc then goto jump end
-		if sg:IsContains(tc) then
-			sg:RemoveCard(tc)
-			ftt=ftt+1
-			if tc:IsLocation(LOCATION_EXTRA) then
-				ect=ect+1
-				ftex=ftex+1
-			else
-				ft=ft+1
-			end
-		else
-			sg:AddCard(tc)
-			ftt=ftt-1
-			if tc:IsLocation(LOCATION_EXTRA) then
-				ect=ect-1
-				ftex=ftex-1
-			else
-				ft=ft-1
-			end
-		end
-		goto start
-	::jump::
-	Duel.SetTargetCard(g)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+	if ect then ftex=math.min(ftex,ect) end
+	if Duel.IsPlayerAffectedByEffect(tp,59822133) then ftt=math.min(ftt,1) ftex=math.min(ftex,1) ft=math.min(ft,1) end
+	if chk==0 then return Duel.IsPlayerCanSpecialSummonCount(tp,2) and ftt>0 and (ft>0 or ftex>0)
+		and aux.SelectUnselectGroup(mg,e,tp,nil,ftt,c511015103.rescon(ft,ftex,ftt),0) end
+	local sg=aux.SelectUnselectGroup(mg,e,tp,nil,ftt,c511015103.rescon(ft,ftex,ftt),1,tp,HINTMSG_SPSUMMON,c511015103.rescon(ft,ftex,ftt))
+	Duel.SetTargetCard(sg)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,sg,sg:GetCount()+1,tp,LOCATION_EXTRA)
 end
 function c511015103.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 	if Duel.IsPlayerAffectedByEffect(tp,59822133) and g:GetCount()>1 then return end
+	local ftex=Duel.GetLocationCountFromEx(tp)
 	local ftt=Duel.GetUsableMZoneCount(tp)
 	local ect=c29724053 and Duel.IsPlayerAffectedByEffect(tp,29724053) and c29724053[tp]
-	if ftt<g:GetCount() or (ect and g:FilterCount(Card.IsLocation,nil,LOCATION_EXTRA)>ect) then
-		local ftex=Duel.GetLocationCountFromEx(tp)
+	if ect then ftex=math.min(ftex,ect) end
+	if ftt<g:GetCount() or g:FilterCount(Card.IsLocation,nil,LOCATION_EXTRA)>ftex then
 		local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-		local sg=Group.CreateGroup()
-		local tc
-		::start::
-			local cancel=sg:GetCount()>0 and (ftt==0 or ect==0) and Duel.IsExistingMatchingCard(c511015103.xyzfilter,tp,LOCATION_EXTRA,0,1,sg,sg,mc)
-			local tg=g:Filter(c511015103.mfilter,sg,g,sg,tp,ft,ftex,ftt,ect,e,true)
-			if tg:GetCount()<=0 then goto jump end
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-			tc=Group.SelectUnselect(tg,sg,tp,cancel,cancel)
-			if not tc then goto jump end
-			if sg:IsContains(tc) then
-				sg:RemoveCard(tc)
-				ftt=ftt+1
-				if tc:IsLocation(LOCATION_EXTRA) then
-					ect=ect+1
-					ftex=ftex+1
-				else
-					ft=ft+1
-				end
-			else
-				sg:AddCard(tc)
-				ftt=ftt-1
-				if tc:IsLocation(LOCATION_EXTRA) then
-					ect=ect-1
-					ftex=ftex-1
-				else
-					ft=ft-1
-				end
-			end
-			goto start
-		::jump::
+		local sg=aux.SelectUnselectGroup(g,e,tp,nil,ftt,c511015103.rescon(ft,ftex,ftt),1,tp,HINTMSG_SPSUMMON,c511015103.rescon(ft,ftex,ftt))
 		if sg:GetCount()<=0 then return false end
 		g=sg
 	end
-	local tc=g:GetFirst()
-	while tc do
-		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_DISABLE)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
-		tc:RegisterEffect(e1)
-		local e2=e1:Clone()
-		e2:SetCode(EFFECT_DISABLE_EFFECT)
-		tc:RegisterEffect(e2)
-		tc=g:GetNext()
-	end
-	Duel.SpecialSummonComplete()
+	if not aux.MainAndExtraSpSummonLoop(c511015103.disop,0,0,0,false,false)(e,tp,eg,ep,ev,re,r,rp,g) then return end
 	local xyzg=Duel.GetMatchingGroup(c511015103.xyzfilter,tp,LOCATION_EXTRA,0,g,g,e)
 	if xyzg:GetCount()>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
@@ -168,7 +80,18 @@ function c511015103.activate(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetCode(511002116)
 			e1:SetReset(RESET_CHAIN)
 			c:RegisterEffect(e1)
+			g:AddCard(c)
 		end
 		Duel.XyzSummon(tp,xyz,g)
 	end
+end
+function c511015103.disop(e,tp,eg,ep,ev,re,r,rp,tc)
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_DISABLE)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	tc:RegisterEffect(e1)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_DISABLE_EFFECT)
+	tc:RegisterEffect(e2)
 end

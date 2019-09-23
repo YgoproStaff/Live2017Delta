@@ -1,26 +1,28 @@
+--瞬間氷結
 --Instant Freeze
-function c511002089.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_NEGATE+CATEGORY_POSITION)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_CHAINING)
-	e1:SetCondition(c511002089.condition)
-	e1:SetTarget(c511002089.target)
-	e1:SetOperation(c511002089.activate)
+	e1:SetCondition(s.condition)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
-function c511002089.condition(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev) and not re:GetHandler():IsType(TYPE_PENDULUM)
 end
-function c511002089.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_POSITION,eg,1,0,0)
 	end
 end
-function c511002089.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ec=re:GetHandler()
 	Duel.NegateActivation(ev)
 	if re:GetHandler():IsRelateToEffect(re) then
@@ -33,9 +35,9 @@ function c511002089.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_CANNOT_TRIGGER)
 		if Duel.GetTurnPlayer()==ec:GetControler() then
-			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END+RESET_OPPO_TURN,3)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_OPPO_TURN,3)
 		else
-			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END+RESET_SELF_TURN,3)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_SELF_TURN,3)
 		end
 		e1:SetValue(1)
 		ec:RegisterEffect(e1)
@@ -44,8 +46,8 @@ function c511002089.activate(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCode(EVENT_PHASE+PHASE_END)
 		e2:SetCountLimit(1)
 		e2:SetLabelObject(e1)
-		e2:SetCondition(c511002089.turncon)
-		e2:SetOperation(c511002089.turnop)
+		e2:SetCondition(s.turncon)
+		e2:SetOperation(s.turnop)
 		e2:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,3)
 		Duel.RegisterEffect(e2,Duel.GetTurnPlayer())
 		local descnum=tp==c:GetOwner() and 0 or 1
@@ -56,7 +58,7 @@ function c511002089.activate(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetCode(1082946)
 		e3:SetLabelObject(e2)
 		e3:SetOwnerPlayer(tp)
-		e3:SetOperation(c511002089.reset)
+		e3:SetOperation(s.reset)
 		if Duel.GetTurnPlayer()==tp then
 			e3:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,3)
 		else
@@ -65,18 +67,18 @@ function c511002089.activate(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e3)
 	end
 end
-function c511002089.reset(e,tp,eg,ep,ev,re,r,rp)
-	c511002089.turnop(e:GetLabelObject(),tp,eg,ep,ev,e,r,rp)
+function s.reset(e,tp,eg,ep,ev,re,r,rp)
+	s.turnop(e:GetLabelObject(),tp,eg,ep,ev,e,r,rp)
 end
-function c511002089.turncon(e,tp,eg,ep,ev,re,r,rp)
+function s.turncon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp
 end
-function c511002089.turnop(e,tp,eg,ep,ev,re,r,rp)
+function s.turnop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=e:GetLabel()+1
 	e:SetLabel(ct)
 	e:GetHandler():SetTurnCounter(ct)
 	if ct==3 then
 		if e:GetLabelObject() then e:GetLabelObject():Reset() end
-		if re and re.Reset then re:Reset() end
+		if re then re:Reset() end
 	end
 end

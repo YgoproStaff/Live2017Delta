@@ -12,14 +12,15 @@ function c511001725.initial_effect(c)
 	c:RegisterEffect(e1,false,2)
 	aux.CallToken(419)
 end
-function c511001725.filter(c,tp)
+function c511001725.filter(c,ft,tp)
 	local re=c:GetReasonEffect()
-	return (Duel.GetLocationCount(tp,LOCATION_MZONE)>0 or c:GetSequence()<5) and c:GetLevel()==10 and c:IsSetCard(0xe6)
+	return (ft>0 or c:GetSequence()<5) and c:GetLevel()==10 and c:IsSetCard(0xe6)
 		and (not c:IsSummonType(SUMMON_TYPE_SPECIAL) or (not re or not re:GetHandler():IsSetCard(0xe6) or not re:GetHandler():IsType(TYPE_MONSTER)))
 end
 function c511001725.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c511001725.filter,1,nil,tp) end
-	local g=Duel.SelectReleaseGroup(tp,c511001725.filter,1,1,nil,tp)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if chk==0 then return ft>-1 and Duel.CheckReleaseGroupCost(tp,c511001725.filter,1,false,nil,nil,ft,tp) end
+	local g=Duel.SelectReleaseGroupCost(tp,c511001725.filter,1,1,false,nil,nil,ft,tp)
 	Duel.Release(g,REASON_COST)
 end
 function c511001725.sptg(e,tp,eg,ep,ev,re,r,rp,chk)

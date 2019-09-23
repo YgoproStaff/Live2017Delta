@@ -1,4 +1,5 @@
 --ネオスペーシア・ロード
+--Neo-Space Road
 function c100000553.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -8,6 +9,7 @@ function c100000553.initial_effect(c)
 	e1:SetOperation(c100000553.operation)
 	c:RegisterEffect(e1)
 end
+c100000553.listed_names={89943723}
 function c100000553.cfilter(c,tp)
 	return c:IsReason(REASON_BATTLE) and c:GetPreviousControler()==tp and c:IsCode(89943723)
 end

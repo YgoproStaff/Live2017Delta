@@ -10,23 +10,36 @@ function c511001960.initial_effect(c)
 	e1:SetOperation(c511001960.activate)
 	c:RegisterEffect(e1)
 end
+function c511001960.spcheck(sg,tp)
+	return aux.ReleaseCheckMMZ(sg,tp) and sg:IsExists(c511001960.chk,1,nil,sg,Group.CreateGroup(),511000813,511000827,511001958)
+end
+function c511001960.chk(c,sg,g,code,...)
+	if not c:IsCode(code) then return false end
+	local res
+	if ... then
+		g:AddCard(c)
+		res=sg:IsExists(c511001960.chk,1,g,sg,g,...)
+		g:RemoveCard(c)
+	else
+		res=true
+	end
+	return res
+end
 function c511001960.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsCode,1,nil,511000813)
-		and Duel.CheckReleaseGroup(tp,Card.IsCode,1,nil,511000827)
-		and Duel.CheckReleaseGroup(tp,Card.IsCode,1,nil,511001958)	end
-	local rg1=Duel.SelectReleaseGroup(tp,Card.IsCode,1,1,nil,511000813)
-	local rg2=Duel.SelectReleaseGroup(tp,Card.IsCode,1,1,nil,511000827)
-	local rg3=Duel.SelectReleaseGroup(tp,Card.IsCode,1,1,nil,511001958)
-	rg1:Merge(rg2)
-	rg1:Merge(rg3)
-	Duel.Release(rg1,REASON_COST)
+	e:SetLabel(1)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,Card.IsCode,3,nil,c511001960.spcheck,nil,511000813,511000827,511001958) end
+	local sg=Duel.SelectReleaseGroupCost(tp,Card.IsCode,3,3,nil,c511001960.spcheck,nil,511000813,511000827,511001958)
+	Duel.Release(sg,REASON_COST)
 end
 function c511001960.spfilter(c,e,tp)
 	return c:IsCode(511001959) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c511001960.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c511001960.spfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,e,tp)
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 end
+	if chk==0 then
+		if e:GetLabel()==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return false end
+		e:SetLabel(0)
+		return Duel.IsExistingMatchingCard(c511001960.spfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,e,tp)
+	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_DECK)
 end
 function c511001960.activate(e,tp,eg,ep,ev,re,r,rp)

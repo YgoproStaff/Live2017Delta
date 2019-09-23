@@ -13,10 +13,10 @@ function c511015105.initial_effect(c)
 	Duel.AddCustomActivityCounter(511015105,ACTIVITY_SPSUMMON,c511015105.counterfilter)
 end
 function c511015105.counterfilter(c)
-	return bit.band(c:GetSummonType(),SUMMON_TYPE_PENDULUM)~=SUMMON_TYPE_PENDULUM
+	return not c:IsSummonType(SUMMON_TYPE_PENDULUM)
 end
 function c511015105.splimit(e,c,sump,sumtype,sumpos,targetp,se)
-	return bit.band(sumtype,SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM
+	return sumtype&SUMMON_TYPE_PENDULUM==SUMMON_TYPE_PENDULUM
 end
 function c511015105.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetCustomActivityCount(511015105,tp,ACTIVITY_SPSUMMON)==0 end
@@ -28,6 +28,9 @@ function c511015105.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetTargetRange(1,0)
 	e1:SetTarget(c511015105.splimit)
 	Duel.RegisterEffect(e1,tp)
+	if e:IsHasType(EFFECT_TYPE_ACTIVATE) then
+		aux.RemainFieldCost(e,tp,eg,ep,ev,re,r,rp,1)
+	end
 end
 function c511015105.filter1(c,e,tp)
 	return c:IsCode(16178681) and c:IsFaceup() and c:IsCanBeSpecialSummoned(e,0,tp,false,false) 
@@ -45,15 +48,10 @@ function c511015105.filter3(c,e,tp,syn,odd)
 	e1:SetValue(1)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
 	odd:RegisterEffect(e1)
-	local e2=Effect.CreateEffect(e:GetHandler())
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_ADD_TYPE)
-	e2:SetReset(RESET_EVENT+0x1fe0000)
-	e2:SetValue(TYPE_TUNER)
-	odd:RegisterEffect(e2)
+	odd:AssumeProperty(ASSUME_TYPE,odd:GetType()|TYPE_TUNER)
 	local result=c:IsSynchroSummonable(nil,Group.FromCards(syn,odd))
 	e1:Reset()
-	e2:Reset()
+	Duel.AssumeReset()
 	return result
 end
 function c511015105.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -75,34 +73,7 @@ function c511015105.activate(e,tp,eg,ep,ev,re,r,rp)
 		or Duel.GetLocationCountFromEx(tp)<=0 or Duel.GetUsableMZoneCount(tp)<=1 then return false end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local sg=g:Filter(Card.IsRelateToEffect,nil,e)
-	local tc=sg:GetFirst()
-	while tc do
-		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_DISABLE)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
-		tc:RegisterEffect(e1)
-		local e2=e1:Clone()
-		e2:SetCode(EFFECT_DISABLE_EFFECT)
-		tc:RegisterEffect(e2)
-		if tc:IsCode(16178681) then
-			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_CHANGE_LEVEL)
-			e1:SetValue(1)
-			e1:SetReset(RESET_EVENT+0x1fe0000)
-			tc:RegisterEffect(e1)
-			local e2=Effect.CreateEffect(e:GetHandler())
-			e2:SetType(EFFECT_TYPE_SINGLE)
-			e2:SetCode(EFFECT_ADD_TYPE)
-			e2:SetReset(RESET_EVENT+0x1fe0000)
-			e2:SetValue(TYPE_TUNER)
-			tc:RegisterEffect(e2)
-		end
-		tc=sg:GetNext()
-	end
-	Duel.SpecialSummonComplete()
+	if not aux.MainAndExtraSpSummonLoop(c511015105.disop,0,0,0,false,false)(e,tp,eg,ep,ev,re,r,rp,sg) then return end
 	Duel.BreakEffect()
 	local g=Duel.GetMatchingGroup(function(sc) return sc:IsType(TYPE_PENDULUM) and sc:IsSynchroSummonable(nil,sg) end,tp,LOCATION_EXTRA,0,nil)
 	if g:GetCount()>0 then
@@ -111,7 +82,6 @@ function c511015105.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SynchroSummon(tp,sc,nil,sg)
 		local c=e:GetHandler()
 		if not c:IsRelateToEffect(e) or not e:IsHasType(EFFECT_TYPE_ACTIVATE) then return end
-		c:CancelToGrave()
 		local e1=Effect.CreateEffect(c)
 		e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 		e1:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_FIELD)
@@ -124,6 +94,30 @@ function c511015105.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetLabelObject(sc)
 		c:RegisterEffect(e1)
+	end
+end
+function c511015105.disop(e,tp,eg,ep,ev,re,r,rp,tc)
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_DISABLE)
+	e1:SetReset(RESET_EVENT+0x1fe0000)
+	tc:RegisterEffect(e1)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_DISABLE_EFFECT)
+	tc:RegisterEffect(e2)
+	if tc:IsCode(16178681) then
+		local e3=Effect.CreateEffect(e:GetHandler())
+		e3:SetType(EFFECT_TYPE_SINGLE)
+		e3:SetCode(EFFECT_CHANGE_LEVEL)
+		e3:SetValue(1)
+		e3:SetReset(RESET_EVENT+0x1fe0000)
+		tc:RegisterEffect(e3)
+		local e4=Effect.CreateEffect(e:GetHandler())
+		e4:SetType(EFFECT_TYPE_SINGLE)
+		e4:SetCode(EFFECT_ADD_TYPE)
+		e4:SetReset(RESET_EVENT+0x1fe0000)
+		e4:SetValue(TYPE_TUNER)
+		tc:RegisterEffect(e4)
 	end
 end
 function c511015105.descon(e,tp,eg,ep,ev,re,r,rp)

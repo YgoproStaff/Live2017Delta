@@ -31,7 +31,7 @@ function c100000571.filter(c,tp,sg,...)
 	return res
 end
 function c100000571.spfilter(c,e,tp)
-	return c:IsCode(100000570) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
+	return c:IsCode(100000570) and c:IsCanBeSpecialSummoned(e,0,tp,true,false) and c:CheckFusionMaterial()
 end
 function c100000571.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroupEx(tp,c100000571.filter,1,nil,tp,Group.CreateGroup(),450000350,450000351,450000352) 

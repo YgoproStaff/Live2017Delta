@@ -1,7 +1,7 @@
 --Call of the Living Dead
-  --Scripted by Edo9300
-  function c511002048.initial_effect(c)
-  	--activate
+	--Scripted by Edo9300
+	function c511002048.initial_effect(c)
+	--activate
  	local e1=Effect.CreateEffect(c)
  	e1:SetType(EFFECT_TYPE_ACTIVATE)
  	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -40,25 +40,23 @@
  	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
  	local g=Duel.SelectMatchingCard(tp,c511002048.fil,tp,LOCATION_GRAVE,0,1,ft,nil,e,tp)
  	if g:GetCount()>0 then
- 		local tc=g:GetFirst()
- 		while tc do
- 			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK)
+		g:ForEach(function(tc)
+			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK)
  			local e1=Effect.CreateEffect(e:GetHandler())
  			e1:SetType(EFFECT_TYPE_SINGLE)
  			e1:SetCode(EFFECT_CHANGE_RACE)
  			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
  			e1:SetValue(RACE_ZOMBIE)
- 			e1:SetReset(RESET_EVENT+0x1fe0000)
+ 			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
  			tc:RegisterEffect(e1)
  			local e2=Effect.CreateEffect(e:GetHandler())
  			e2:SetType(EFFECT_TYPE_SINGLE)
  			e2:SetCode(EFFECT_SET_DEFENCE)
  			e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
  			e2:SetValue(0)
- 			e2:SetReset(RESET_EVENT+0x1fe0000)
+ 			e2:SetReset(RESET_EVENT+RESETS_STANDARD)
  			tc:RegisterEffect(e2)
- 			tc=g:GetNext()
- 		end
+		end)
  		Duel.SpecialSummonComplete()
  	end
  end
@@ -73,21 +71,21 @@
  end
  function c511002048.operation(e,tp,eg,ep,ev,re,r,rp)
  	local tc=eg:Filter(c511002048.filter,nil,e,tp):GetFirst()
- 	if tc:IsRelateToEffect(e) then
+ 	if tc and tc:IsRelateToEffect(e) then
  		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK)
  		local e1=Effect.CreateEffect(e:GetHandler())
  		e1:SetType(EFFECT_TYPE_SINGLE)
  		e1:SetCode(EFFECT_CHANGE_RACE)
  		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
  		e1:SetValue(RACE_ZOMBIE)
- 		e1:SetReset(RESET_EVENT+0x1fe0000)
+ 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
  		tc:RegisterEffect(e1)
  		local e2=Effect.CreateEffect(e:GetHandler())
  		e2:SetType(EFFECT_TYPE_SINGLE)
  		e2:SetCode(EFFECT_SET_DEFENCE)
  		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
  		e2:SetValue(0)
- 		e2:SetReset(RESET_EVENT+0x1fe0000)
+ 		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
  		tc:RegisterEffect(e2)
  		local e3=Effect.CreateEffect(e:GetHandler())
  		e3:SetType(EFFECT_TYPE_SINGLE)

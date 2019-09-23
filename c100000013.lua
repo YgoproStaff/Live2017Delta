@@ -1,4 +1,5 @@
---無限械アイン・ソフ
+--無限械アイン・ソフ (VG)
+--Endless Emptiness (VG)
 function c100000013.initial_effect(c)
 	--Activate to Grave
 	local e1=Effect.CreateEffect(c)
@@ -46,8 +47,9 @@ function c100000013.initial_effect(c)
 	e4:SetOperation(c100000013.thop)
 	c:RegisterEffect(e4)
 end
+c100000013.listed_names={9409625}
 function c100000013.cfilter(c)
-	return c:IsFaceup() and c:IsCode(100000012) and c:IsAbleToGraveAsCost()
+	return c:IsFaceup() and c:IsCode(9409625) and c:IsAbleToGraveAsCost()
 end
 function c100000013.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c100000013.cfilter,tp,LOCATION_ONFIELD,0,1,nil) end
@@ -99,7 +101,7 @@ function c100000013.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp
 end
 function c100000013.cosfilter(c)
-	return (c:IsSetCard(0x4a) or c:IsCode(74530899) or c:IsCode(8967776)) and c:IsType(TYPE_MONSTER) and c:IsDiscardable()
+	return c:IsSetCard(0x4a) and c:IsType(TYPE_MONSTER) and c:IsDiscardable()
 end
 function c100000013.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c100000013.cosfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
@@ -122,7 +124,7 @@ function c100000013.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP)
 end
 function c100000013.thfilter(c)
-	return c:IsCode(100000012) and c:IsAbleToHand()
+	return c:IsCode(9409625) and c:IsAbleToHand()
 end
 function c100000013.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c100000013.thfilter(chkc) end

@@ -1,4 +1,5 @@
---Blue-Eyes Alternative White Dragon
+--青眼の亜白龍 (Anime)
+--Blue-Eyes Alternative White Dragon (Anime)
 --fixed by MLD
 function c511013026.initial_effect(c)
 	c:EnableUnsummonable()
@@ -19,6 +20,7 @@ function c511013026.initial_effect(c)
 	e2:SetValue(89631139)
 	c:RegisterEffect(e2)
 end
+c511013026.listed_names={89631139}
 function c511013026.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()

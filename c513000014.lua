@@ -1,7 +1,7 @@
 --TG ハルバード・キャノン
 function c513000014.initial_effect(c)
 	--synchro summon
-	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsType,TYPE_SYNCHRO),aux.NonTuner(Card.IsType,TYPE_SYNCHRO),2)
+	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsType,TYPE_SYNCHRO),1,1,aux.NonTuner(Card.IsType,TYPE_SYNCHRO),2,99)
 	c:EnableReviveLimit()
 	--register
 	local e1=Effect.CreateEffect(c)

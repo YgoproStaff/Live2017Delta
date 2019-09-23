@@ -10,9 +10,9 @@ function c100000115.initial_effect(c)
 	e1:SetOperation(c100000115.activate)
 	c:RegisterEffect(e1)
 end
-function c100000115.cost(e,tp,eg,ep,ev,re,r,rp,chk)	
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,nil,0x5) end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,nil,0x5)
+function c100000115.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,Card.IsSetCard,1,false,nil,nil,0x5) end
+	local g=Duel.SelectReleaseGroupCost(tp,Card.IsSetCard,1,1,false,nil,nil,0x5)
 	Duel.Release(g,REASON_COST)
 end
 function c100000115.filter(c)

@@ -57,7 +57,8 @@ function c100000235.filter(c,e,tp)
 	return c:IsFaceup() and c:GetSummonPlayer()==tp and g:IsExists(c100000235.filter2,1,nil,c,e,tp)
 end
 function c100000235.filter2(c,eqc,e,tp)
-	return c:GetFlagEffect(100000235)~=0 and c:CheckEquipTarget(eqc) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:GetFlagEffect(100000235)~=0 and c:CheckEquipTarget(eqc) and aux.IsCodeListed(c,eqc:GetCode())
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c100000235.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and eg:IsExists(c100000235.filter,1,nil,e,tp) end	

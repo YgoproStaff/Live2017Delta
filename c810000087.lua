@@ -21,15 +21,15 @@ function c810000087.cfilter(c,tp)
 	return lv>0 and Duel.IsExistingMatchingCard(c810000087.spfilter,tp,LOCATION_DECK,0,1,nil,lv+1)
 end
 function c810000087.filter(c,lv)
-	return c:GetLevel()==lv and c:IsAbleToHand()
+	return c:IsLevel(lv) and c:IsAbleToHand()
 end
 function c810000087.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()~=100 then return false end
 		e:SetLabel(0)
-		return Duel.CheckReleaseGroup(tp,c810000087.cfilter,1,nil,tp)
+		return Duel.CheckReleaseGroupCost(tp,c810000087.cfilter,1,false,nil,nil,tp)
 	end
-	local rg=Duel.SelectReleaseGroup(tp,c810000087.cfilter,1,1,nil,tp)
+	local rg=Duel.SelectReleaseGroupCost(tp,c810000087.cfilter,1,1,false,nil,nil,tp)
 	local lv=rg:GetFirst():GetLevel()
 	Duel.Release(rg,REASON_COST)
 	Duel.SetTargetParam(lv)

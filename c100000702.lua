@@ -13,24 +13,24 @@ function c100000702.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c100000702.condition(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp
+	return Duel.GetAttacker():IsControler(1-tp)
 end
-function c100000702.cosfilter(c,e,tp)
-	return c:IsCode(100000701) and c:IsAbleToGraveAsCost()
+function c100000702.cosfilter(c,ft)
+	return c:IsCode(100000701) and c:IsAbleToGraveAsCost() and (ft>0 or (c:IsLocation(LOCATION_MZONE) and c:GetSequence()<5))
 end
 function c100000702.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost()
-	 and Duel.IsExistingMatchingCard(c100000702.cosfilter,tp,LOCATION_ONFIELD,0,1,nil) end
-	local tc=Duel.SelectMatchingCard(tp,c100000702.cosfilter,tp,LOCATION_ONFIELD,0,1,1,nil)
-	tc:AddCard(e:GetHandler())
-	Duel.SendtoGrave(tc,REASON_COST)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if chk==0 then return ft>-1 and e:GetHandler():IsAbleToGraveAsCost() 
+		and Duel.IsExistingMatchingCard(c100000702.cosfilter,tp,LOCATION_ONFIELD,0,1,nil,ft) end
+	local g=Duel.SelectMatchingCard(tp,c100000702.cosfilter,tp,LOCATION_ONFIELD,0,1,1,nil,ft)
+	g:AddCard(e:GetHandler())
+	Duel.SendtoGrave(g,REASON_COST)
 end
 function c100000702.filter(c,e,tp)
 	return c:IsCode(60417395) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end
 function c100000702.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c100000702.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c100000702.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function c100000702.activate(e,tp,eg,ep,ev,re,r,rp)

@@ -59,21 +59,8 @@ function c511001744.initial_effect(c)
 		ge3:SetCountLimit(1)
 		ge3:SetOperation(c511001744.clear)
 		Duel.RegisterEffect(ge3,0)
-		local ge4=Effect.CreateEffect(c)
-		ge4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge4:SetCode(EVENT_ADJUST)
-		ge4:SetCountLimit(1)
-		ge4:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
-		ge4:SetOperation(c511001744.archchk)
-		Duel.RegisterEffect(ge4,0)
 	end
-end
-function c511001744.archchk(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetFlagEffect(0,420)==0 then 
-		Duel.CreateToken(tp,420)
-		Duel.CreateToken(1-tp,420)
-		Duel.RegisterFlagEffect(0,420,0,0,0)
-	end
+	aux.CallToken(420)
 end
 function c511001744.checkop(e,tp,eg,ep,ev,re,r,rp)
 	if eg:IsExists(Card.IsControler,1,nil,1-tp) then
@@ -87,9 +74,6 @@ function c511001744.clear(e,tp,eg,ep,ev,re,r,rp)
 	c511001744[0]=false
 	c511001744[1]=false
 end
-function c511001744.synfilter(c)
-	return c:IsSetCard(0x20f) or c:IsCode(7391448)
-end
 function c511001744.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
 	local c=e:GetHandler()
@@ -97,7 +81,7 @@ function c511001744.atkcon(e,tp,eg,ep,ev,re,r,rp)
 		and not Duel.IsDamageCalculated()
 end
 function c511001744.atkfilter(c)
-	return c:IsFaceup() and (c:IsSetCard(0x20f) or c:IsCode(7391448))
+	return c:IsFaceup() and c:IsGoyo()
 end
 function c511001744.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c511001744.atkfilter,tp,LOCATION_MZONE,0,1,nil) 
@@ -130,25 +114,23 @@ function c511001744.cttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c511001744.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
-	local tc=g:GetFirst()
-	while tc do
-		Duel.GetControl(tc,tp)
-		tc=g:GetNext()
-	end
+	Duel.GetControl(g,tp)
 end
 function c511001744.ctcon2(e,tp,eg,ep,ev,re,r,rp)
 	return c511001744[tp]
 end
-function c511001744.costfilter(c)
-	return c:IsSetCard(0x20f) or c:IsCode(7391448)
+function c511001744.costfilter(c,dg,ft,tp)
+	return c:IsGoyo() and (ft>0 or (c:IsControler(tp) and c:GetSequence()<5)) and (c:IsControler(tp) or c:IsFaceup())
 end
 function c511001744.ctcost2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c511001744.costfilter,1,nil) end
-	local sg=Duel.SelectReleaseGroup(tp,c511001744.costfilter,1,1,nil)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	local dg=Duel.GetMatchingGroup(c511001744.ctfilter,tp,0,LOCATION_MZONE,nil,e)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,c511001744.costfilter,1,false,aux.ReleaseCheckTarget,nil,dg,ft,tp) end
+	local sg=Duel.SelectReleaseGroupCost(tp,c511001744.costfilter,1,1,false,aux.ReleaseCheckTarget,nil,dg,ft,tp)
 	Duel.Release(sg,REASON_COST)
 end
-function c511001744.ctfilter(c)
-	return c:IsFaceup() and c:IsLevelBelow(8) and c:IsAbleToChangeControler()
+function c511001744.ctfilter(c,e)
+	return c:IsFaceup() and c:IsLevelBelow(8) and c:IsAbleToChangeControler() and (not e or c:IsCanBeEffectTarget(e))
 end
 function c511001744.cttg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c511001744.ctfilter(chkc) end
@@ -159,9 +141,7 @@ function c511001744.cttg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c511001744.ctop2(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() and not Duel.GetControl(tc,tp) then
-		if not tc:IsImmuneToEffect(e) and tc:IsAbleToChangeControler() then
-			Duel.Destroy(tc,REASON_EFFECT)
-		end
+	if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
+		Duel.GetControl(tc,tp)
 	end
 end

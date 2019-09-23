@@ -1,4 +1,5 @@
 --コンタクト・ソウル
+--Contact Soul
 function c100000551.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -11,6 +12,7 @@ function c100000551.initial_effect(c)
 	e1:SetOperation(c100000551.activate)
 	c:RegisterEffect(e1)
 end
+c100000551.listed_names={89943723}
 function c100000551.cfilter(c)
 	return c:IsFaceup() and c:IsCode(89943723)
 end

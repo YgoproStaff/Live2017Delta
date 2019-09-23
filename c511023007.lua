@@ -1,4 +1,5 @@
---E・HERO ストーム・ネオス
+--E・HERO ストーム・ネオス (Anime)
+--Elemental HERO Storm Neos (Anime)
 --cleaned up by MLD
 function c511023007.initial_effect(c)
 	--fusion material
@@ -33,6 +34,7 @@ function c511023007.initial_effect(c)
 	e5:SetOperation(c511023007.desop)
 	c:RegisterEffect(e5)
 end
+c511023007.listed_names={89943723,17955766,54959865,24094653}
 c511023007.material_setcode=0x8
 function c511023007.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA)

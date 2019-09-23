@@ -22,7 +22,7 @@ end
 function c511023008.descon(e,tp,eg,ep,ev,re,r,rp)
 	local ec=e:GetHandler():GetPreviousEquipTarget()
 	return e:GetHandler():IsReason(REASON_LOST_TARGET) and ec:IsLocation(LOCATION_GRAVE)
-		and bit.band(ec:GetReason(),0x41)==0x41
+		and ec:IsReason(REASON_DESTROY)
 end
 function c511023008.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

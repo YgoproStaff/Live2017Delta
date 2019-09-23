@@ -42,7 +42,8 @@ function c511001101.initial_effect(c)
 	c:RegisterEffect(e6)
 end
 function c511001101.descon(e)
-	return not Duel.IsEnvironment(12644061)
+	local c=e:GetHandler()
+	return not Duel.IsEnvironment(12644061) and (c:IsLocation(LOCATION_MZONE) or c:GetType()&TYPE_CONTINUOUS+TYPE_SPELL==TYPE_CONTINUOUS+TYPE_SPELL)
 end
 function c511001101.crystaltg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

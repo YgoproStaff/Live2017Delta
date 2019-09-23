@@ -14,14 +14,15 @@ function c511009559.initial_effect(c)
 end
 function c511009559.filter(c,e,tp,tid)
 	local rk=c:GetRank()
-	return c:IsType(TYPE_XYZ) and c:GetTurnID()==tid and c:GetReason()&REASON_BATTLE~=0
+	local pg=aux.GetMustBeMaterialGroup(tp,Group.FromCards(c),tp,nil,nil,REASON_XYZ)
+	return pg:GetCount()<=1 and c:IsType(TYPE_XYZ) and c:GetTurnID()==tid and c:GetReason()&REASON_BATTLE~=0
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and (rk>0 or c:IsStatus(STATUS_NO_LEVEL)) 
-		and Duel.IsExistingMatchingCard(c511009559.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,rk)
+		and Duel.IsExistingMatchingCard(c511009559.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,rk,pg)
 end
-function c511009559.spfilter(c,e,tp,mc,rk)
+function c511009559.spfilter(c,e,tp,mc,rk,pg)
 	if c.rum_limit and not c.rum_limit(mc,e) then return false end
 	return c:IsType(TYPE_XYZ) and mc:IsType(TYPE_XYZ,c,SUMMON_TYPE_XYZ,tp) and c:IsRank(rk+1) and c:IsRace(RACE_SPELLCASTER) and mc:IsCanBeXyzMaterial(c,tp) 
-		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
+		and (pg:GetCount()<=0 or pg:IsContains(mc)) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function c511009559.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tid=Duel.GetTurnCount()
@@ -49,8 +50,9 @@ function c511009559.spop(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetReset(RESET_EVENT+0x1fe0000)
 	tc:RegisterEffect(e2)
 	Duel.SpecialSummonComplete()
+	local pg=aux.GetMustBeMaterialGroup(tp,Group.FromCards(tc),tp,nil,nil,REASON_XYZ)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c511009559.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc,tc:GetRank())
+	local g=Duel.SelectMatchingCard(tp,c511009559.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc,tc:GetRank(),pg)
 	local sc=g:GetFirst()
 	if sc then
 		Duel.BreakEffect()

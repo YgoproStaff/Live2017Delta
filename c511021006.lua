@@ -70,7 +70,7 @@ function c511021006.atkop(e,tp,eg,ep,ev,re,r,rp,chk)
 		e2:SetCode(EVENT_ADJUST)
 		e2:SetRange(LOCATION_MZONE)	
 		e2:SetOperation(c511021006.atkup)
-		e2:SetReset(RESET_EVENT+0x1fe0000)
+		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e2)
 	end
 end

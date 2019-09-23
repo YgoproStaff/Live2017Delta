@@ -13,10 +13,7 @@ function c511002395.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_FUSION) and c:IsAbleToExtra() and c:IsSetCard(0x3008)
 end
 function c511002395.spfilter(c,e,tp,lv)
-	return c:IsType(TYPE_FUSION) and c:IsSetCard(0x3008) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) 
-end
-function c511002395.lvfilter(c,lv)
-	return c:GetLevel()==lv
+	return c:IsType(TYPE_FUSION) and c:IsSetCard(0x3008) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and c:CheckFusionMaterial()
 end
 function c511002395.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c511002395.filter,tp,LOCATION_MZONE,0,1,nil) end
@@ -36,7 +33,7 @@ function c511002395.activate(e,tp,eg,ep,ev,re,r,rp)
 			local sumg=Duel.GetMatchingGroup(c511002395.spfilter,tp,LOCATION_EXTRA,0,nil,e,tp)
 			sumg:Sub(spg)
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-			local gc=sumg:FilterSelect(tp,c511002395.lvfilter,1,1,nil,tc:GetPreviousLevelOnField()):GetFirst()
+			local gc=sumg:FilterSelect(tp,Card.IsLevel,1,1,nil,tc:GetPreviousLevelOnField()):GetFirst()
 			if gc then
 				spg:AddCard(gc)
 			end

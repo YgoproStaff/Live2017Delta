@@ -11,41 +11,70 @@ function c511600005.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(511600005,0))
 	e2:SetCategory(CATEGORY_ATKCHANGE)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetCountLimit(1)
 	e2:SetCondition(c511600005.condition)
-	e2:SetTarget(c511600005.target)
 	e2:SetOperation(c511600005.operation)
 	c:RegisterEffect(e2)
 end
 function c511600005.filter(c)
-	return c:IsFaceup() and c:IsRace(RACE_SPELLCASTER)
+	return c:IsFaceup() and c:IsRace(RACE_SPELLCASTER) and c:GetAttackedCount()==0 and c:IsAttackable()
 end
 function c511600005.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c511600005.filter,tp,LOCATION_MZONE,0,2,nil)
-end
-function c511600005.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c511600005.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c511600005.filter,tp,LOCATION_MZONE,0,2,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local g1=Duel.SelectTarget(tp,c511600005.filter,tp,LOCATION_MZONE,0,2,2,nil,tp)
+	local at=Duel.GetAttacker()
+	return at:IsControler(tp) and at:IsRace(RACE_SPELLCASTER) 
+		and Duel.IsExistingMatchingCard(c511600005.filter,tp,LOCATION_MZONE,0,1,at)
 end
 function c511600005.operation(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local g1=g:Select(tp,1,1,nil)
-	g:Sub(g1)
-	local tc1=g1:GetFirst()
-	local tc2=g:GetFirst()
-	if tc1:IsFacedown() or tc2:IsFacedown() or not tc1:IsRelateToEffect(e) or not tc2:IsRelateToEffect(e) then return end
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-	e1:SetValue(3000)
-	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-	tc1:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetCode(EFFECT_CANNOT_ATTACK)
-	tc2:RegisterEffect(e2)
+	local c=e:GetHandler()
+	local tc=Duel.GetAttacker()
+	if Duel.SelectEffectYesNo(tp,c) then
+		local g=Duel.GetMatchingGroup(c511600005.filter,tp,LOCATION_MZONE,0,tc)
+		for sc in aux.Next(g) do
+			tc:SetCardTarget(sc)
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_CANNOT_ATTACK)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+			sc:RegisterEffect(e1)
+		end
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+		e1:SetCondition(c511600005.atkcon)
+		e1:SetValue(3000)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_DAMAGE)
+		tc:RegisterEffect(e1)
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
+		e2:SetCode(EVENT_LEAVE_FIELD)
+		e2:SetReset(RESET_PHASE+PHASE_DAMAGE)
+		e2:SetOperation(c511600005.desop)
+		tc:RegisterEffect(e2)
+		local e3=Effect.CreateEffect(c)
+		e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+		e3:SetCode(EVENT_DAMAGE_STEP_END)
+		e3:SetRange(LOCATION_MZONE)
+		e3:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e3:SetOperation(c511600005.reset)
+		tc:RegisterEffect(e3)
+	end
+end
+function c511600005.atkcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetCardTargetCount()>0
+end
+function c511600005.desop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local g=c:GetCardTarget():Filter(Card.IsLocation,nil,LOCATION_MZONE)
+	if c:IsReason(REASON_DESTROY+REASON_BATTLE) and g:GetCount()>0 then
+		Duel.Destroy(g,REASON_BATTLE)
+	end
+	e:Reset()
+end
+function c511600005.reset(e,tp,eg,ep,ev,re,r,rp)
+	for tc in aux.Next(e:GetHandler():GetCardTarget()) do
+		e:GetHandler():CancelCardTarget(tc)
+	end
+	e:Reset()
 end

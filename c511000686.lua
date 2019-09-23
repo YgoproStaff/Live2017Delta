@@ -24,18 +24,22 @@ function c511000686.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tg=eg:GetFirst()
 	local rk=tg:GetRank()
 	if chkc then return chkc==tg end
-	if chk==0 then return tg:IsOnField() and tg:IsCanBeEffectTarget(e) and tg:IsAbleToGrave() 
-		and (rk>0 or tg:IsStatus(STATUS_NO_LEVEL)) and Duel.IsPlayerCanSpecialSummonCount(tp,2) and Duel.GetLocationCountFromEx(tp,tp,tg)>1
-		and Duel.IsExistingMatchingCard(c511000686.filter2,tp,LOCATION_EXTRA,0,1,nil,rk+1,e,tp,tg)
-		and Duel.IsExistingMatchingCard(c511000686.filter2,tp,LOCATION_EXTRA,0,1,nil,rk+2,e,tp,tg) end
+	if chk==0 then
+		local pg=aux.GetMustBeMaterialGroup(tp,Group.CreateGroup(),tp,nil,nil,REASON_XYZ)
+		return pg:GetCount()<=0 and tg:IsOnField() and tg:IsCanBeEffectTarget(e) and tg:IsAbleToGrave() 
+			and (rk>0 or tg:IsStatus(STATUS_NO_LEVEL)) and Duel.IsPlayerCanSpecialSummonCount(tp,2) and Duel.GetLocationCountFromEx(tp,tp,tg)>1
+			and Duel.IsExistingMatchingCard(c511000686.filter2,tp,LOCATION_EXTRA,0,1,nil,rk+1,e,tp,tg)
+			and Duel.IsExistingMatchingCard(c511000686.filter2,tp,LOCATION_EXTRA,0,1,nil,rk+2,e,tp,tg)
+	end
 	Duel.SetTargetCard(tg)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,tg,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_EXTRA)
 end
 function c511000686.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if not tc or tc:IsFacedown() or not tc:IsRelateToEffect(e) or tc:IsControler(1-tp) or tc:IsImmuneToEffect(e) then return end
-	if Duel.GetLocationCountFromEx(tp,tp,tc)<=1 or Duel.SendtoGrave(tc,REASON_EFFECT)==0 then return end
+	local pg=aux.GetMustBeMaterialGroup(tp,Group.CreateGroup(),tp,nil,nil,REASON_XYZ)
+	if not tc or tc:IsFacedown() or not tc:IsRelateToEffect(e) or tc:IsControler(1-tp) or tc:IsImmuneToEffect(e) or pg:GetCount()>0 
+		or Duel.GetLocationCountFromEx(tp,tp,tc)<=1 or Duel.SendtoGrave(tc,REASON_EFFECT)==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local tc1=Duel.SelectMatchingCard(tp,c511000686.filter2,tp,LOCATION_EXTRA,0,1,1,nil,tc:GetRank()+1,e,tp,tc):GetFirst()
 	if tc1 then

@@ -1,4 +1,4 @@
---Holding Arms
+--Holding Arms (Anime)
 function c511000164.initial_effect(c)
 	--attack
 	local e1=Effect.CreateEffect(c)
@@ -32,6 +32,15 @@ function c511000164.initial_effect(c)
 	e4:SetCondition(c511000164.effcon)
 	e4:SetValue(c511000164.efilterx)
 	c:RegisterEffect(e4)
+	local e5=Effect.CreateEffect(c)
+	e5:SetCode(EFFECT_SEND_REPLACE)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetCondition(c511000164.effcon)
+	e5:SetTarget(c511000164.reptg)
+	e5:SetValue(function(e,c) return false end)
+	c:RegisterEffect(e5)
 end
 function c511000164.condition(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetAttackTarget()
@@ -93,7 +102,7 @@ function c511000164.desop(e,tp,eg,ep,ev,re,r,rp)
 		if e:GetLabelObject() then e:GetLabelObject():Reset() end
 		c:ResetFlagEffect(511000164)
 		Duel.Destroy(c,REASON_EFFECT)
-		if re and re.Reset then re:Reset() end
+		if re then re:Reset() end
 	end
 end
 function c511000164.efilter(c)
@@ -104,5 +113,9 @@ function c511000164.effcon(e)
 end
 function c511000164.efilterx(e,te)
 	if not te then return false end
-	return te:IsHasCategory(CATEGORY_TOHAND+CATEGORY_DESTROY+CATEGORY_REMOVE+CATEGORY_TODECK+CATEGORY_RELEASE+CATEGORY_TOGRAVE)
+	return te:IsHasCategory(CATEGORY_TOHAND+CATEGORY_DESTROY+CATEGORY_REMOVE+CATEGORY_TODECK+CATEGORY_RELEASE+CATEGORY_TOGRAVE+CATEGORY_FUSION_SUMMON)
+end
+function c511000164.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return re and e:GetHandler():IsReason(REASON_EFFECT) and r&REASON_EFFECT~=0 end
+	return true
 end

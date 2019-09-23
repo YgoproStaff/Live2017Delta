@@ -115,7 +115,7 @@ function c511009508.atkop(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetCode(EFFECT_SET_ATTACK_FINAL)
 			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 			e1:SetValue(0)
-			if tc:RegisterEffect(e1)>0 and atk>0 then
+			if tc:RegisterEffect(e1)~=0 and atk and atk>0 then
 				sum=atk
 			end
 		end

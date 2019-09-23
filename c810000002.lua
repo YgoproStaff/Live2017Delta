@@ -43,7 +43,7 @@ end
 function c810000002.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) and (tc:IsType(TYPE_FIELD) or Duel.GetLocationCount(tp,LOCATION_SZONE)>0) 
-		and not c:IsHasEffect(EFFECT_CANNOT_TRIGGER) then
+		and not tc:IsHasEffect(EFFECT_CANNOT_TRIGGER) then
 		local te=tc:GetActivateEffect()
 		local pre={Duel.GetPlayerEffect(tp,EFFECT_CANNOT_ACTIVATE)}
 		if pre[1] then
@@ -93,7 +93,7 @@ function c810000002.activate(e,tp,eg,ep,ev,re,r,rp)
 			Duel.Equip(tp,tc,g:GetFirst())
 		end
 		tc:ReleaseEffectRelation(te)
-		if etc then	
+		if etc then 
 			etc=g:GetFirst()
 			while etc do
 				etc:ReleaseEffectRelation(te)

@@ -1,14 +1,16 @@
 --E－HERO マリシャス・デビル
-function c86676862.initial_effect(c)
+--Evil HERO Malicious Fiend
+local s,id=GetID()
+function s.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
-	aux.AddFusionProcMix(c,true,true,58554959,c86676862.ffilter)
+	aux.AddFusionProcMix(c,true,true,58554959,s.ffilter)
 	--spsummon condition
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e2:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e2:SetValue(c86676862.splimit)
+	e2:SetValue(aux.EvilHeroLimit)
 	c:RegisterEffect(e2)
 	--Pos Change
 	local e3=Effect.CreateEffect(c)
@@ -17,7 +19,7 @@ function c86676862.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetTargetRange(0,LOCATION_MZONE)
-	e3:SetCondition(c86676862.poscon)
+	e3:SetCondition(s.poscon)
 	e3:SetValue(POS_FACEUP_ATTACK)
 	c:RegisterEffect(e3)
 	--must attack
@@ -26,7 +28,7 @@ function c86676862.initial_effect(c)
 	e4:SetCode(EFFECT_MUST_ATTACK)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetTargetRange(0,LOCATION_MZONE)
-	e4:SetCondition(c86676862.poscon)
+	e4:SetCondition(s.poscon)
 	c:RegisterEffect(e4)
 	local e5=e4:Clone()
 	e5:SetCode(EFFECT_MUST_ATTACK_MONSTER)
@@ -37,15 +39,16 @@ function c86676862.initial_effect(c)
 	e6:SetValue(1)
 	c:RegisterEffect(e6)
 end
-c86676862.material_setcode={0x8,0x6008}
-c86676862.dark_calling=true
-function c86676862.splimit(e,se,sp,st)
+s.material_setcode={0x8,0x6008}
+s.dark_calling=true
+s.listed_names={CARD_DARK_FUSION,58554959}
+function s.splimit(e,se,sp,st)
 	return st==SUMMON_TYPE_FUSION+0x10
 end
-function c86676862.ffilter(c,fc,sumtype,tp)
+function s.ffilter(c,fc,sumtype,tp)
 	return c:IsRace(RACE_FIEND,fc,sumtype,tp) and c:GetLevel()>=6
 end
-function c86676862.poscon(e)
+function s.poscon(e)
 	local ph=Duel.GetCurrentPhase()
 	return Duel.GetTurnPlayer()~=e:GetHandlerPlayer() and ph>=0x8 and ph<=0x20
 end

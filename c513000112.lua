@@ -20,6 +20,7 @@ function c513000112.initial_effect(c)
 	e2:SetCondition(c513000112.regcon)
 	e2:SetOperation(c513000112.regop)
 	c:RegisterEffect(e2)
+	aux.CallToken(420)
 end
 function c513000112.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsReason(REASON_DESTROY)
@@ -57,7 +58,7 @@ function c513000112.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker():IsControler(1-tp)
 end
 function c513000112.filter(c,e,tp)
-	return (c:IsSetCard(0xec) or c:IsSetCard(0xb1)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsYomi() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c513000112.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c513000112.filter(chkc,e,tp) end

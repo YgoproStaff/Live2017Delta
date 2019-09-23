@@ -12,7 +12,7 @@ end
 function c511004408.tg(e,tp,eg,ev,ep,re,r,rp,chk)
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	local t1=Duel.CheckEvent(EVENT_ATTACK_ANNOUNCE) and a and d and d:IsAttribute(ATTRIBUTE_DARK) and a:IsControler(1-tp)
+	local t1=Duel.CheckEvent(EVENT_ATTACK_ANNOUNCE) and a and d and d:IsFaceup() and d:IsAttribute(ATTRIBUTE_DARK) and a:IsControler(1-tp)
 	local t2=not Duel.IsPlayerAffectedByEffect(tp,59822133) and Duel.GetLocationCount(tp,LOCATION_MZONE)>2 
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,511004422,0x10f3,0x4011,0,0,1,RACE_PLANT,ATTRIBUTE_DARK)
 	if chk==0 then return t1 or t2 end
@@ -35,7 +35,7 @@ function c511004408.tg(e,tp,eg,ev,ep,re,r,rp,chk)
 	if opt==1 or opt==2 then
 		e:SetCategory(e:GetCategory()+CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
 		Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,3,0,0)
-		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,3,0,0)
+		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,3,tp,0)
 	end
 	Duel.SetTargetParam(opt)
 end

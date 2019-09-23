@@ -1,4 +1,4 @@
---Elemental HERO Absolute Zero
+--Elemental HERO Absolute Zero (manga)
 function c511023011.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddFusionProcMix(c,true,true,aux.FilterBoolFunction(Card.IsFusionSetCard,0x8),aux.FilterBoolFunctionEx(Card.IsAttribute,ATTRIBUTE_WATER))
@@ -12,7 +12,7 @@ function c511023011.initial_effect(c)
 end
 c511023011.material_setcode=0x8
 function c511023011.filter(c)
-	return c:IsFaceup() and c:IsRace(ATTRIBUTE_WATER)
+	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_WATER)
 end
 function c511023011.value(e,c)
 	return Duel.GetMatchingGroupCount(c511023011.filter,0,LOCATION_MZONE,LOCATION_MZONE,e:GetHandler())*500

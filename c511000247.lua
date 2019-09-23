@@ -1,7 +1,7 @@
 --Polar God Emperor Thor
 function c511000247.initial_effect(c)
 	--Synchro Summon
-	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),2)
+	aux.AddSynchroProcedure(c,nil,1,1,aux.NonTuner(nil),2,99)
 	c:EnableReviveLimit()
 	c:SetUniqueOnField(1,0,511000247)
 	--Effect Absorber
@@ -79,7 +79,7 @@ function c511000247.regop(e,tp,eg,ep,ev,re,r,rp)
 	local pos=c:GetPreviousPosition()
 	if c:IsReason(REASON_BATTLE) then pos=c:GetBattlePosition() end
 	if c:IsReason(REASON_DESTROY)
-		and c:IsPreviousLocation(LOCATION_ONFIELD) and bit.band(pos,POS_FACEUP)~=0 then
+		and c:IsPreviousLocation(LOCATION_ONFIELD) and pos&POS_FACEUP~=0 then
 		c:RegisterFlagEffect(511000247,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 	end
 end
@@ -97,7 +97,7 @@ function c511000247.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c511000247.damcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+1
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_SPECIAL+1)
 end
 function c511000247.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

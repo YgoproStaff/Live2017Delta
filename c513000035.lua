@@ -85,7 +85,7 @@ function c513000035.discon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsStatus(STATUS_BATTLE_DESTROYED) then return false end
 	if not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
-	return re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) and Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS):IsContains(c)
+	return rp == tp and re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) and Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS):IsContains(c)
 end
 function c513000035.disop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

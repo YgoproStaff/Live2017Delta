@@ -24,7 +24,7 @@ function c100000490.xyzfilter(c,mg,sc,set)
 			e1:SetCode(EFFECT_XYZ_MATERIAL)
 			tc:RegisterEffect(e1)
 			table.insert(reset,e1)
-			tc=g:GetNext()
+			tc=mg:GetNext()
 		end
 	end
 	local res=c:IsXyzSummonable(mg,mg:GetCount(),mg:GetCount())
@@ -33,18 +33,17 @@ function c100000490.xyzfilter(c,mg,sc,set)
 	end
 	return res
 end
-function c100000490.rescon(sg,e,tp,mg)
-	return Duel.IsExistingMatchingCard(c100000490.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,sg,e:GetHandler())
-end
-function c100000490.rescon2(sg,e,tp,mg)
-	return Duel.IsExistingMatchingCard(c100000490.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,sg,e:GetHandler(),true)
+function c100000490.rescon(set)
+	return	function(sg,e,tp,mg)
+				return Duel.IsExistingMatchingCard(c100000490.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,sg,e:GetHandler(),set)
+			end
 end
 function c100000490.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	local mg=Duel.GetMatchingGroup(c100000490.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,e)
-	if chk==0 then return aux.SelectUnselectGroup(mg,e,tp,nil,nil,c100000490.rescon,0) end
+	if chk==0 then return aux.SelectUnselectGroup(mg,e,tp,nil,nil,c100000490.rescon(false),0) end
 	local reset={}
-	local tc=g:GetFirst()
+	local tc=mg:GetFirst()
 	while tc do
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -52,10 +51,10 @@ function c100000490.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		e1:SetCode(EFFECT_XYZ_MATERIAL)
 		tc:RegisterEffect(e1)
 		table.insert(reset,e1)
-		tc=g:GetNext()
+		tc=mg:GetNext()
 	end
-	local tg=aux.SelectUnselectGroup(mg,e,tp,nil,nil,c100000490.rescon2,1,tp,HINTMSG_XMATERIAL,c100000490.rescon2)
-	Duel.SetTargetCard(g)
+	local tg=aux.SelectUnselectGroup(mg,e,tp,nil,nil,c100000490.rescon(true),1,tp,HINTMSG_XMATERIAL,c100000490.rescon(true))
+	Duel.SetTargetCard(tg)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 	for _,te in ipairs(reset) do
 		te:Reset()

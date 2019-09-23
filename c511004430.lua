@@ -20,8 +20,8 @@ function c511004430.cfilter(c,tp)
 	return Duel.IsExistingTarget(c511004430.filter,tp,LOCATION_MZONE,0,1,c,tp,c)
 end
 function c511004430.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c511004430.cfilter,1,nil,tp) end
-	local g=Duel.SelectReleaseGroup(tp,c511004430.cfilter,1,1,nil,tp)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,c511004430.cfilter,1,false,nil,nil,tp) end
+	local g=Duel.SelectReleaseGroupCost(tp,c511004430.cfilter,1,1,false,nil,nil,tp)
 	Duel.Release(g,REASON_COST)
 end
 function c511004430.filter1(c,tp,rc)

@@ -23,10 +23,10 @@ end
 function c511001573.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetAttackTarget()
+	if not tc or not tc:IsRelateToBattle() then return end
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_PRE_BATTLE_DAMAGE)
-	e2:SetCondition(c511001573.rdcon)
 	e2:SetOperation(c511001573.rdop)
 	e2:SetReset(RESET_PHASE+PHASE_DAMAGE)
 	tc:RegisterEffect(e2)		
@@ -36,20 +36,16 @@ function c511001573.activate(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetOperation(c511001573.spop)
 	e2:SetReset(RESET_PHASE+PHASE_DAMAGE)
 	Duel.RegisterEffect(e2,tp)
-	local e3=Effect.CreateEffect(e:GetHandler())
+	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e3:SetTargetRange(0,LOCATION_MZONE)
 	e3:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
 	e3:SetValue(1)
 	Duel.RegisterEffect(e3,tp)
 end
-function c511001573.rdcon(e,tp,eg,ep,ev,re,r,rp)
-	return ep==tp
-end
 function c511001573.rdop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChangeBattleDamage(ep,ev-500)
+	Duel.ChangeBattleDamage(tp,math.min(Duel.GetBattleDamage(tp)-500,0))
 end
 function c511001573.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end

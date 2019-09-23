@@ -6,16 +6,16 @@ function c511000503.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCondition(c511000503.con)
+	e1:SetCondition(c511000503.condition)
 	e1:SetTarget(c511000503.target)
 	e1:SetOperation(c511000503.activate)
 	c:RegisterEffect(e1)
 end
 function c511000503.filter(c)
-	return c:GetLevel()>=4 and c:IsSetCard(0x8)
+	return c:IsLevelBelow(4) and c:IsSetCard(0x8)
 end
-function c511000503.con(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c511000503.filter,tp,LOCATION_GRAVE,0,5,nil)
+function c511000503.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(c511000503.filter,tp,LOCATION_GRAVE,0,2,nil)
 end
 function c511000503.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,3) end

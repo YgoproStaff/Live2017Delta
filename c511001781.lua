@@ -14,18 +14,9 @@ function c511001781.initial_effect(c)
 	local e7=Effect.CreateEffect(c)
 	e7:SetType(EFFECT_TYPE_SINGLE)
 	e7:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e7:SetValue(c511001781.indes)
+	e7:SetValue(aux.NOT(aux.TargetBoolFunction(Card.IsSetCard,0x48)))
 	c:RegisterEffect(e7)
-	if not c511001781.global_check then
-		c511001781.global_check=true
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_ADJUST)
-		ge2:SetCountLimit(1)
-		ge2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
-		ge2:SetOperation(c511001781.numchk)
-		Duel.RegisterEffect(ge2,0)
-	end
+	aux.CallToken(6387204)
 end
 c511001781.xyz_number=6
 function c511001781.rumfilter(c)
@@ -48,9 +39,9 @@ function c511001781.rankupregop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCountLimit(1)
 	e1:SetTarget(c511001781.eqtg)
 	e1:SetOperation(c511001781.eqop)
-	e1:SetReset(RESET_EVENT+0x1fe0000)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e1)
-	aux.AddEREquipLimit(c,nil,aux.FilterBoolFunction(Card.IsSetCard,0x48),c511001781.equipop,e1,nil,RESET_EVENT+0x1fe0000)
+	aux.AddEREquipLimit(c,nil,aux.FilterBoolFunction(Card.IsSetCard,0x48),c511001781.equipop,e1,nil,RESET_EVENT+RESETS_STANDARD)
 	--equip 2
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(32559361,0))
@@ -59,9 +50,9 @@ function c511001781.rankupregop(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetCode(EVENT_BATTLED)
 	e2:SetTarget(c511001781.eqtg2)
 	e2:SetOperation(c511001781.eqop)
-	e2:SetReset(RESET_EVENT+0x1fe0000)
+	e2:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e2)
-	aux.AddEREquipLimit(c,nil,aux.NOT(aux.FilterBoolFunction(Card.IsType,TYPE_TOKEN)),c511001781.equipop,e2,nil,RESET_EVENT+0x1fe0000)
+	aux.AddEREquipLimit(c,nil,aux.NOT(aux.FilterBoolFunction(Card.IsType,TYPE_TOKEN)),c511001781.equipop,e2,nil,RESET_EVENT+RESETS_STANDARD)
 	--atkup
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
@@ -69,7 +60,7 @@ function c511001781.rankupregop(e,tp,eg,ep,ev,re,r,rp)
 	e3:SetCode(EFFECT_UPDATE_ATTACK)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetValue(c511001781.val)
-	e3:SetReset(RESET_EVENT+0x1fe0000)
+	e3:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e3)
 	--
 	local e4=Effect.CreateEffect(c)
@@ -83,7 +74,7 @@ function c511001781.rankupregop(e,tp,eg,ep,ev,re,r,rp)
 	e4:SetCost(c511001781.discost)
 	e4:SetTarget(c511001781.distg)
 	e4:SetOperation(c511001781.disop)
-	e4:SetReset(RESET_EVENT+0x1fe0000)
+	e4:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e4)
 	--lp 1
 	local e5=Effect.CreateEffect(c)
@@ -93,7 +84,7 @@ function c511001781.rankupregop(e,tp,eg,ep,ev,re,r,rp)
 	e5:SetCost(c511001781.lpcost)
 	e5:SetTarget(c511001781.lptg)
 	e5:SetOperation(c511001781.lpop)
-	e5:SetReset(RESET_EVENT+0x1fe0000)
+	e5:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e5,false,1)
 	--spsummon
 	local e6=Effect.CreateEffect(c)
@@ -105,8 +96,16 @@ function c511001781.rankupregop(e,tp,eg,ep,ev,re,r,rp)
 	e6:SetCondition(c511001781.spcon)
 	e6:SetTarget(c511001781.sptg)
 	e6:SetOperation(c511001781.spop)
-	e6:SetReset(RESET_EVENT+0x1fe0000)
+	e6:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e6)
+	--Double Snare
+	local e7=Effect.CreateEffect(c)
+	e7:SetType(EFFECT_TYPE_SINGLE)
+	e7:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
+	e7:SetRange(LOCATION_SZONE)
+	e7:SetCode(3682106)
+	e7:SetReset(RESET_EVENT+RESETS_STANDARD)
+	c:RegisterEffect(e7)
 end
 function c511001781.eqfilter(c,tp)
 	return c:IsSetCard(0x48) and (c:IsAbleToChangeControler() or c:IsControler(tp))
@@ -160,7 +159,7 @@ end
 function c511001781.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
-	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
+	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
@@ -192,20 +191,25 @@ function c511001781.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return tp==Duel.GetTurnPlayer() and c:GetOverlayCount()==0
 end
-function c511001781.spfilter(c,e,tp,mc)
-	return c:IsCode(9161357) and mc:IsCanBeXyzMaterial(c,tp) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,true)
+function c511001781.spfilter(c,e,tp,mc,pg)
+	return c:IsCode(9161357) and mc:IsCanBeXyzMaterial(c,tp) and (pg:GetCount()<=0 or pg:IsContains(mc)) 
+		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,true)
 end
 function c511001781.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 
-		and Duel.IsExistingMatchingCard(c511001781.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp,c) end
+	if chk==0 then
+		local pg=aux.GetMustBeMaterialGroup(tp,Group.FromCards(c),tp,nil,nil,REASON_XYZ)
+		return pg:GetCount()<=1 and Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 
+			and Duel.IsExistingMatchingCard(c511001781.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp,c,pg)
+	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
 end
 function c511001781.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsFacedown() or not c:IsRelateToEffect(e) or c:IsControler(1-tp) or c:IsImmuneToEffect(e) then return end
+	local pg=aux.GetMustBeMaterialGroup(tp,Group.FromCards(c),tp,nil,nil,REASON_XYZ)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c511001781.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp,c)
+	local g=Duel.SelectMatchingCard(tp,c511001781.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp,c,pg)
 	local sc=g:GetFirst()
 	if sc then
 		local mg=c:GetOverlayGroup()
@@ -217,11 +221,4 @@ function c511001781.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,false,true,POS_FACEUP)
 		sc:CompleteProcedure()
 	end
-end
-function c511001781.numchk(e,tp,eg,ep,ev,re,r,rp)
-	Duel.CreateToken(tp,6387204)
-	Duel.CreateToken(1-tp,6387204)
-end
-function c511001781.indes(e,c)
-	return not c:IsSetCard(0x48)
 end

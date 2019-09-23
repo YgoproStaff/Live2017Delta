@@ -1,14 +1,15 @@
 -- Forceful Deal
 -- scripted by: UnknownGuest
+--fixed by MLD
 function c800000000.initial_effect(c)
 	-- Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetCondition(c800000000.condition)
+	e1:SetCost(c800000000.cost)
 	e1:SetTarget(c800000000.target)
 	e1:SetOperation(c800000000.activate)
-	e1:SetCost(c800000000.cost)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -24,29 +25,28 @@ function c800000000.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c800000000.cfilter,1,nil,tp)
 end
 function c800000000.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	local g=Duel.GetReleaseGroup(tp)
+	e:SetLabel(g:GetCount())
+	if chk==0 then return g:GetCount()>0 and g:FilterCount(aux.MZFilter,nil,tp)+Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
 	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
-	local sg=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_MZONE,0,nil)
-	Duel.Destroy(sg,REASON_EFFECT)
+	local exg=Duel.GetMatchingGroup(aux.ReleaseCostFilter,tp,0,LOCATION_MZONE,nil)
+	exg:Sub(g)
+	if exg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(59160188,2)) then
+		g:Merge(exg)
+	end
+	Duel.Release(g,REASON_COST)
 end
-
-function c800000000.confilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsControlerCanBeChanged()
-end
-
 function c800000000.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c800000000.confilter,tp,0,LOCATION_MZONE,1,nil) end
+	local g=Duel.GetMatchingGroup(Card.IsControlerCanBeChanged,tp,0,LOCATION_MZONE,nil,true)
+	if chk==0 then
+		local ct=e:GetLabel()
+		e:SetLabel(0)
+		return g:GetCount()>0 and Duel.GetLocationCount(tp,LOCATION_MZONE,1-tp,LOCATION_REASON_CONTROL)>=-ct+g:GetCount()
+	end
 	Duel.SetOperationInfo(0,CATEGORY_CONTROL,nil,1,1-tp,LOCATION_MZONE)
+	e:SetLabel(0)
 end
 function c800000000.activate(e,tp,eg,ep,ev,re,r,rp)
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	local c=e:GetHandler()
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
-	local g=Duel.SelectMatchingCard(tp,c800000000.confilter,tp,0,LOCATION_MZONE,ft,ft,nil)
-	local tc=g:GetFirst()
-	while tc do
-		Duel.GetControl(tc,tp)
-		tc=g:GetNext()
-	end
+	local g=Duel.GetMatchingGroup(Card.IsControlerCanBeChanged,tp,0,LOCATION_MZONE,nil,true)
+	Duel.GetControl(g,tp)
 end

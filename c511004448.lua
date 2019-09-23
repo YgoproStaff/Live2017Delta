@@ -11,27 +11,26 @@ function c511004448.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c511004448.filter(c,tp)
-	return bit.band(c:GetPreviousTypeOnField(),TYPE_MONSTER)==TYPE_MONSTER and bit.band(c:GetPreviousTypeOnField(),TYPE_PENDULUM)==TYPE_PENDULUM and c:GetPreviousControler()==tp
+	return c:GetPreviousTypeOnField()&(TYPE_PENDULUM+TYPE_MONSTER)==(TYPE_PENDULUM+TYPE_MONSTER) and c:GetPreviousControler()==tp
 end
 function c511004448.condition(e,tp,eg,ev,ep,re,r,rp)
 	return eg:IsExists(c511004448.filter,1,nil,tp)
 end
 function c511004448.target(e,tp,eg,ev,ep,re,r,rp,chk,chkc)
-	local lp=Duel.GetFieldCard(tp,LOCATION_SZONE,6)
-	local rp=Duel.GetFieldCard(tp,LOCATION_SZONE,7)
+	local lp=Duel.GetFieldCard(tp,LOCATION_PZONE,0)
+	local rp=Duel.GetFieldCard(tp,LOCATION_PZONE,1)
 	if chkc then return eg:IsExists(c511004448.filter,1,nil) and (lp==nil or rp==nil) end
 	if chk==0 then return lp==nil or rp==nil end
 	local tc=eg:FilterSelect(tp,c511004448.filter,1,1,nil,tp)
 	Duel.SetTargetCard(tc)
 end
 function c511004448.operation(e,tp,eg,ev,ep,re,r,rp)
-	local lp=Duel.GetFieldCard(tp,LOCATION_SZONE,6)
-	local rp=Duel.GetFieldCard(tp,LOCATION_SZONE,7)
+	local lp=Duel.GetFieldCard(tp,LOCATION_PZONE,0)
+	local rp=Duel.GetFieldCard(tp,LOCATION_PZONE,1)
 	if lp and rp then return end
-	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
-		local e1=Effect.CreateEffect(c)
+	if tc and tc:IsRelateToEffect(e) and Duel.MoveToField(tc,tp,tp,LOCATION_PZONE,POS_FACEUP,true) then
+		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetCode(EFFECT_CHANGE_DAMAGE)

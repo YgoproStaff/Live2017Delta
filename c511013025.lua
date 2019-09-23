@@ -12,11 +12,11 @@ function c511013025.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c511013025.cfilter(c)
-	return c:IsFaceup() and bit.band(c:GetType(),TYPE_SPELL+TYPE_FIELD)==TYPE_SPELL+TYPE_FIELD
+	return c:IsFaceup() and c:IsType(TYPE_SPELL)
 end
 function c511013025.condition(e,tp,eg,ep,ev,re,r,rp)
 	return rp~=tp and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev) 
-		and Duel.IsExistingMatchingCard(c511013025.cfilter,tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingMatchingCard(c511013025.cfilter,tp,LOCATION_SZONE,0,1,nil)
 end
 function c511013025.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

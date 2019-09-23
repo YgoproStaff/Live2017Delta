@@ -4,23 +4,34 @@ function c511000763.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(511000763,0))
 	e1:SetCategory(CATEGORY_LVCHANGE+CATEGORY_RECOVER)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetOperation(c511000763.op)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetCountLimit(1)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCondition(c511000763.lvcon)
+	e1:SetTarget(c511000763.lvtg)
+	e1:SetOperation(c511000763.lvop)
 	c:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	c:RegisterEffect(e2)
-	local e3=e1:Clone()
-	e3:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
-	c:RegisterEffect(e3)
 end
-function c511000763.op(e,tp,eg,ep,ev,re,r,rp)
+
+function c511000763.lvcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsStatus(STATUS_SUMMON_TURN+STATUS_SPSUMMON_TURN)
+end
+function c511000763.lvfilter(c,lv)
+	return c:IsFaceup() and c:GetLevel()>0 and c:GetLevel()~=lv
+end
+function c511000763.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local lv=e:GetHandler():GetLevel()
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c511000763.lvfilter(chkc,lv) end
+	if chk==0 then return Duel.IsExistingTarget(c511000763.lvfilter,tp,LOCATION_MZONE,0,1,nil,lv) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	Duel.SelectTarget(tp,c511000763.lvfilter,tp,LOCATION_MZONE,0,1,1,nil,lv)
+end
+function c511000763.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local lv=e:GetHandler():GetLevel()
 	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local tc=Duel.SelectMatchingCard(tp,Card.IsFaceup,tp,LOCATION_MZONE,0,1,1,c):GetFirst()
-	if c:IsFaceup() and c:IsRelateToEffect(e) and tc then
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) and c:IsFaceup() and c:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_CHANGE_LEVEL)

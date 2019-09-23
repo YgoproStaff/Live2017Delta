@@ -43,6 +43,7 @@ end
 function c511005084.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanSpecialSummonMonster(tp,511005082,0,0x4011,300,300,1,RACE_FIEND,ATTRIBUTE_DARK) 
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
+	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,0)
 end
 function c511005084.activate(e,tp,eg,ep,ev,re,r,rp)
@@ -67,7 +68,7 @@ function c511005084.damop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c511005084.splimit(e,c,sump,sumtype,sumpos,targetp,se)
-	return bit.band(sumpos,POS_FACEUP_ATTACK)==0
+	return sumpos&POS_FACEUP_ATTACK==0
 end
 function c511005084.descon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(Card.IsCode,1,nil,511005082)

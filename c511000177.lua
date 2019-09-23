@@ -22,25 +22,18 @@ function c511000177.spfilter(c)
 end
 function c511000177.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local sg=Duel.GetMatchingGroupCount(c511000177.spfilter,c:GetControler(),LOCATION_MZONE,0,c)
-	if chk==0 then return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>(sg-1)
-		and	Duel.IsExistingMatchingCard(c511000177.spfilter,c:GetControler(),LOCATION_MZONE,0,1,c) end
-	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,sg,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,sg,0,0)
+	local ct=Duel.GetMatchingGroupCount(c511000177.spfilter,tp,LOCATION_MZONE,0,c)
+	if chk==0 then return ct>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>=ct and not Duel.IsPlayerAffectedByEffect(tp,59822133) 
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,511000178,0,0x4011,0,0,1,RACE_ZOMBIE,ATTRIBUTE_DARK) end
+	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,ct,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,ct,tp,0)
 end
 function c511000177.spop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local sg=Duel.GetMatchingGroupCount(c511000177.spfilter,c:GetControler(),LOCATION_MZONE,0,c)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=(sg-1) then return end
-	if not Duel.IsPlayerCanSpecialSummonMonster(tp,511000178,0,0x4011,0,0,1,RACE_ZOMBIE,ATTRIBUTE_DARK) then return end
-	for i=1,sg do
+	local ct=Duel.GetMatchingGroupCount(c511000177.spfilter,tp,LOCATION_MZONE,0,e:GetHandler())
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<ct or Duel.IsPlayerAffectedByEffect(tp,59822133) 
+		or not Duel.IsPlayerCanSpecialSummonMonster(tp,511000178,0,0x4011,0,0,1,RACE_ZOMBIE,ATTRIBUTE_DARK) then return end
+	for i=1,ct do
 		local token=Duel.CreateToken(tp,511000178)
-		Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
-		token:RegisterEffect(e1,true)
 	end
 	Duel.SpecialSummonComplete()
 end

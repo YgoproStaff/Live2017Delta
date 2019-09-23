@@ -1,4 +1,4 @@
---Transmigrating Life Force
+--Life Transformation
 --fixed by MLD
 function c511009541.initial_effect(c)
 	--Activate
@@ -23,14 +23,14 @@ function c511009541.filter(c)
 	return c:IsType(TYPE_SPELL) and c:IsSSetable()
 end
 function c511009541.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c511009541.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and c511009541.filter(chkc) end
 	local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
 	if e:GetHandler():IsLocation(LOCATION_HAND) then
 		ft=ft-1
 	end
-	if chk==0 then return ft>3 and Duel.IsExistingTarget(c511009541.filter,tp,LOCATION_GRAVE,0,4,nil) end
+	if chk==0 then return ft>3 and Duel.IsExistingTarget(c511009541.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,4,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local g=Duel.SelectTarget(tp,c511009541.filter,tp,LOCATION_GRAVE,0,4,4,nil)	
+	local g=Duel.SelectTarget(tp,c511009541.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,4,4,nil)	
 	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,g,4,0,0)
 end
 function c511009541.activate(e,tp,eg,ep,ev,re,r,rp)

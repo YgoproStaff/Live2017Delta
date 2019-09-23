@@ -1,4 +1,6 @@
+--リレーションシップ
 --Relationship
+--fixed by Larry126
 function c511001355.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -45,7 +47,7 @@ function c511001355.clear(e,tp,eg,ep,ev,re,r,rp)
 	c511001355[1]:Clear()
 end
 function c511001355.filter(c,e,tp)
-	return c:IsControler(tp) and c:IsLocation(LOCATION_HAND+LOCATION_DECK) and c:IsSetCard(0x3008) 
+	return c:IsControler(tp) and c:IsLocation(LOCATION_DECK) and c:IsSetCard(0x3008) 
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c511001355.target(e,tp,eg,ep,ev,re,r,rp,chk)

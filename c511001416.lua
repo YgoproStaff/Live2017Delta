@@ -1,4 +1,5 @@
---Iron Hans
+--鉄のハンス (Anime)
+--Iron Hans (Anime)
 function c511001416.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
@@ -16,8 +17,9 @@ function c511001416.initial_effect(c)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e3)
 end
+c511001416.listed_names={73405179}
 function c511001416.filter(c,e,tp)
-	return c:IsCode(511001415) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsCode(73405179) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c511001416.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

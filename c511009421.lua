@@ -34,7 +34,8 @@ function c511009421.filter(c)
 	return c:IsFaceup() and c:IsRace(RACE_DRAGON) and c:IsControlerCanBeChanged() 
 		and (not sg:IsContains(c) or (c:IsType(TYPE_XYZ) and not c:IsHasEffect(EFFECT_RANK_LEVEL) and not c:IsHasEffect(EFFECT_RANK_LEVEL_S)))
 end
-function c511009421.target(e,tp,eg,ep,ev,re,r,rp,tc)
+function c511009421.target(e,tp,eg,ep,ev,re,r,rp,tc,chk)
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_CONTROL,tc,1,0,0)
 end
 function c511009421.cttg(e,c)

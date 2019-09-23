@@ -18,8 +18,8 @@ function c511020011.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsAttackPos()
 end
 function c511020011.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,1,e:GetHandler()) end
-	local g=Duel.SelectReleaseGroup(tp,nil,1,1,e:GetHandler())
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,nil,1,false,nil,e:GetHandler()) end
+	local g=Duel.SelectReleaseGroupCost(tp,nil,1,1,false,nil,e:GetHandler())
 	Duel.Release(g,REASON_COST)
 end
 function c511020011.filter(c)

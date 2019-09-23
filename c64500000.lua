@@ -1,5 +1,6 @@
 --Z－メタル・キャタピラー
-function c64500000.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	aux.AddUnionProcedure(c,aux.FilterBoolFunction(Card.IsCode,62651957,65622692))
 	--Atk up
 	local e1=Effect.CreateEffect(c)
@@ -12,3 +13,4 @@ function c64500000.initial_effect(c)
 	e2:SetCode(EFFECT_UPDATE_DEFENSE)
 	c:RegisterEffect(e2)
 end
+s.listed_names={62651957,65622692}

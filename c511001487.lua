@@ -32,9 +32,8 @@ function c511001487.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsLocation(LOCATION_SZONE) then return end
 	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:GetControler()==c:GetControler() then
+	if c:IsRelateToEffect(e) and tc and tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:GetControler()==c:GetControler() then
 		Duel.Equip(tp,c,tc)
-		c:CancelToGrave()
 		--disable
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD)
@@ -63,7 +62,7 @@ function c511001487.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c511001487.disable(e,c)
-	return c:IsType(TYPE_XYZ) or bit.band(c:GetOriginalType(),TYPE_XYZ)==TYPE_XYZ
+	return c:IsType(TYPE_XYZ) or c:GetOriginalType()&TYPE_XYZ==TYPE_XYZ
 end
 function c511001487.eqlimit(e,c)
 	return c:GetControler()==e:GetOwnerPlayer() and c:IsSetCard(0x107b)

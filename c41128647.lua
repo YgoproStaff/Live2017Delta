@@ -1,5 +1,7 @@
 --ダイナミックP
-function c41128647.initial_effect(c)
+--Dinomic Powerload
+local s,id=GetID()
+function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -24,19 +26,16 @@ function c41128647.initial_effect(c)
 	e4:SetCode(EFFECT_CANNOT_ACTIVATE)
 	e4:SetRange(LOCATION_FZONE)
 	e4:SetTargetRange(0,1)
-	e4:SetValue(c41128647.aclimit)
-	e4:SetCondition(c41128647.actcon)
+	e4:SetValue(1)
+	e4:SetCondition(s.actcon)
 	c:RegisterEffect(e4)
 end
-function c41128647.aclimit(e,re,tp)
-	return not re:GetHandler():IsImmuneToEffect(e)
-end
-function c41128647.cfilter(c,tp)
+function s.cfilter(c,tp)
 	return c:IsFaceup() and c:IsSetCard(0xd8) and c:IsControler(tp)
 end
-function c41128647.actcon(e)
+function s.actcon(e)
 	local tp=e:GetHandlerPlayer()
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	return (a and c41128647.cfilter(a,tp)) or (d and c41128647.cfilter(d,tp))
+	return (a and s.cfilter(a,tp)) or (d and s.cfilter(d,tp))
 end

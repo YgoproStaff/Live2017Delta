@@ -1,5 +1,7 @@
+--ダブルクロス・アーマー
 --Double Cloth Armor
-function c110000120.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	--Cannot Attack
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -10,20 +12,20 @@ function c110000120.initial_effect(c)
 	e2:SetDescription(aux.Stringid(110000107,0))
 	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_DAMAGE)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e2:SetCode(EVENT_BATTLE_START)
-	e2:SetTarget(c110000120.destg)
-	e2:SetOperation(c110000120.desop)
+	e2:SetCode(EVENT_BATTLE_CONFIRM)
+	e2:SetTarget(s.destg)
+	e2:SetOperation(s.desop)
 	c:RegisterEffect(e2)
 	aux.CallToken(419)
 end
-function c110000120.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetAttackTarget() and Duel.GetAttackTarget()==c end
 	local g=Group.FromCards(Duel.GetAttacker(),Duel.GetAttackTarget())
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,Duel.GetAttacker():GetAttack())
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
-function c110000120.desop(e,tp,eg,ep,ev,re,r,rp)
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Group.CreateGroup()
 	local c=Duel.GetAttacker()
 	if c:IsRelateToBattle() then g:AddCard(c) end

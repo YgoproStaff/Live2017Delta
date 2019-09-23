@@ -7,7 +7,8 @@ function c511001600.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e1:SetCondition(c511001600.indcon)
+	e1:SetLabel(1)
+	e1:SetCondition(c511001600.con)
 	e1:SetValue(1)
 	c:RegisterEffect(e1)
 	--atkup
@@ -16,7 +17,8 @@ function c511001600.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EFFECT_SET_ATTACK_FINAL)
-	e2:SetCondition(c511001600.atkcon)
+	e2:SetLabel(2)
+	e2:SetCondition(c511001600.con)
 	e2:SetValue(c511001600.atkval)
 	c:RegisterEffect(e2)
 	--disable
@@ -25,26 +27,31 @@ function c511001600.initial_effect(c)
 	e3:SetCode(EFFECT_DISABLE)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetTargetRange(0,LOCATION_ONFIELD)
-	e3:SetCondition(c511001600.discon)
+	e3:SetLabel(3)
+	e3:SetCondition(c511001600.con)
 	c:RegisterEffect(e3)
 	--disable effect
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e4:SetCode(EVENT_CHAIN_SOLVING)
 	e4:SetRange(LOCATION_MZONE)
-	e4:SetCondition(c511001600.discon)
+	e4:SetLabel(3)
+	e4:SetCondition(c511001600.con)
 	e4:SetOperation(c511001600.disop)
 	c:RegisterEffect(e4)
+	--Double Snare
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetLabel(3)
+	e5:SetCondition(c511001600.con)
+	e5:SetCode(3682106)
+	c:RegisterEffect(e5)
 end
 c511001600.material_setcode=0x93
-function c511001600.indcon(e)
-	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),0,LOCATION_MZONE)==1
-end
-function c511001600.atkcon(e)
-	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),0,LOCATION_MZONE)==2
-end
-function c511001600.discon(e)
-	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),0,LOCATION_MZONE)==3
+function c511001600.con(e)
+	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),0,LOCATION_MZONE)==e:GetLabel()
 end
 function c511001600.atkval(e,c)
 	return c:GetAttack()*2

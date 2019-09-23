@@ -4,7 +4,6 @@ function c511000110.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddFusionProcMix(c,true,true,511000107,511000108,511000109)
 	aux.AddContactFusion(c,c511000110.contactfilter,c511000110.contactop,c511000110.splimit)
-	c:RegisterEffect(e1)
 	--damage
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(511000110,0))
@@ -31,8 +30,8 @@ function c511000110.contactop(g,tp)
 	Duel.SendtoDeck(g,nil,2,REASON_COST+REASON_MATERIAL)
 end
 function c511000110.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,1,nil) end
-	local sg=Duel.SelectReleaseGroup(tp,nil,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,nil,1,false,nil,nil) end
+	local sg=Duel.SelectReleaseGroupCost(tp,nil,1,1,false,nil,nil)
 	Duel.Release(sg,REASON_COST)
 end
 function c511000110.target(e,tp,eg,ep,ev,re,r,rp,chk)

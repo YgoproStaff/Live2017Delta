@@ -10,6 +10,7 @@ function c511001816.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 c511001816.fit_monster={23995346}
+c511001816.listed_names={89631139,23995346}
 function c511001816.filter(c,e,tp,m)
 	local cd=c:GetCode()
 	if cd~=23995346 or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) then return false end

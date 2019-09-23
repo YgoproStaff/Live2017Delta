@@ -22,10 +22,13 @@ function c511002520.filter(c,e,tp)
 	return c:IsCode(44508094) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SYNCHRO,tp,false,false)
 end
 function c511002520.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCountFromEx(tp)>0
-		and Duel.IsExistingMatchingCard(c511002520.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
+	if chk==0 then
+		local pg=aux.GetMustBeMaterialGroup(tp,Group.CreateGroup(),tp,nil,nil,REASON_SYNCHRO)
+		return pg:GetCount()<=0 and Duel.GetLocationCountFromEx(tp)>0 
+			and Duel.IsExistingMatchingCard(c511002520.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp)
+	end
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
-	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
+	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
@@ -34,7 +37,9 @@ function c511002520.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=re:GetHandler()
 	if not tc:IsDisabled() then
 		Duel.NegateEffect(ev)
-		if tc:IsRelateToEffect(re) and Duel.Destroy(eg,REASON_EFFECT)~=0 and Duel.GetLocationCountFromEx(tp)>0 then
+		local pg=aux.GetMustBeMaterialGroup(tp,Group.CreateGroup(),tp,nil,nil,REASON_SYNCHRO)
+		if tc:IsRelateToEffect(re) and Duel.Destroy(eg,REASON_EFFECT)~=0 and Duel.GetLocationCountFromEx(tp)>0 
+			and pg:GetCount()<=0 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 			local tc=Duel.SelectMatchingCard(tp,c511002520.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp):GetFirst()
 			if tc then

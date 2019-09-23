@@ -20,7 +20,7 @@ function c170000152.filter1(c,e,tp)
 		and Duel.IsExistingMatchingCard(c170000152.filter2,tp,LOCATION_EXTRA,0,1,nil,c:GetCode(),e,tp)
 end
 function c170000152.filter2(c,code,e,tp)
-	if not c.material_count or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) then return false end
+	if not c.material_count or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) or not c:CheckFusionMaterial() then return false end
 	for i=1,c.material_count do
 		if code==c.material[i] then
 			for j=1,c.material_count do

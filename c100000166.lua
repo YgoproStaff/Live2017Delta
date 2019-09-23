@@ -12,8 +12,8 @@ function c100000166.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c100000166.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsAttribute,1,nil,ATTRIBUTE_WATER) end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsAttribute,1,1,nil,ATTRIBUTE_WATER)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,Card.IsAttribute,1,false,nil,nil,ATTRIBUTE_WATER) end
+	local g=Duel.SelectReleaseGroupCost(tp,Card.IsAttribute,1,1,false,nil,nil,ATTRIBUTE_WATER)
 	Duel.Release(g,REASON_COST)
 end
 function c100000166.tgfilter(c)
@@ -84,6 +84,6 @@ function c100000166.turnop(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():SetTurnCounter(ct)
 	if ct==3 then
 		e:GetLabelObject():Reset()
-		if re and re.Reset then re:Reset() end
+		if re then re:Reset() end
 	end
 end

@@ -1,4 +1,6 @@
+--セメタリー・リバウンド
 --Graveyard Rebound
+--fixed by Larry126
 function c513000080.initial_effect(c)
 	--to deck
 	local e1=Effect.CreateEffect(c)
@@ -10,10 +12,13 @@ function c513000080.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c513000080.con(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsPreviousLocation(LOCATION_DECK) and e:GetHandler():GetPreviousControler()==tp and bit.band(r,REASON_EFFECT)~=0
+	local c=e:GetHandler()
+	return c:IsPreviousLocation(LOCATION_DECK) and r&REASON_EFFECT~=0
+		and c:GetPreviousControler()==tp
 end
 function c513000080.op(e,tp,eg,ep,ev,re,r,rp)
-	local e1=Effect.CreateEffect(e:GetHandler())
+	local c=e:GetHandler()
+	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TODECK)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_GRAVE)
@@ -26,7 +31,7 @@ function c513000080.op(e,tp,eg,ep,ev,re,r,rp)
 	else
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END+RESET_SELF_TURN)
 	end
-	e:GetHandler():RegisterEffect(e1)
+	c:RegisterEffect(e1)
 end
 function c513000080.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnCount()~=e:GetLabel()
@@ -49,7 +54,7 @@ function c513000080.tdop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c513000080.operation(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()	
+	local c=e:GetHandler()  
 	local g=Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_GRAVE,0,nil,TYPE_SPELL+TYPE_TRAP)
 	if g:GetCount()<=0 then return end
 	local tc=g:GetFirst()
@@ -107,7 +112,10 @@ function c513000080.actg(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 	c:CreateEffectRelation(te)
-	if target then target(te,tp,eg,ep,ev,re,r,rp,1) end			
+	if target then target(te,tp,eg,ep,ev,re,r,rp,1) end
+	for tc in aux.Next(Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)) do
+		tc:CreateEffectRelation(te)   
+	end
 end
 function c513000080.acop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

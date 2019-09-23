@@ -13,10 +13,7 @@ function c511000799.initial_effect(c)
 	e2:SetDescription(aux.Stringid(511000799,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCode(EVENT_BATTLE_DESTROYED)
-	e2:SetCondition(c511000799.spcon)
-	e2:SetCost(c511000799.spcost)
 	e2:SetTarget(c511000799.sptg)
 	e2:SetOperation(c511000799.spop)
 	c:RegisterEffect(e2)
@@ -26,17 +23,8 @@ function c511000799.ntcon(e,c,minc)
 	return minc==0 and c:GetLevel()>4 and Duel.GetFieldGroupCount(c:GetControler(),LOCATION_HAND,0)>=5
 		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
-function c511000799.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetPreviousLocation()==LOCATION_MZONE and e:GetHandler():IsReason(REASON_BATTLE)
-end
-function c511000799.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:GetFlagEffect(511000799)==0 end
-	c:RegisterFlagEffect(511000799,RESET_PHASE+PHASE_END,0,1)
-end
 function c511000799.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c511000799.spop(e,tp,eg,ep,ev,re,r,rp)
@@ -68,6 +56,7 @@ function c511000799.spop(e,tp,eg,ep,ev,re,r,rp)
 		e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e4:SetCode(EFFECT_ADD_SETCODE)
 		e4:SetValue(0x600)
+		e4:SetReset(RESET_EVENT+0x1fe0000)
 		c:RegisterEffect(e4)
 	end
 end

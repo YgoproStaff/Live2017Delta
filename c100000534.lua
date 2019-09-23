@@ -1,17 +1,18 @@
---ワルキューレ・ドリッド
+--ワルキューレ・ドリット (Anime)
+--Valkyrie Dritte (Anime)
 function c100000534.initial_effect(c)
-	--atk def
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCode(EFFECT_UPDATE_ATTACK)
-	e2:SetValue(c100000534.value)
-	c:RegisterEffect(e2)
+	--atk/def
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetValue(c100000534.atkvalue)
+	c:RegisterEffect(e1)
 end
-function c100000534.filter(c)
+function c100000534.rmfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_MONSTER)
 end
-function c100000534.value(e,c)
-	return Duel.GetMatchingGroupCount(c100000534.filter,c:GetControler(),LOCATION_REMOVED,LOCATION_REMOVED,nil)*100
+function c100000534.atkvalue(e,c)
+	return Duel.GetMatchingGroupCount(c100000534.rmfilter,c:GetControler(),0,LOCATION_REMOVED,nil)*100
 end

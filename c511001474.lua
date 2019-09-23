@@ -36,17 +36,14 @@ function c511001474.activate(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetOperation(c511001474.tdop)
 			e1:SetReset(RESET_PHASE+PHASE_END)
 			Duel.RegisterEffect(e1,tp)
+			tc:RegisterFlagEffect(511001474,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 		end
 	end
 end
 function c511001474.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
-	if tc then
+	if tc and tc:GetFlagEffect(511001474)>0 then
 		Duel.Hint(HINT_CARD,0,511001474)
-		if tc:IsLocation(LOCATION_DECK) then
-			Duel.MoveSequence(tc,1)
-		else
-			Duel.SendtoDeck(tc,nil,1,REASON_EFFECT)
-		end
+		Duel.SendtoDeck(tc,nil,1,REASON_EFFECT)
 	end
 end

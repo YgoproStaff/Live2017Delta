@@ -40,9 +40,10 @@ function c513000067.initial_effect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
 	e5:SetCode(EFFECT_CANNOT_DISABLE)
 	c:RegisterEffect(e5)
+	aux.CallToken(420)
 end
 function c513000067.cfilter(c)
-	return c:IsSetCard(0x21a) or c:IsCode(82382815)
+	return c:IsChampion()
 end
 function c513000067.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c513000067.cfilter,tp,LOCATION_GRAVE,0,3,nil)

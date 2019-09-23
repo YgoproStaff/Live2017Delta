@@ -1,4 +1,5 @@
---真青眼の究極竜
+--真青眼の究極竜 (Anime)
+--Neo Blue-Eyes Ultimate Dragon (Anime)
 function c511016006.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
@@ -27,6 +28,7 @@ function c511016006.initial_effect(c)
 	e3:SetValue(c511016006.efilter)
 	c:RegisterEffect(e3)
 end
+c511016006.listed_names={89631139,23995346}
 function c511016006.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:GetFlagEffect(511016006)==0 and Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_EXTRA,0,1,nil,23995346) end

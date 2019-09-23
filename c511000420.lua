@@ -1,13 +1,15 @@
---Goddess Verdande's Guidance
+--女神ヴェルダンディの導き (Anime)
+--Goddess Verdande's Guidance (Anime)
+--Scripted by Eerie Code and AlphaKretin
 function c511000420.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--Reveal TOP of Deck
+	--Guess top
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(511000420,0))
+	e2:SetDescription(aux.Stringid(100243009,1))
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetCountLimit(1)
 	e2:SetRange(LOCATION_SZONE)
@@ -21,7 +23,8 @@ function c511000420.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetTargetParam(Duel.SelectOption(tp,70,71,72))
 end
 function c511000420.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetFieldGroupCount(1-tp,0,LOCATION_DECK)<=0 then return end
+	if Duel.GetFieldGroupCount(1-tp,0,LOCATION_DECK)<=0
+		or not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.DisableShuffleCheck()
 	Duel.ConfirmDecktop(1-tp,1)
 	local g=Duel.GetDecktopGroup(1-tp,1)
@@ -29,14 +32,14 @@ function c511000420.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not tc then return end
 	local opt=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
 	if (opt==0 and tc:IsType(TYPE_MONSTER)) then
-		if tc:IsCanBeSpecialSummoned(e,0,tp,false,false) then
-			Duel.SpecialSummon(tc,0,1-tp,1-tp,false,false,POS_FACEDOWN_DEFENSE)
+		if tc:IsCanBeSpecialSummoned(e,0,tp,false,false,1-tp,POS_FACEDOWN_DEFENSE) then
+			Duel.SpecialSummon(tc,0,tp,1-tp,false,false,POS_FACEDOWN_DEFENSE)
 		end
 	elseif (opt==1 and tc:IsType(TYPE_SPELL)) then
-		Duel.SSet(1-tp,g:GetFirst())
-		Duel.ConfirmCards(tp,g)	
+		Duel.SSet(1-tp,tc)
+		Duel.ConfirmCards(tp,g) 
 	elseif (opt==2 and tc:IsType(TYPE_TRAP))then
-		Duel.SSet(1-tp,g:GetFirst())
+		Duel.SSet(1-tp,tc)
 		Duel.ConfirmCards(tp,g)
 	end
 end

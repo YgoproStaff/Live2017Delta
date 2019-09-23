@@ -79,7 +79,7 @@ function c513000052.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummonComplete()
 end
 function c513000052.cfilter(c)
-	return (c:IsSetCard(0x4a) or c:IsCode(74530899)) and c:IsFaceup()
+	return c:IsSetCard(0x4a) and not c:IsCode(8967776) and c:IsFaceup()
 end
 function c513000052.atkval(e,c)
 	local g=Duel.GetMatchingGroup(c513000052.cfilter,c:GetControler(),LOCATION_MZONE,0,nil)

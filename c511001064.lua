@@ -36,8 +36,10 @@ function c511001064.condition(e,tp,eg,ep,ev,re,r,rp)
 	return tc:GetSummonType()==SUMMON_TYPE_XYZ and tc:IsControler(1-tp) and tc:IsCode(12533811)
 end
 function c511001064.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCountFromEx(tp)>0 
-		and Duel.GetFieldGroupCount(tp,0,LOCATION_EXTRA)>0 end
+	if chk==0 then
+		local pg=aux.GetMustBeMaterialGroup(tp,Group.CreateGroup(),tp,nil,nil,REASON_XYZ)
+		return pg:GetCount()<=0 and Duel.GetLocationCountFromEx(tp)>0 and Duel.GetFieldGroupCount(tp,0,LOCATION_EXTRA)>0 
+			and Duel.IsPlayerCanSpecialSummon(tp,SUMMON_TYPE_XYZ,POS_FACEUP,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function c511001064.spfilter(c,e,tp)
@@ -48,7 +50,8 @@ function c511001064.eqlimit(e,c)
 end
 function c511001064.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or Duel.GetLocationCountFromEx(tp)<=0 then return end
+	local pg=aux.GetMustBeMaterialGroup(tp,Group.CreateGroup(),tp,nil,nil,REASON_XYZ)
+	if not c:IsRelateToEffect(e) or pg:GetCount()>0 or Duel.GetLocationCountFromEx(tp)<=0 then return end
 	local sg=Duel.GetMatchingGroup(c511001064.spfilter,tp,0,LOCATION_EXTRA,nil,e,tp)
 	if sg:GetCount()>0 then
 		Duel.ConfirmCards(tp,sg)

@@ -133,7 +133,8 @@ function c511003051.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_CHANGE_LEVEL)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		e1:SetValue(clv)
-		if tc:RegisterEffect(e1)<=0 or not c:IsRelateToEffect(e) then return end
+		tc:RegisterEffect(e1)
+		if tc:IsImmuneToEffect(e1) or not c:IsRelateToEffect(e) then return end
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 		local g=Duel.SelectMatchingCard(tp,c511003051.ccfilter,tp,LOCATION_MZONE,0,1,1,nil,c,tc,clv,tp)

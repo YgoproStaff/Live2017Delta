@@ -2,6 +2,7 @@
 --No.62 銀河眼の光子竜皇 (Anime)
 --Scripted By TheOnePharaoh
 --fixed by MLD
+--effect updated by Larry126 (ATK multiplied while attacking)
 function c511010062.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,nil,8,2)
@@ -135,7 +136,7 @@ function c511010062.atkop2(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetCode(EFFECT_SET_ATTACK_FINAL)
 	e1:SetValue(c:GetAttack()*ct)
-	e1:SetReset(RESET_EVENT+0x1fe0000)
+	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE)
 	c:RegisterEffect(e1)
 end
 function c511010062.rktg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -143,7 +144,7 @@ function c511010062.rktg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c511010062.rkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-    local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	local tc=g:GetFirst()
 	while tc do
 		local e1=Effect.CreateEffect(c)

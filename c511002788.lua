@@ -9,12 +9,7 @@ function c511002788.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c511002788.filter(c,g)
-	local tc=g:GetFirst()
-	while tc do
-		if c:IsCode(tc:GetCode()) then return true end
-		tc=g:GetNext()
-	end
-	return false
+	return g:IsExists(Card.IsCode,1,nil,c:GetCode())
 end
 function c511002788.operation(e,tp,eg,ep,ev,re,r,rp)
 	local endtime=0
@@ -27,16 +22,17 @@ function c511002788.operation(e,tp,eg,ep,ev,re,r,rp)
 		44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,
 		93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120)
 	endtime=os.time()-start
-	if endtime>10 or tc~=ct then
-		check=false
+	check=endtime<=10 and tc==ct
+	if e:GetHandler():IsRelateToEffect(e) then
+		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 	end
-	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
-	if check==true then
-		Duel.Damage(tp,500,REASON_EFFECT)
+	if check then
+		Duel.Damage(tp,1200,REASON_EFFECT)
 	else
-		if Duel.GetAttacker() then
-			Duel.Destroy(Duel.GetAttacker(),REASON_EFFECT)
+		local a=Duel.GetAttacker()
+		if a and a:IsRelateToBattle() then
+			Duel.Destroy(a,REASON_EFFECT)
 		end
-		Duel.Damage(1-tp,500,REASON_EFFECT)
+		Duel.Damage(1-tp,1200,REASON_EFFECT)
 	end
 end

@@ -25,8 +25,6 @@ function c511001167.activate(e,tp,eg,ep,ev,re,r,rp)
 	if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() and c:IsRelateToEffect(e) then
 		local fid=c:GetFieldID()
 		c:CancelToGrave()
-		Duel.Overlay(tc,Group.FromCards(c))
-		tc:RegisterFlagEffect(51101167,RESET_EVENT+0x1fe0000,0,1,fid)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 		e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
@@ -37,6 +35,8 @@ function c511001167.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetLabelObject(tc)
 		e1:SetLabel(fid)
 		c:RegisterEffect(e1)
+		Duel.Overlay(tc,Group.FromCards(c))
+		tc:RegisterFlagEffect(51101167,RESET_EVENT+RESETS_STANDARD,0,1,fid)
 	end
 end
 function c511001167.con(e,tp,eg,ep,ev,re,r,rp)
@@ -46,7 +46,7 @@ function c511001167.con(e,tp,eg,ep,ev,re,r,rp)
 		e:Reset()
 		return false
 	else return c:IsReason(REASON_COST) and re:IsHasType(0x7e0) and re:IsActiveType(TYPE_MONSTER)
-		and bit.band(c:GetPreviousLocation(),LOCATION_OVERLAY)~=0 end
+		and c:GetPreviousLocation()&LOCATION_OVERLAY~=0 end
 end
 function c511001167.op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -64,7 +64,7 @@ function c511001167.op(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetOperation(c511001167.atop)
 	e1:SetLabelObject(tc)
 	e1:SetLabel(e:GetLabel())
-	e1:SetReset(RESET_EVENT+0x1fe0000)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e1)
 end
 function c511001167.atcost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -86,7 +86,6 @@ function c511001167.atop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:GetFlagEffect(51101167)>0 and tc:GetFlagEffectLabel(51101167)==e:GetLabel() and c:IsRelateToEffect(e) then
-		Duel.Overlay(tc,Group.FromCards(c))
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 		e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
@@ -97,5 +96,6 @@ function c511001167.atop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetLabelObject(tc)
 		e1:SetLabel(e:GetLabel())
 		c:RegisterEffect(e1)
+		Duel.Overlay(tc,Group.FromCards(c))
 	end
 end

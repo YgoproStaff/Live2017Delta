@@ -1,4 +1,5 @@
---Clear Kuriboh (Anime)
+--クリアクリボー
+--Clear Kuriboh
 function c511018001.initial_effect(c)
 	--negate
 	local e1=Effect.CreateEffect(c)
@@ -49,41 +50,12 @@ function c511018001.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
 function c511018001.drop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	if Duel.Draw(tp,1,REASON_EFFECT)==0 then return end
 	local tc=Duel.GetOperatedGroup():GetFirst()
-	if tc:IsType(TYPE_MONSTER) then
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-		if tc:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.SelectYesNo(tp,aux.Stringid(46613515,2)) then
-			Duel.ConfirmCards(1-tp,tc)
-			Duel.BreakEffect()
-			if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)~=0 and not Duel.GetAttacker():IsImmuneToEffect(e) then
-				Duel.BreakEffect()
-				local a=Duel.GetAttacker()
-				if a then
-					local e1=Effect.CreateEffect(c)
-					e1:SetType(EFFECT_TYPE_SINGLE)
-					e1:SetCode(EFFECT_MUST_ATTACK)
-					e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE)
-					a:RegisterEffect(e1)
-					local e2=Effect.CreateEffect(c)
-					e2:SetType(EFFECT_TYPE_FIELD)
-					e2:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
-					e2:SetTargetRange(0,LOCATION_MZONE)
-					e2:SetValue(c511018001.actlimit)
-					e2:SetLabelObject(tc)
-					e2:SetReset(RESET_PHASE+PHASE_DAMAGE)
-					Duel.RegisterEffect(e2,tp)
-				end
-			end
-		end
+	local a=Duel.GetAttacker()
+	if tc and tc:IsType(TYPE_MONSTER) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and tc:IsCanBeSpecialSummoned(e,0,tp,false,false) 
+		and Duel.SelectYesNo(tp,aux.Stringid(46613515,2)) and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)~=0 
+		and a and not a:IsImmuneToEffect(e) and a:IsRelateToBattle() and a:GetAttackableTarget() and a:GetAttackableTarget():IsContains(tc) then
+		Duel.ChangeAttackTarget(tc)
 	end
 end
-function c511018001.actlimit(e,c)
-	return not c==e:GetLabelObject()
-end
---[[
-	Staunch Defender 92854392
-	battle mania
-	ring of magnetism
---]]

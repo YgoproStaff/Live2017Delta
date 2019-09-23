@@ -59,42 +59,31 @@ end
 function c511015100.cfilter(c,tp)
 	return c:IsPreviousSetCard(0x99) and c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_MZONE)
 end
-function c511015100.costfilter(c)
-	return not c:IsSetCard(0x99)
+function c511015100.spcheck(sg,tp)
+	if not aux.ReleaseCheckMMZ(sg,tp) then return false end
+	if sg:GetCount()==1 then
+		return sg:IsExists(Card.IsSetCard,1,nil,0x99)
+	else return true end
 end
 function c511015100.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c511015100.cfilter,1,nil,tp)
 end
 function c511015100.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local b1 = Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,nil,0x99)
-	local b2 = Duel.CheckReleaseGroup(tp,c511015100.costfilter,2,nil)
-	if chk==0 then return b1 or b2 end
-	local b3 = true
-	if b1 and b2 then b3 = Duel.SelectYesNo(tp,aux.Stringid(511015100,4)) end
-	if b1 and b3 then
-		local sg=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,nil,0x99)
-		Duel.Release(sg,REASON_COST)
-	elseif b2 then
-		local sg=Duel.SelectReleaseGroup(tp,c511015100.costfilter,2,2,nil)
-		Duel.Release(sg,REASON_COST)
-	end
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,Card.IsSetCard,1,nil,aux.ReleaseCheckMMZ,nil,0x99) 
+		or Duel.CheckReleaseGroupCost(tp,nil,2,nil,aux.ReleaseCheckMMZ,nil) end
+	local sg=Duel.SelectReleaseGroupCost(tp,nil,1,2,nil,c511015100.spcheck,nil)
+	Duel.Release(sg,REASON_COST)
 end
 function c511015100.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,true,false) end
+	if chk==0 then return e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c511015100.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
-	if Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)~=0 then
-		c:CompleteProcedure()
-	elseif Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
-		and c:IsCanBeSpecialSummoned(e,0,tp,true,false) then
-		Duel.SendtoGrave(c,REASON_RULE)
+	if c:IsRelateToEffect(e) then
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-
 function c511015100.discfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x99) and c:IsAbleToGraveAsCost()
 end
@@ -113,7 +102,7 @@ function c511015100.distg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c511015100.disop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		Duel.NegateRelatedChain(tc,RESET_TURN_SET)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -126,14 +115,12 @@ function c511015100.disop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e2)
 	end
 end
-
 function c511015100.aclimit(e,re,tp)
 	return re:IsHasType(EFFECT_TYPE_ACTIVATE)
 end
 function c511015100.actcon(e)
 	return Duel.GetAttacker()==e:GetHandler()
 end
-
 function c511015100.dmcon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
@@ -156,7 +143,7 @@ function c511015100.dmtarget(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c511015100.dmop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
+	if tc and tc:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
@@ -164,7 +151,6 @@ function c511015100.dmop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE)
 		tc:RegisterEffect(e1)
 	end
-	
 	local e2=Effect.CreateEffect(e:GetHandler())
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_PRE_BATTLE_DAMAGE)
@@ -175,7 +161,6 @@ end
 function c511015100.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ChangeBattleDamage(tp,0)
 end
-
 function c511015100.dm2con(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
@@ -194,7 +179,7 @@ function c511015100.dm2cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c511015100.dm2op(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
+	if tc and tc:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
@@ -202,7 +187,6 @@ function c511015100.dm2op(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE)
 		tc:RegisterEffect(e1)
 	end
-	
 	local e2=Effect.CreateEffect(e:GetHandler())
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_PRE_BATTLE_DAMAGE)
@@ -211,25 +195,17 @@ function c511015100.dm2op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e2,tp)
 end
 function c511015100.dam2op(e,tp,eg,ep,ev,re,r,rp)
-	if ep~=tp or ev==0 then return end
-	Duel.ChangeBattleDamage(tp,ev/2)
-	--damage opponent
+	if Duel.GetBattleDamage(tp)==0 then return end
+	Duel.ChangeBattleDamage(tp,Duel.GetBattleDamage(tp)/2)
 	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetCategory(CATEGORY_DAMAGE)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_BATTLE_DAMAGE)
-	e1:SetTarget(c511015100.dmgtg)
 	e1:SetOperation(c511015100.dmgop)
 	e1:SetReset(RESET_PHASE+PHASE_DAMAGE)
 	Duel.RegisterEffect(e1,tp)
 end
-function c511015100.dmgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetTargetPlayer(1-tp)
-	Duel.SetTargetParam(ev)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,800)
-end
 function c511015100.dmgop(e,tp,eg,ep,ev,re,r,rp)
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	Duel.Damage(p,d,REASON_EFFECT)
+	if ep==tp then
+		Duel.Damage(1-tp,ev,REASON_EFFECT)
+	end
 end

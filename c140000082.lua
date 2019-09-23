@@ -11,16 +11,20 @@ function c140000082.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c140000082.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,3,nil) end
-	local rg=Duel.SelectReleaseGroup(tp,nil,3,3,nil)
-	Duel.Release(rg,REASON_COST)
+	e:SetLabel(1)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,nil,3,false,aux.ReleaseCheckMMZ,nil) end
+	local sg=Duel.SelectReleaseGroupCost(tp,nil,3,3,false,aux.ReleaseCheckMMZ,nil)
+	Duel.Release(sg,REASON_COST)
 end
 function c140000082.filter(c,e,tp)
 	return c:IsCode(140000083) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end
 function c140000082.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-		and Duel.IsExistingMatchingCard(c140000082.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
+	if chk==0 then
+		if e:GetLabel()==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return false end
+		e:SetLabel(0)
+		return Duel.IsExistingMatchingCard(c140000082.filter,tp,LOCATION_DECK,0,1,nil,e,tp)
+	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function c140000082.activate(e,tp,eg,ep,ev,re,r,rp)

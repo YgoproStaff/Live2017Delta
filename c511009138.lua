@@ -31,7 +31,7 @@ function c511009138.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c511009138.damval(e,re,val,r,rp,rc)
-	if bit.band(r,REASON_EFFECT)~=0 then return 0 end
+	if r&REASON_EFFECT~=0 then return 0 end
 	return val
 end
 function c511009138.cfilter(c)

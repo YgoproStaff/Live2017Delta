@@ -1,4 +1,5 @@
 --Purge Ray (Anime)
+--fixed by MLD
 function c511247007.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -10,18 +11,19 @@ function c511247007.initial_effect(c)
 	e1:SetOperation(c511247007.activate)
 	c:RegisterEffect(e1)
 end
-function c511247007.cfilter(c,e,tp)
+function c511247007.cfilter(c,e,tp,ft)
 	local rk=c:GetRank()
-	return rk>1 and c:IsType(TYPE_XYZ)
-		and Duel.IsExistingMatchingCard(c511247007.filter,tp,LOCATION_EXTRA,0,1,nil,rk,e,tp)
+	return rk>1 and c:IsType(TYPE_XYZ) and (ft>0 or (c:IsControler(tp) and c:GetSequence()<5)) and (c:IsControler(tp) or c:IsFaceup())
+		and Duel.IsExistingMatchingCard(c511247007.filter,tp,LOCATION_GRAVE,0,1,nil,rk,e,tp)
 end
 function c511247007.filter(c,rk,e,tp)
 	return c:IsType(TYPE_XYZ) and c:IsRankBelow(rk-1) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c511247007.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(100)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c511247007.cfilter,1,nil,e,tp) end
-	local g=Duel.SelectReleaseGroup(tp,c511247007.cfilter,1,1,nil,e,tp)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if chk==0 then return ft>-1 and Duel.CheckReleaseGroupCost(tp,c511247007.cfilter,1,false,nil,nil,e,tp,ft) end
+	local g=Duel.SelectReleaseGroupCost(tp,c511247007.cfilter,1,1,false,nil,nil,e,tp,ft)
 	e:SetLabel(g:GetFirst():GetRank())
 	Duel.Release(g,REASON_COST)
 end
@@ -29,7 +31,7 @@ function c511247007.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()~=100 then return false end
 		e:SetLabel(0)
-		return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+		return e:IsHasType(EFFECT_TYPE_ACTIVATE)
 	end
 end
 function c511247007.activate(e,tp,eg,ep,ev,re,r,rp)
@@ -47,7 +49,8 @@ function c511247007.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local rk=e:GetLabel()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c511247007.filter,tp,LOCATION_EXTRA,0,1,1,nil,rk,e,tp)
-	Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+	local g=Duel.SelectMatchingCard(tp,c511247007.filter,tp,LOCATION_GRAVE,0,1,1,nil,rk,e,tp)
+	if g:GetCount()>0 then
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+	end
 end
-

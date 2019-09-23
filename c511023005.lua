@@ -1,5 +1,6 @@
---Elemental HERO Darkbright
---fixed by MLD
+--Ｅ・ＨＥＲＯ ダーク・ブライトマン (Anime)
+--Elemental HERO Darkbright (Anime)
+--fixed by MLD & Larry126
 function c511023005.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
@@ -45,12 +46,12 @@ function c511023005.posop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c511023005.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
+	local g=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_MZONE,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function c511023005.desop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,0,LOCATION_MZONE,1,1,nil)
 	if g:GetCount()>0 then
 		Duel.HintSelection(g)
 		Duel.Destroy(g,REASON_EFFECT)

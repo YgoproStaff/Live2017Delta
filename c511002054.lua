@@ -17,18 +17,9 @@ function c511002054.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e2:SetValue(c511002054.indes)
+	e2:SetValue(aux.NOT(aux.TargetBoolFunction(Card.IsSetCard,0x48)))
 	c:RegisterEffect(e2)
-	if not c511002054.global_check then
-		c511002054.global_check=true
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_ADJUST)
-		ge2:SetCountLimit(1)
-		ge2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
-		ge2:SetOperation(c511002054.numchk)
-		Duel.RegisterEffect(ge2,0)
-	end
+	aux.CallToken(10389142)
 end
 c511002054.xyz_number=42
 function c511002054.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -40,7 +31,7 @@ function c511002054.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,10389143,0,0x4011,2000,0,6,RACE_MACHINE,ATTRIBUTE_WIND) end
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,ft,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,ft,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,ft,tp,0)
 end
 function c511002054.spop(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
@@ -91,11 +82,4 @@ function c511002054.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=g:Filter(c511002054.desfilter,nil,e:GetLabel())
 	g:DeleteGroup()
 	Duel.Destroy(tg,REASON_EFFECT)
-end
-function c511002054.numchk(e,tp,eg,ep,ev,re,r,rp)
-	Duel.CreateToken(tp,10389142)
-	Duel.CreateToken(1-tp,10389142)
-end
-function c511002054.indes(e,c)
-	return not c:IsSetCard(0x48)
 end

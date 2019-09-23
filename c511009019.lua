@@ -18,17 +18,18 @@ function c511009019.initial_effect(c)
 	e2:SetOperation(c511009019.atkop)
 	c:RegisterEffect(e2)
 end
-function c511009019.spfilter(c)
-	return c:IsCode(56907389) and c:GetEquipGroup():IsExists(Card.IsCode,1,nil,68540058)
+function c511009019.spfilter(c,ft,tp)
+	return c:IsCode(56907389) and c:GetEquipGroup():IsExists(Card.IsCode,1,nil,68540058) and (ft>0 or (c:IsControler(tp) and c:GetSequence()<5)) 
+		and (c:IsControler(tp) or c:IsFaceup())
 end
 function c511009019.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-		and Duel.CheckReleaseGroup(tp,c511009019.spfilter,1,nil)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	return ft>-1 and Duel.CheckReleaseGroup(tp,c511009019.spfilter,1,nil,ft,tp)
 end
 function c511009019.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.SelectReleaseGroup(tp,c511009019.spfilter,1,1,nil)
+	local g=Duel.SelectReleaseGroup(tp,c511009019.spfilter,1,1,nil,Duel.GetLocationCount(tp,LOCATION_MZONE),tp)
 	Duel.Release(g,REASON_COST)
 	Duel.ShuffleDeck(tp)
 end

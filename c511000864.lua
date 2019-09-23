@@ -23,36 +23,33 @@ function c511000864.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c511000864.filter,tp,LOCATION_MZONE,0,1,1,tc)
-	if g:GetCount()>0 then
+	local rc=g:GetFirst()
+	if rc then
 		Duel.HintSelection(g)
-		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
-		--sp summon
-		local e2=Effect.CreateEffect(e:GetHandler())
-		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e2:SetRange(LOCATION_REMOVED)
-		e2:SetCode(EVENT_PHASE+PHASE_STANDBY)
-		e2:SetCountLimit(1)
-		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN)
-		e2:SetOperation(c511000864.spop)
-		e2:SetLabel(0)
-		g:GetFirst():RegisterEffect(e2)
-		Duel.Damage(1-tp,g:GetFirst():GetLevel()*100,REASON_EFFECT)
+		if Duel.Remove(rc,POS_FACEUP,REASON_EFFECT)>0 then
+			local e2=Effect.CreateEffect(e:GetHandler())
+			e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+			e2:SetCode(EVENT_PHASE+PHASE_STANDBY)
+			e2:SetCountLimit(1)
+			e2:SetReset(RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN)
+			e2:SetLabelObject(rc)
+			e2:SetOperation(c511000864.spop)
+			e2:SetLabel(Duel.GetTurnCount())
+			Duel.RegisterEffect(e2,tp)
+			Duel.Damage(1-tp,rc:GetLevel()*100,REASON_EFFECT)
+			rc:RegisterFlagEffect(511000864,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,0,0)
+		end
 	end
 end
 function c511000864.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
-	local ct=e:GetLabel()
-	ct=ct+1
-	e:SetLabel(ct)
-	if ct>=1 then
-		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)
+	local tc=e:GetLabelObject()
+	if Duel.GetTurnPlayer()~=tp or Duel.GetTurnCount()==e:GetLabel() or not tc or tc:GetFlagEffect(511000864)==0 then return end
+	if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetRange(LOCATION_MZONE)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
-		e1:SetValue(e:GetHandler():GetLevel()*100)
-		e:GetHandler():RegisterEffect(e1)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetValue(tc:GetLevel()*100)
+		tc:RegisterEffect(e1)
 	end
 end

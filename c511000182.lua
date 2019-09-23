@@ -10,7 +10,7 @@ function c511000182.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c511000182.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>1 end
+	if chk==0 then return Duel.IsPlayerCanSpecialSummon(tp) and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>1 end
 end
 function c511000182.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<2 then return end
@@ -18,15 +18,14 @@ function c511000182.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetDecktopGroup(tp,2)
 	if g:GetCount()>0 then
 		Duel.DisableShuffleCheck()
-		Duel.ConfirmCards(1-tp,g)
 		local tg=g:RandomSelect(1-tp,1)
 		local tc=tg:GetFirst()
 		if tc:IsType(TYPE_MONSTER) and tc:IsCanBeSpecialSummoned(e,0,tp,false,false) then
 			Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
-			local g2=Duel.GetDecktopGroup(tp,1)
-			Duel.MoveSequence(g2:GetFirst(),1)
+			local g2=g:Filter(aux.TRUE,tg)
 			Duel.SendtoHand(g2,nil,REASON_EFFECT)
 			Duel.ConfirmCards(1-tp,g2)
-		else Duel.SendtoGrave(g,REASON_EFFECT) end
+			Duel.ShuffleHand(tp)
+		else Duel.SendtoGrave(g,REASON_EFFECT+REASON_REVEAL) end
 	end
 end

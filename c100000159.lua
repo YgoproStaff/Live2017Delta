@@ -4,7 +4,7 @@ function c100000159.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(100000159,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_BATTLE_DESTROYED)
 	e1:SetCondition(c100000159.condition)
 	e1:SetTarget(c100000159.target)
@@ -12,10 +12,10 @@ function c100000159.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c100000159.condition(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)
+	return e:GetHandler():IsLocation(LOCATION_GRAVE)
 end
 function c100000159.filter(c,e,tp)
-	return c:IsCode(100000159) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsCode(72714226) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c100000159.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

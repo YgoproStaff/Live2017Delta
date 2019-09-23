@@ -56,40 +56,22 @@ function c511001295.initial_effect(c)
 	e8:SetRange(LOCATION_MZONE)
 	e8:SetOperation(c511001295.conop)
 	c:RegisterEffect(e8)
-	if not c511001295.global_check then
-		c511001295.global_check=true
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_ADJUST)
-		ge2:SetCountLimit(1)
-		ge2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
-		ge2:SetOperation(c511001295.archchk)
-		Duel.RegisterEffect(ge2,0)
-	end
+	aux.CallToken(420)
 end
-function c511001295.archchk(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetFlagEffect(0,420)==0 then 
-		Duel.CreateToken(tp,420)
-		Duel.CreateToken(1-tp,420)
-		Duel.RegisterFlagEffect(0,420,0,0,0)
-	end
+function c511001295.rescon(sg,e,tp,mg)
+	return aux.ChkfMMZ(1)(sg,e,tp,mg) and sg:IsExists(Card.IsBattleguard,1,nil)
 end
 function c511001295.spcon(e,c)
 	if c==nil then return true end
-	local g=Duel.GetReleaseGroup(c:GetControler())
-	local d=g:FilterCount(Card.IsBattleguard,nil)
-	local ct=g:GetCount()
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-3 and d>0 and ct>2
+	local tp=c:GetControler()
+	local rg=Duel.GetReleaseGroup(tp)
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-3 and rg:GetCount()>2 and rg:IsExists(Card.IsBattleguard,1,nil) 
+		and aux.SelectUnselectGroup(rg,e,tp,3,3,c511001295.rescon,0)
 end
 function c511001295.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetReleaseGroup(c:GetControler())
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg1=g:FilterSelect(tp,Card.IsBattleguard,1,1,nil)
-	g:RemoveCard(sg1:GetFirst())
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg2=g:Select(tp,2,2,nil)
-	sg2:Merge(sg1)
-	Duel.Release(sg2,REASON_COST)
+	local g=Duel.GetReleaseGroup(tp)
+	local sg=aux.SelectUnselectGroup(g,e,tp,3,3,c511001295.rescon,1,tp,HINTMSG_RELEASE)
+	Duel.Release(sg,REASON_COST)
 end
 function c511001295.ctcon(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetHandler():GetCardTarget()

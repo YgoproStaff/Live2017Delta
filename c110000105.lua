@@ -15,6 +15,13 @@ function c110000105.initial_effect(c)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetOperation(c110000105.disop)
 	c:RegisterEffect(e4)
+	--Double Snare
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCode(3682106)
+	c:RegisterEffect(e2)
 	aux.CallToken(419)
 end
 function c110000105.cfilter(c,tp)

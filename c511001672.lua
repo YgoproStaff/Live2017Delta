@@ -10,23 +10,14 @@ function c511001672.initial_effect(c)
 	e1:SetOperation(c511001672.operation)
 	c:RegisterEffect(e1)
 end
-function c511001672.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	e:SetLabel(1)
-	return true
-end
-function c511001672.filter(c,cst)
-	return c:IsFaceup() and c:IsType(TYPE_XYZ) and (not cst or c:GetOverlayCount()~=0)
+function c511001672.filter(c)
+	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:GetOverlayCount()~=0
 end
 function c511001672.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local chkcost=e:GetLabel()==1 and true or false
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c511001672.filter(chkc,chkcost) end
-	if chk==0 then
-		e:SetLabel(0)
-		return Duel.IsExistingTarget(c511001672.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,chkcost)
-	end
-	e:SetLabel(0)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c511001672.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c511001672.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,c511001672.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,chkcost)
+	Duel.SelectTarget(tp,c511001672.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 end
 function c511001672.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
@@ -37,13 +28,13 @@ function c511001672.operation(e,tp,eg,ep,ev,re,r,rp)
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_DISABLE)
-			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 			tc:RegisterEffect(e1)
 			local e2=Effect.CreateEffect(e:GetHandler())
 			e2:SetType(EFFECT_TYPE_SINGLE)
 			e2:SetCode(EFFECT_DISABLE_EFFECT)
 			e2:SetValue(RESET_TURN_SET)
-			e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+			e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 			tc:RegisterEffect(e2)
 		end
 	end

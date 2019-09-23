@@ -15,11 +15,11 @@ end
 function c100000252.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_END and Duel.GetTurnPlayer()~=tp  
 end
-function c100000252.costfilter(c,e,tp)
+function c100000252.costfilter(c,e,tp,ft)
 	if not c:IsSetCard(0x41) or not c:IsAbleToGraveAsCost() then return false end
 	local code=c:GetCode()
 	local class=_G["c"..code]
-	return Duel.IsExistingMatchingCard(c100000252.spfilter,tp,LOCATION_GRAVE,0,1,nil,class,e,tp)
+	return (ft>0 or c:GetSequence()<5) and Duel.IsExistingMatchingCard(c100000252.spfilter,tp,LOCATION_GRAVE,0,1,nil,class,e,tp)
 end
 function c100000252.spfilter(c,class,e,tp)
 	local code=c:GetCode()
@@ -29,25 +29,30 @@ function c100000252.spfilter(c,class,e,tp)
 	return false
 end
 function c100000252.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c100000252.costfilter,tp,LOCATION_MZONE,0,1,nil,e,tp) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,c100000252.costfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
-	Duel.SendtoGrave(g,REASON_COST)
-	e:SetLabel(g:GetFirst():GetCode())
+	e:SetLabel(1)
+	return true
 end
 function c100000252.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 end
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if chk==0 then
+		if e:GetLabel()~=1 then return false end
+		e:SetLabel(0)
+		return ft>-1 and Duel.IsExistingMatchingCard(c100000252.costfilter,tp,LOCATION_MZONE,0,1,nil,e,tp,ft)
+	end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local g=Duel.SelectMatchingCard(tp,c100000252.costfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp,ft)
+	Duel.SendtoGrave(g,REASON_COST)
+	Duel.SetTargetParam(g:GetFirst():GetCode())
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
 end
 function c100000252.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	local code=e:GetLabel()
+	local code=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
 	local class=_G["c"..code]
 	if class==nil or class.lvupcount==nil then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c100000252.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,class,e,tp)
-	local tc=g:GetFirst()
-	if tc then
-		Duel.SpecialSummon(tc,0,tp,tp,true,false,POS_FACEUP)
+	if g:GetCount()>0 then
+		Duel.SpecialSummon(g,0,tp,tp,true,false,POS_FACEUP)
 	end
 end

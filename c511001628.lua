@@ -1,3 +1,4 @@
+--ハイパー・ギャラクシー
 --Hyper Galaxy
 function c511001628.initial_effect(c)
 	--Activate
@@ -10,6 +11,7 @@ function c511001628.initial_effect(c)
 	e1:SetOperation(c511001628.activate)
 	c:RegisterEffect(e1)
 end
+c511001628.listed_names={93717133}
 function c511001628.cfilter(c,ft)
 	return c:IsFaceup() and c:IsAttackAbove(2000) and c:IsReleasable() and (not ft or ft>0 or c:GetSequence()<5)
 end

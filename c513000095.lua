@@ -1,4 +1,6 @@
---黒の魔法神官
+--黒の魔法神官 (Anime)
+--Sorcerer of Dark Magic (Anime)
+--updated by Larry126
 function c513000095.initial_effect(c)
 	c:EnableReviveLimit()
 	--cannot special summon
@@ -31,9 +33,13 @@ function c513000095.initial_effect(c)
 	c:RegisterEffect(e3)
 	--atk change
 	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e4:SetCode(EVENT_BATTLE_START)
+	e4:SetDescription(aux.Stringid(77058170,0))
+	e4:SetCategory(CATEGORY_ATKCHANGE)
+	e4:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
+	e4:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
 	e4:SetRange(LOCATION_MZONE)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e4:SetTarget(c513000095.atktg)
 	e4:SetOperation(c513000095.atkop)
 	c:RegisterEffect(e4)
 end
@@ -68,15 +74,26 @@ end
 function c513000095.filter(c)
 	return c:IsRace(RACE_SPELLCASTER) and c:IsPreviousLocation(LOCATION_ONFIELD)
 end
+function c513000095.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return false end
+	local c=e:GetHandler()
+	local bc=c:GetBattleTarget()
+	local atk=-Duel.GetMatchingGroupCount(c513000095.filter,tp,LOCATION_GRAVE,0,nil)*500
+	if chk==0 then return c:GetFlagEffect(513000095)==0 and atk~=0
+		and bc and bc:IsOnField() and bc:IsFaceup() and bc:IsCanBeEffectTarget(e) end
+	c:RegisterFlagEffect(513000095,RESET_CHAIN,0,1)
+	Duel.SetTargetCard(bc)
+	Duel.SetOperationInfo(0,CATEGORY_ATKCHANGE,bc,1,1-tp,atk)
+end
 function c513000095.atkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetHandler():GetBattleTarget()
-	local atk=Duel.GetMatchingGroupCount(c513000095.filter,tp,LOCATION_GRAVE,0,nil)*500
-	if tc then
-		local e1=Effect.CreateEffect(e:GetHandler())
+	local c=e:GetHandler()
+	local bc=c:GetBattleTarget()
+	if bc and bc:IsFaceup() and bc:IsRelateToEffect(e) then
+		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(-atk)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
-		tc:RegisterEffect(e1)
+		e1:SetValue(-Duel.GetMatchingGroupCount(c513000095.filter,tp,LOCATION_GRAVE,0,nil)*500)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		bc:RegisterEffect(e1)
 	end
 end

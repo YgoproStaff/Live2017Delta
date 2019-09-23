@@ -39,6 +39,13 @@ function c511002854.initial_effect(c)
 	e4:SetTarget(c511002854.distg)
 	e4:SetOperation(c511002854.disop)
 	c:RegisterEffect(e4)
+	--Double Snare
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetCode(3682106)
+	c:RegisterEffect(e5)
 end
 function c511002854.con1(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetBattleDamage(tp)>0
@@ -75,7 +82,7 @@ function c511002854.op2(e,tp,eg,ep,ev,re,r,rp,val,r,rc)
 end
 function c511002854.refcon(e,re,val,r,rp,rc)
 	local cc=Duel.GetCurrentChain()
-	if cc==0 or bit.band(r,REASON_EFFECT)==0 then return end
+	if cc==0 or r&REASON_EFFECT==0 then return end
 	local cid=Duel.GetChainInfo(0,CHAININFO_CHAIN_ID)
 	if cid==e:GetLabel() then e:SetLabel(val) return 0
 	else return val end

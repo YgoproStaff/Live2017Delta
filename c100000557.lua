@@ -1,4 +1,5 @@
 --未来への希望
+--Hope for the Future
 function c100000557.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -11,6 +12,7 @@ function c100000557.initial_effect(c)
 	e1:SetOperation(c100000557.activate)
 	c:RegisterEffect(e1)
 end
+c100000557.listed_names={89943723}
 function c100000557.cfilter(c)
 	return c:IsCode(89943723) and c:IsFaceup()
 end

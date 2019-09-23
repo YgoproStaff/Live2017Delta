@@ -25,21 +25,23 @@ function c511001649.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabelObject(tc)
 end
 function c511001649.filter(c,e,tp)
-	return c:IsCode(511001648) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false)
+	return c:IsCode(511001648) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and c:CheckFusionMaterial()
 end
 function c511001649.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+	if chk==0 then return Duel.GetLocationCountFromEx(tp,tp,e:GetHandler())>0 
 		and Duel.IsExistingMatchingCard(c511001649.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
+	Duel.SetTargetCard(e:GetLabelObject())
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function c511001649.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	if Duel.GetLocationCountFromEx(tp)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c511001649.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
-	local tc=g:GetFirst()
-	if tc then
-		Duel.SpecialSummon(tc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)
+	local tc=Duel.SelectMatchingCard(tp,c511001649.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp):GetFirst()
+	if tc and Duel.SpecialSummon(tc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)>0 then
 		tc:CompleteProcedure()
-		Duel.RaiseSingleEvent(tc,511001649,e,REASON_EFFECT,tp,tp,e:GetLabelObject():GetTextAttack())
+		local tc2=Duel.GetFirstTarget()
+		if tc2 then
+			Duel.RaiseSingleEvent(tc,511001649,e,REASON_EFFECT,tp,tp,tc2:GetTextAttack())
+		end
 	end
 end

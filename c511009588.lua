@@ -60,6 +60,12 @@ function c511009588.initial_effect(c)
 	e5:SetValue(c511009588.repval)
 	e5:SetOperation(c511009588.repop)
 	c:RegisterEffect(e5)
+	--double tuner check
+	local e6=Effect.CreateEffect(c)
+	e6:SetType(EFFECT_TYPE_SINGLE)
+	e6:SetCode(EFFECT_MATERIAL_CHECK)
+	e6:SetValue(c511009588.valcheck)
+	c:RegisterEffect(e6)
 end
 function c511009588.discon1(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainDisablable(ev) and re:IsActiveType(TYPE_MONSTER)
@@ -205,4 +211,15 @@ end
 function c511009588.repop(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.CheckLocation(tp,LOCATION_PZONE,0) and not Duel.CheckLocation(tp,LOCATION_PZONE,1) then return false end
 	Duel.MoveToField(e:GetHandler(),tp,tp,LOCATION_PZONE,POS_FACEUP,true)
+end
+function c511009588.valcheck(e,c)
+	local g=c:GetMaterial()
+	if g:IsExists(Card.IsType,2,nil,TYPE_TUNER) then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+		e1:SetCode(21142671)
+		e1:SetReset(RESET_EVENT+0xfe0000+RESET_PHASE+PHASE_END)
+		c:RegisterEffect(e1)
+	end
 end

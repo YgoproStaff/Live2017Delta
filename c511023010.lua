@@ -1,4 +1,5 @@
---Elemental HERO Aqua Neos
+--Ｅ・ＨＥＲＯ アクア・ネオス (Anime)
+--Elemental HERO Aqua Neos (Anime)
 function c511023010.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
@@ -32,6 +33,7 @@ function c511023010.initial_effect(c)
 	e5:SetOperation(c511023010.desop)
 	c:RegisterEffect(e5)
 end
+c511023010.listed_names={89943723,17955766,24094653}
 c511023010.material_setcode={0x8,0x3008,0x9,0x1f}
 function c511023010.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA)

@@ -1,4 +1,5 @@
 --Magic Barier
+--cleaned up by MLD
 function c511018003.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)
@@ -9,13 +10,11 @@ function c511018003.initial_effect(c)
 	e1:SetOperation(c511018003.operation)
 	c:RegisterEffect(e1)
 end
-function c511018003.filter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsFaceup()
-end
 function c511018003.target(e,tp,eg,ev,ep,re,r,rp,chk,chkc)
-	if chkc then return c511018003.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c511018003.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
-	Duel.SelectTarget(tp,c511018003.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 end
 function c511018003.operation(e,tp)
 	local c=e:GetHandler()
@@ -29,6 +28,3 @@ function c511018003.operation(e,tp)
 		tc:RegisterEffect(e1)
 	end
 end
---[[
-	http://yugioh.wikia.com/wiki/Magic_Barrier
---]]

@@ -5,6 +5,7 @@ function c511000243.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e1:SetValue(c511000243.splimit)
 	c:RegisterEffect(e1)
 	--Send 1 "Forbidden One" monster from your Hand or Deck to the Graveyard
 	local e2=Effect.CreateEffect(c)
@@ -52,6 +53,9 @@ function c511000243.initial_effect(c)
 	e7:SetRange(LOCATION_MZONE)
 	e7:SetOperation(c511000243.winop)
 	c:RegisterEffect(e7)
+end
+function c511000243.splimit(e,se,sp,st)
+	return se:GetHandler():IsCode(511000244)
 end
 function c511000243.forbtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

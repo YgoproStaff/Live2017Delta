@@ -1,17 +1,16 @@
 --No.107 銀河眼の時空竜 (Anime)
+--Number 107: Galaxy-Eyes Tachyon Dragon (Anime)
 --fixed and cleaned up by MLD
+--fixed by Larry126
 function c511010107.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,nil,8,2)
 	c:EnableReviveLimit()
-	--
+	--battle indestructable
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EVENT_CHAIN_SOLVED)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e1:SetCondition(c511010107.regcon)
-	e1:SetOperation(c511010107.regop)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e1:SetValue(aux.NOT(aux.TargetBoolFunction(Card.IsSetCard,0x48)))
 	c:RegisterEffect(e1)
 	--negate opponent's turn
 	local e2=Effect.CreateEffect(c)
@@ -39,29 +38,39 @@ function c511010107.initial_effect(c)
 	e3:SetTarget(c511010107.negtg)
 	e3:SetOperation(c511010107.negop)
 	c:RegisterEffect(e3,false,1)
-	--battle indestructable
-	local e6=Effect.CreateEffect(c)
-	e6:SetType(EFFECT_TYPE_SINGLE)
-	e6:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e6:SetValue(c511010107.indes)
-	c:RegisterEffect(e6)
 	if not c511010107.global_check then
 		c511010107.global_check=true
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_ADJUST)
-		ge2:SetCountLimit(1)
-		ge2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
-		ge2:SetOperation(c511010107.numchk)
-		Duel.RegisterEffect(ge2,0)
+		--Cards that resolved effects check
+		BPResolvedEffects={}
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetCode(EVENT_CHAIN_SOLVED)
+		e1:SetCondition(c511010107.regcon)
+		e1:SetOperation(c511010107.regop)
+		Duel.RegisterEffect(e1,0)
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e2:SetCode(EVENT_PHASE+PHASE_END)
+		e2:SetCountLimit(1)
+		e2:SetOperation(c511010107.reset)
+		Duel.RegisterEffect(e2,0)
 	end
+	aux.CallToken(88177324)
 end
 c511010107.xyz_number=107
 function c511010107.regcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()>=PHASE_BATTLE_START and Duel.GetCurrentPhase()<=PHASE_BATTLE
 end
 function c511010107.regop(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():RegisterFlagEffect(511010107,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_BATTLE,0,0)
+	local cid=e:GetOwner():GetFieldID()
+	if not BPResolvedEffects[cid] then BPResolvedEffects[cid]={} end
+	for _,fid in ipairs(BPResolvedEffects[cid]) do
+		if fid==re:GetHandler():GetFieldID() then return end
+	end
+	table.insert(BPResolvedEffects[cid],re:GetHandler():GetFieldID())
+end
+function c511010107.reset(e,tp,eg,ep,ev,re,r,rp)
+	BPResolvedEffects={}
 end
 function c511010107.negcono(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp
@@ -75,7 +84,7 @@ function c511010107.negconp(e,tp,eg,ep,ev,re,r,rp)
 		and not Duel.IsExistingMatchingCard(c511010107.cfilter,tp,LOCATION_MZONE,0,1,e:GetHandler())
 end
 function c511010107.ftarget(e,c)
-	return c:GetFlagEffect(511010108)==0
+	return c:GetFlagEffectLabel(511010108)~=e:GetLabel()
 end
 function c511010107.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
@@ -84,7 +93,7 @@ function c511010107.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetCode(EFFECT_CANNOT_ATTACK)
-		e1:SetProperty(EFFECT_FLAG_OATH)
+		e1:SetProperty(EFFECT_FLAG_OATH+EFFECT_FLAG_IGNORE_IMMUNE)
 		e1:SetTargetRange(LOCATION_MZONE,0)
 		e1:SetTarget(c511010107.ftarget)
 		e1:SetLabel(e:GetHandler():GetFieldID())
@@ -97,25 +106,24 @@ function c511010107.disfilter(c)
 end
 function c511010107.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c511010107.disfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler()) 
-		or e:GetHandler():GetFlagEffect(511010107)>0 end
+		or BPResolvedEffects[e:GetHandler():GetFieldID()] end
 end
 function c511010107.negop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local res=false
 	local g=Duel.GetMatchingGroup(c511010107.disfilter,tp,LOCATION_MZONE,LOCATION_MZONE,c)
-	if g:GetCount()>0 then
-		local tc=g:GetFirst()
-		while tc do
-			local e1=Effect.CreateEffect(c)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_DISABLE)
-			e1:SetReset(RESET_EVENT+0x1fe0000)
-			tc:RegisterEffect(e1)
-			local e2=Effect.CreateEffect(c)
-			e2:SetType(EFFECT_TYPE_SINGLE)
-			e2:SetCode(EFFECT_DISABLE_EFFECT)
-			e2:SetReset(RESET_EVENT+0x1fe0000)
-			tc:RegisterEffect(e2)
+	for tc in aux.Next(g) do
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_DISABLE)
+		e1:SetReset(RESET_EVENT+0x1fe0000)
+		tc:RegisterEffect(e1)
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_DISABLE_EFFECT)
+		e2:SetReset(RESET_EVENT+0x1fe0000)
+		tc:RegisterEffect(e2)
+		if not tc:IsImmuneToEffect(e1) and not tc:IsImmuneToEffect(e2) then
 			local e3=Effect.CreateEffect(c)
 			e3:SetType(EFFECT_TYPE_SINGLE)
 			e3:SetCode(EFFECT_SET_ATTACK_FINAL)
@@ -128,38 +136,31 @@ function c511010107.negop(e,tp,eg,ep,ev,re,r,rp)
 			e4:SetValue(tc:GetBaseDefense())
 			e4:SetReset(RESET_EVENT+0x1fe0000)
 			tc:RegisterEffect(e4)
-			tc=g:GetNext()
 		end
 		res=true
 	end
 	if c:IsFacedown() or not c:IsRelateToEffect(e) then return end
-	local ct=c:GetFlagEffect(511010107)
-	if ct>0 then
+	local fid=e:GetHandler():GetFieldID()
+	local bpre=BPResolvedEffects[fid]
+	if bpre then
 		Duel.BreakEffect()
-		local atk=ct*1000
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(atk)
-		e1:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_END)
-		c:RegisterEffect(e1)
+		local e5=Effect.CreateEffect(c)
+		e5:SetType(EFFECT_TYPE_SINGLE)
+		e5:SetCode(EFFECT_UPDATE_ATTACK)
+		e5:SetValue(#bpre*1000)
+		e5:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_END)
+		c:RegisterEffect(e5)
 		res=true
 	end
-	if Duel.GetTurnPlayer()==tp and res then
-		local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e2:SetCode(EFFECT_EXTRA_ATTACK)
-		e2:SetValue(c:GetAttackAnnouncedCount())
-		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_BATTLE)
-		c:RegisterEffect(e2)
-		c:RegisterFlagEffect(511010108,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE+PHASE_BATTLE,0,0)
+	local atkct=c:GetAttackAnnouncedCount()
+	if atkct>0 and Duel.GetTurnPlayer()==tp and res then
+		local e6=Effect.CreateEffect(c)
+		e6:SetType(EFFECT_TYPE_SINGLE)
+		e6:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e6:SetCode(EFFECT_EXTRA_ATTACK)
+		e6:SetValue(atkct)
+		e6:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_BATTLE)
+		c:RegisterEffect(e6)
+		c:RegisterFlagEffect(511010108,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE+PHASE_BATTLE,0,1,fid)
 	end
-end
-function c511010107.numchk(e,tp,eg,ep,ev,re,r,rp)
-	Duel.CreateToken(tp,88177324)
-	Duel.CreateToken(1-tp,88177324)
-end
-function c511010107.indes(e,c)
-	return not c:IsSetCard(0x48)
 end

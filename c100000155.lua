@@ -1,4 +1,5 @@
---氷結のフィッツジェラルド
+--氷結のフィッツジェラルド (TF6)
+--Frozen Fitzgerald (TF6)
 function c100000155.initial_effect(c)
 	--dark synchro summon
 	c:EnableReviveLimit()
@@ -26,6 +27,7 @@ function c100000155.initial_effect(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e4:SetCode(EVENT_BATTLED)
+	e4:SetRange(LOCATION_MZONE)
 	e4:SetCondition(c100000155.condition)
 	e4:SetOperation(c100000155.operation)
 	c:RegisterEffect(e4)	

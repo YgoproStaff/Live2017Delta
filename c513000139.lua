@@ -5,6 +5,7 @@
 --credit to TPD & Cybercatman
 --updated by Larry126
 function c513000139.initial_effect(c)
+	aux.CallToken(421)
 	--summon with 3 tribute
 	local e1=Effect.CreateEffect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -36,27 +37,18 @@ function c513000139.initial_effect(c)
 	e5:SetTarget(c513000139.erastg)
 	e5:SetOperation(c513000139.erasop)
 	c:RegisterEffect(e5)
-	if not c513000139.global_check then
-		c513000139.global_check=true
-	--register
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_ADJUST)
-		ge1:SetCountLimit(1)
-		ge1:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
-		ge1:SetOperation(c513000139.chk)
-		Duel.RegisterEffect(ge1,0)
-	end
+	local e6=Effect.CreateEffect(c)
+	e6:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e6:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
+	e6:SetCode(EVENT_ADJUST)
+	e6:SetRange(0xff&~LOCATION_GRAVE)
+	e6:SetLabelObject(e5)
+	e6:SetOperation(c513000139.op)
+	c:RegisterEffect(e6)
 end
-function c513000139.chk(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetFlagEffect(tp,421)==0 and Duel.GetFlagEffect(1-tp,421)==0 then
-		Duel.CreateToken(tp,421)
-		Duel.CreateToken(1-tp,421)
-		Duel.RegisterFlagEffect(tp,421,nil,0,1)
-		Duel.RegisterFlagEffect(1-tp,421,nil,0,1)
-	end
+function c513000139.op(e,tp,eg,ev,ep,re,r,rp)
+	e:GetLabelObject():SetLabel(e:GetHandler():GetFlagEffectLabel(513000065))
 end
--------------------------------------------------------------------
 function c513000139.ttcon(e,c)
 	if c==nil then return true end
 	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-3 and Duel.GetTributeCount(c)>=3
@@ -76,5 +68,26 @@ function c513000139.erastg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c513000139.erasop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
-	Duel.SendtoGrave(g,REASON_EFFECT)
+	local c=e:GetHandler()
+	local phr=e:GetLabel()
+	local hr=c:GetFlagEffectLabel(513000065)
+	if phr~=hr then
+		if phr then
+			c:ResetFlagEffect(513000065)
+			c:RegisterFlagEffect(513000065,0,0,0,phr)
+			Duel.SendtoGrave(g,REASON_EFFECT)
+			c:ResetFlagEffect(513000065)
+			if hr then
+				c:RegisterFlagEffect(513000065,0,0,0,hr)
+			end
+		else
+			c:ResetFlagEffect(513000065)
+			Duel.SendtoGrave(g,REASON_EFFECT)
+			if hr then
+				c:RegisterFlagEffect(513000065,0,0,0,hr)
+			end
+		end
+	else
+		Duel.SendtoGrave(g,REASON_EFFECT)
+	end
 end

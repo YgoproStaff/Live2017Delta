@@ -1,9 +1,10 @@
---Metal Reflect Slime
+--メタル・リフレクト・スライム (Anime)
+--Metal Reflect Slime (Anime)
 --Scripted by eclair11
 function c511009214.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_BATTLE_DAMAGE)
 	e1:SetCondition(c511009214.condition)
@@ -12,7 +13,8 @@ function c511009214.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c511009214.condition(e,tp,eg,ep,ev,re,r,rp)
-	return ep==tp and ev>=Duel.GetLP(tp)+ev/2
+	return ep==tp and Duel.GetAttacker():IsControler(1-tp)
+		and Duel.GetBattleDamage(ep)>=(Duel.GetLP(tp)+Duel.GetBattleDamage(ep))/2
 end
 function c511009214.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -22,7 +24,8 @@ function c511009214.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c511009214.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetAttacker()
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
+	if not tc:IsFaceup() or not tc:IsRelateToBattle()
+		or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
 		or not Duel.IsPlayerCanSpecialSummonMonster(tp,511009215,0,0x4011,0,-2,1,RACE_AQUA,ATTRIBUTE_WATER) then return end
 	local token=Duel.CreateToken(tp,511009215)
 	Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP)
@@ -53,9 +56,9 @@ function c511009214.activate(e,tp,eg,ep,ev,re,r,rp)
 	e3:SetReset(RESET_EVENT+0x1fe0000)
 	token:RegisterEffect(e3,true)
 	local e4=Effect.CreateEffect(e:GetHandler())
-    e4:SetType(EFFECT_TYPE_SINGLE)
-    e4:SetCode(EFFECT_CANNOT_ATTACK)
-    e4:SetReset(RESET_EVENT+0x1fe0000)
-    token:RegisterEffect(e4,true)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetCode(EFFECT_CANNOT_ATTACK)
+	e4:SetReset(RESET_EVENT+0x1fe0000)
+	token:RegisterEffect(e4,true)
 	Duel.SpecialSummonComplete()
 end

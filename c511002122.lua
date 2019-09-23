@@ -18,17 +18,17 @@ function c511002122.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetTargetCard(Duel.GetAttackTarget())
 end
 function c511002122.filter(c,e,tp)
-	return c:GetLevel()==1 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsLevel(1) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c511002122.activate(e,tp,eg,ep,ev,re,r,rp)
 	local at=Duel.GetAttackTarget()
 	if not Duel.NegateAttack() then return end
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=1 or Duel.IsPlayerAffectedByEffect(tp,59822133) then return end
+	if Duel.IsPlayerAffectedByEffect(tp,59822133) then return end
 	local g=Duel.GetMatchingGroup(c511002122.filter,tp,LOCATION_DECK,0,nil,e,tp)
-	if at and at:IsRelateToEffect(e) and at:IsReleasableByEffect() and g:GetCount()>1 
+	if at and at:IsRelateToEffect(e) and at:IsReleasableByEffect() and g:GetCount()>1 and (Duel.GetLocationCount(tp,LOCATION_MZONE)>1 or c:GetSequence()<5) 
 		and Duel.SelectYesNo(tp,aux.Stringid(63014935,2)) then
+		Duel.BreakEffect()
 		if Duel.Release(at,REASON_EFFECT)~=0 then
-			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 			local sg=g:Select(tp,2,2,nil)
 			local tc=sg:GetFirst()

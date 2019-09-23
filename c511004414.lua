@@ -12,7 +12,7 @@ function c511004414.initial_effect(c)
 	local e2=e1:Clone()
 	e2:SetProperty(EFFECT_FLAG_CLIENT_HINT)
 	e2:SetCode(EFFECT_ATTACK_ALL)
-	e2:SetValue(c511004414.atkfilter)
+	e2:SetValue(aux.TargetBoolFunction(Card.IsCode,511009337))
 	c:RegisterEffect(e2)
 	--Destroy
 	local e4=Effect.CreateEffect(c)
@@ -55,7 +55,7 @@ function c511004414.target(e,tp,eg,ep,ev,re,r,rp,tc,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,tc,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,2,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,0)
 end
 function c511004414.operation(e,tp,eg,ev,ep,re,r,rp)
 	local c=e:GetHandler()
@@ -69,9 +69,6 @@ function c511004414.operation(e,tp,eg,ev,ep,re,r,rp)
 		end
 		Duel.SpecialSummonComplete()
 	end
-end
-function c511004414.atkfilter(e,c)
-	return c:IsCode(511009337)
 end
 function c511004414.descon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetHandler():GetFirstCardTarget()

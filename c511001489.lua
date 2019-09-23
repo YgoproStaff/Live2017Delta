@@ -41,6 +41,9 @@ function c511001489.initial_effect(c)
 	e5:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	c:RegisterEffect(e5)
 end
+function c511001489.spfilter(c,ft,tp)
+	return c:IsCode(3643300) and (ft>0 or (c:IsControler(tp) and c:GetSequence()<5)) and (c:IsControler(tp) or c:IsFaceup())
+end
 function c511001489.hspcon(e,c)
 	if c==nil then return true end
 	local eff={c:GetCardEffect(EFFECT_NECRO_VALLEY)}
@@ -48,11 +51,12 @@ function c511001489.hspcon(e,c)
 		local op=te:GetOperation()
 		if not op or op(e,c) then return false end
 	end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
-		and Duel.CheckReleaseGroup(c:GetControler(),Card.IsCode,1,nil,3643300)
+	local tp=c:GetControler()
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	return ft>-1 and Duel.CheckReleaseGroup(tp,c511001489.spfilter,1,nil,ft,tp)
 end
 function c511001489.hspop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.SelectReleaseGroup(tp,Card.IsCode,1,1,nil,3643300)
+	local g=Duel.SelectReleaseGroup(tp,c511001489.spfilter,1,1,nil,Duel.GetLocationCount(tp,LOCATION_MZONE),tp)
 	Duel.Release(g,REASON_COST)
 end
 function c511001489.bantg(e,tp,eg,ep,ev,re,r,rp,chk)

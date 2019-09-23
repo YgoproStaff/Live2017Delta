@@ -40,22 +40,22 @@ function c511003053.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
 	return ph==PHASE_MAIN1 or (ph>=PHASE_BATTLE_START and ph<=PHASE_BATTLE) or ph==PHASE_MAIN2
 end
-function c511003053.cfilter(c)
+function c511003053.cfilter(c,ft,tp)
 	local mg=c:GetMaterial()
-	if not mg or not mg:IsExists(Card.IsCode,1,nil,511003050) then return false end
-	return c:IsSummonType(SUMMON_TYPE_FUSION) or c:IsSummonType(SUMMON_TYPE_SYNCHRO) or c:IsSummonType(SUMMON_TYPE_XYZ)
+	return mg and mg:IsExists(Card.IsCode,1,nil,511003050) and c:IsSummonType(SUMMON_TYPE_FUSION,SUMMON_TYPE_SYNCHRO,SUMMON_TYPE_XYZ) 
+		 and (ft>0 or (c:IsControler(tp) and c:GetSequence()<5)) and (c:IsControler(tp) or c:IsFaceup())
 end
 function c511003053.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c511003053.cfilter,1,nil) end
-	local g=Duel.SelectReleaseGroup(tp,c511003053.cfilter,1,1,nil)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if chk==0 then return ft>-1 and Duel.CheckReleaseGroup(tp,c511003053.cfilter,1,nil,ft,tp) end
+	local g=Duel.SelectReleaseGroup(tp,c511003053.cfilter,1,1,nil,ft,tp)
 	Duel.Release(g,REASON_COST)
 end
 function c511003053.filter(c,e,tp)
 	return c:IsCode(511003050) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c511003053.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c511003053.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c511003053.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
 end
 function c511003053.spop(e,tp,eg,ep,ev,re,r,rp)

@@ -31,7 +31,7 @@ function c511002842.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()~=1 then return false end
 		e:SetLabel(0)
-		return g:GetCount()>0 and Duel.IsExistingMatchingCard(c511002842.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+		return g:GetCount()>0 and Duel.IsExistingMatchingCard(c511002842.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,g) end
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 	Duel.SetTargetParam(g:GetCount())
 end

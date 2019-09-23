@@ -1,4 +1,4 @@
---スフィア・ボム球体時限爆弾
+--Blast Sphere (Anime)
 function c511002509.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)
@@ -59,7 +59,7 @@ function c511002509.eqop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c511002509.descon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()~=tp
+	return e:GetHandler():GetTurnID()~=Duel.GetTurnCount()
 end
 function c511002509.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -67,23 +67,27 @@ function c511002509.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ec=c:GetEquipTarget()
 	ec:CreateEffectRelation(e)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,c,1,0,0)
-	if c:GetAttack()>=ec:GetAttack() then
+	local catk=c:GetAttack()
+	local ecatk=ec:GetAttack()
+	if catk>=ecatk then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,ec,1,0,0)
-		Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,c:GetAttack()-ec:GetAttack())
+		Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,catk-ecatk)
 	else
-		Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,ec:GetAttack()-c:GetAttack())
+		Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,ecatk-catk)
 	end
 end
 function c511002509.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local ec=c:GetEquipTarget()
 	if not c:IsRelateToEffect(e) or not ec or not ec:IsRelateToEffect(e) then return end
+	local catk=c:GetAttack()
 	if Duel.Destroy(c,REASON_EFFECT)>0 then
-		if c:GetAttack()>=ec:GetAttack() then
+		local ecatk=ec:GetAttack()
+		if catk>=ecatk then
 			Duel.Destroy(ec,REASON_EFFECT)
-			Duel.Damage(1-tp,c:GetAttack()-ec:GetAttack(),REASON_EFFECT)
+			Duel.Damage(1-tp,catk-ecatk,REASON_EFFECT)
 		else
-			Duel.Damage(tp,ec:GetAttack()-c:GetAttack(),REASON_EFFECT)
+			Duel.Damage(tp,ecatk-catk,REASON_EFFECT)
 		end
 	end
 end

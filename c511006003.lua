@@ -1,4 +1,5 @@
 --Evil Eye of Coercion
+--fixed by MLD
 function c511006003.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -6,14 +7,12 @@ function c511006003.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCondition(c511006003.condition)
 	c:RegisterEffect(e1)
-	
-	--attack directly
+	 --prevent target
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_DIRECT_ATTACK)
+	e2:SetCode(EFFECT_IGNORE_BATTLE_TARGET)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetValue(1)
+	e2:SetTargetRange(0,LOCATION_MZONE)
 	c:RegisterEffect(e2)
 end
 function c511006003.cfilter(c)

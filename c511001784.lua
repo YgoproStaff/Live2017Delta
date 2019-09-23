@@ -25,14 +25,14 @@ function c511001784.initial_effect(c)
 end
 function c511001784.negcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
+	if c:IsStatus(STATUS_BATTLE_DESTROYED) or ep==tp or not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	return g and g:IsContains(c)
 end
 function c511001784.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	if re:GetHandler():IsRelateToEffect(re) and re:GetHandler():IsDestructable() then
+	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
@@ -50,11 +50,13 @@ function c511001784.cfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToGraveAsCost()
 end
 function c511001784.cbcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c511001784.cfilter,tp,LOCATION_ONFIELD,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c511001784.cfilter,tp,LOCATION_ONFIELD,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,c511001784.cfilter,tp,LOCATION_ONFIELD,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,c511001784.cfilter,tp,LOCATION_ONFIELD,0,1,1,e:GetHandler())
 	Duel.SendtoGrave(g,REASON_COST)
 end
 function c511001784.cbop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChangeAttackTarget(e:GetHandler())
+	if e:GetHandler():IsRelateToEffect(e) then
+		Duel.ChangeAttackTarget(e:GetHandler())
+	end
 end

@@ -66,7 +66,7 @@ function c511001982.datop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c511001982.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetMatchingGroupCount(Card.IsDiscardable,tp,LOCATION_HAND,0,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,2,nil) end
 	Duel.DiscardHand(tp,Card.IsDiscardable,2,2,REASON_COST+REASON_DISCARD)
 end
 function c511001982.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)

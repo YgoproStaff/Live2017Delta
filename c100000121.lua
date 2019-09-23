@@ -1,5 +1,7 @@
---開運ミラクルストーン
-function c100000121.initial_effect(c)
+--開運ミラクルストーン (VG)
+--Miracle Stone (VG)
+local s,id=GetID()
+function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -11,8 +13,8 @@ function c100000121.initial_effect(c)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x520))
-	e2:SetValue(c100000121.val)
+	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x12e))
+	e2:SetValue(s.val)
 	c:RegisterEffect(e2)
 	--attack res
 	local e3=Effect.CreateEffect(c)
@@ -20,15 +22,15 @@ function c100000121.initial_effect(c)
 	e3:SetCode(EFFECT_CANNOT_ATTACK)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e3:SetTarget(c100000121.atktg)
+	e3:SetTarget(s.atktg)
 	c:RegisterEffect(e3)
 end
-function c100000121.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x520)
+function s.filter(c)
+	return c:IsFaceup() and c:IsSetCard(0x12e)
 end
-function c100000121.val(e,c)
-	return Duel.GetMatchingGroupCount(c100000121.filter,c:GetControler(),LOCATION_MZONE,LOCATION_MZONE,nil)*1000
+function s.val(e,c)
+	return Duel.GetMatchingGroupCount(s.filter,c:GetControler(),LOCATION_MZONE,LOCATION_MZONE,nil)*1000
 end
-function c100000121.atktg(e,c)
-	return c:IsStatus(STATUS_SUMMON_TURN) and c:IsSetCard(0x520) and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)~=0 
+function s.atktg(e,c)
+	return c:IsStatus(STATUS_SUMMON_TURN) and c:IsSetCard(0x12e) and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)~=0 
 end

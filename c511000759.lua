@@ -1,3 +1,4 @@
+--インスタント・チューン
 --Instant Tune
 function c511000759.initial_effect(c)
 	--Activate
@@ -5,16 +6,45 @@ function c511000759.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,51100759+EFFECT_COUNT_CODE_OATH)
+	e1:SetCondition(c511000759.condition)
 	e1:SetTarget(c511000759.target)
 	e1:SetOperation(c511000759.activate)
 	c:RegisterEffect(e1)
+	if not c511000759.global_check then
+		c511000759.global_check=true
+		c511000759[0]=true
+		c511000759[1]=true
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
+		ge1:SetOperation(c511000759.checkop)
+		Duel.RegisterEffect(ge1,0)
+		local ge2=Effect.CreateEffect(c)
+		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge2:SetCode(EVENT_ADJUST)
+		ge2:SetCountLimit(1)
+		ge2:SetOperation(c511000759.clear)
+		Duel.RegisterEffect(ge2,0)
+	end
+end
+function c511000759.checkop(e,tp,eg,ep,ev,re,r,rp)
+	if eg:IsExists(Card.IsControler,1,nil,1-tp) then
+		c511000759[eg:GetFirst():GetControler()]=true
+	end
+end
+function c511000759.clear(e,tp,eg,ep,ev,re,r,rp)
+	c511000759[0]=false
+	c511000759[1]=false
+end
+function c511000759.condition(e,tp,eg,ep,ev,re,r,rp)
+	return c511000759[tp]
 end
 function c511000759.filter(c,e,tp)
 	return c:IsType(TYPE_SYNCHRO) 
 		and Duel.IsExistingMatchingCard(c511000759.matfilter,tp,LOCATION_MZONE,0,1,nil,e:GetHandler(),c)
 end
 function c511000759.matfilter(c,mc,sc)
+	if not c:IsFaceup() then return end
 	local g=Group.FromCards(c,mc)
 	local e1=Effect.CreateEffect(mc)
 	e1:SetType(EFFECT_TYPE_SINGLE)

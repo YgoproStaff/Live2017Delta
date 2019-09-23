@@ -22,13 +22,14 @@ c100000706.collection={
 	[77121851]=true;[63120904]=true;[19153634]=true;[28933734]=true;
 }
 function c100000706.filter(c,e,tp)
-	return (c:IsSetCard(0x316) or c100000706.collection[c:GetCode()]) and c:GetCode()~=100000706 
+	return (c:IsSetCard(0x316) or c100000706.collection[c:GetCode()]) and not c:IsCode(100000706) 
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c100000706.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c100000706.filter(chkc,e,tp) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-		and Duel.IsExistingTarget(c100000706.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if e:GetHandler():GetSequence()<5 then ft=ft+1 end
+	if chk==0 then return ft>0 and Duel.IsExistingTarget(c100000706.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,c100000706.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)

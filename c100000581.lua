@@ -24,15 +24,16 @@ function c100000581.initial_effect(c)
 end
 function c100000581.filter1(c,e,tp)
 	local rk=c:GetRank()
-	return rk>0 and c:IsFaceup() and c:CheckRemoveOverlayCard(tp,1,REASON_COST)
-		and Duel.IsExistingMatchingCard(c100000581.filter2,tp,LOCATION_EXTRA,0,1,nil,rk,e,tp,c)
+	local pg=aux.GetMustBeMaterialGroup(tp,Group.FromCards(c),tp,nil,nil,REASON_XYZ)
+	return pg:GetCount()<=1 and rk>0 and c:IsFaceup() and c:CheckRemoveOverlayCard(tp,1,REASON_COST) and Duel.GetLocationCountFromEx(tp,tp,c)>0
+		and Duel.IsExistingMatchingCard(c100000581.filter2,tp,LOCATION_EXTRA,0,1,nil,rk,e,tp,c,pg)
 end
-function c100000581.filter2(c,rk,e,tp,mc)
-	return c:GetRank()==rk+1 and mc:IsCanBeXyzMaterial(c,tp) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
+function c100000581.filter2(c,rk,e,tp,mc,pg)
+	return (pg:GetCount()<=0 or pg:IsContains(mc)) and c:IsRank(rk+1) and mc:IsCanBeXyzMaterial(c,tp) 
+		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function c100000581.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-		and Duel.IsExistingMatchingCard(c100000581.filter1,tp,LOCATION_MZONE,0,1,nil,e,tp) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c100000581.filter1,tp,LOCATION_MZONE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVEXYZ)
 	local tc=Duel.SelectMatchingCard(tp,c100000581.filter1,tp,LOCATION_MZONE,0,1,1,nil,e,tp):GetFirst()
 	tc:RemoveOverlayCard(tp,1,1,REASON_COST)
@@ -42,16 +43,18 @@ function c100000581.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c100000581.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if not tc or tc:IsFacedown() or not tc:IsRelateToEffect(e) or tc:IsControler(1-tp) or tc:IsImmuneToEffect(e) then return end
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<0 then return end
+	if not tc or tc:IsFacedown() or not tc:IsRelateToEffect(e) or tc:IsControler(1-tp) or tc:IsImmuneToEffect(e) 
+		or Duel.GetLocationCountFromEx(tp,tp,tc)<=0 then return end
+	local pg=aux.GetMustBeMaterialGroup(tp,Group.FromCards(tc),tp,nil,nil,REASON_XYZ)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c100000581.filter2,tp,LOCATION_EXTRA,0,1,1,nil,tc:GetRank(),e,tp,tc)
+	local g=Duel.SelectMatchingCard(tp,c100000581.filter2,tp,LOCATION_EXTRA,0,1,1,nil,tc:GetRank(),e,tp,tc,pg)
 	local sc=g:GetFirst()
 	if sc then
 		local mg=tc:GetOverlayGroup()
 		if mg:GetCount()~=0 then
 			Duel.Overlay(sc,mg)
 		end
+		sc:SetMaterial(Group.FromCards(tc))
 		Duel.Overlay(sc,Group.FromCards(tc))
 		Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 		sc:CompleteProcedure()

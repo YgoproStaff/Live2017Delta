@@ -10,20 +10,26 @@ function c511000878.initial_effect(c)
 	e1:SetOperation(c511000878.operation)
 	c:RegisterEffect(e1)
 end
-function c511000878.cfilter(c)
-	return c:IsFaceup() and c:IsCode(38033121) and c:IsAbleToHandAsCost()
+function c511000878.cfilter(c,ft)
+	return c:IsFaceup() and c:IsCode(38033121) and c:IsAbleToHandAsCost() and (ft>1 or c:GetSequence()<5)
 end
 function c511000878.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c511000878.cfilter,tp,LOCATION_MZONE,0,1,nil) end
+	e:SetLabel(1)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if chk==0 then return ft>0 and Duel.IsExistingMatchingCard(c511000878.cfilter,tp,LOCATION_MZONE,0,1,nil,ft) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectMatchingCard(tp,c511000878.cfilter,tp,LOCATION_MZONE,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,c511000878.cfilter,tp,LOCATION_MZONE,0,1,1,nil,ft)
 	Duel.SendtoHand(g,nil,REASON_COST)
 end
 function c511000878.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and not Duel.IsPlayerAffectedByEffect(tp,59822133) 
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,511000879,0,0x4011,0,0,1,RACE_WINDBEAST,ATTRIBUTE_WIND) end
+	if chk==0 then
+		if e:GetLabel()==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)<=1 then return false end
+		e:SetLabel(0)
+		return not Duel.IsPlayerAffectedByEffect(tp,59822133) 
+			and Duel.IsPlayerCanSpecialSummonMonster(tp,511000879,0,0x4011,0,0,1,RACE_WINDBEAST,ATTRIBUTE_WIND)
+	end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,2,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,0)
 end
 function c511000878.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)>1 and not Duel.IsPlayerAffectedByEffect(tp,59822133) 
@@ -44,7 +50,7 @@ function c511000878.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c511000878.desfilter(c)
-	return c:IsFaceup() and c:IsCode(511000879) and c:IsDestructable()
+	return c:IsFaceup() and c:IsCode(511000879)
 end
 function c511000878.spfilter(c,e,tp)
 	return c:IsCode(38033121) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

@@ -11,21 +11,26 @@ function c511000132.initial_effect(c)
 	e1:SetOperation(c511000132.activate)
 	c:RegisterEffect(e1)
 end
-function c511000132.costfilter(c,e,tp)
-	return c:IsFaceup() and c:IsCode(49375719) and c:IsAbleToGraveAsCost()
+function c511000132.costfilter(c,ft)
+	return c:IsFaceup() and c:IsCode(49375719) and c:IsAbleToGraveAsCost() and (ft>0 or c:GetSequence()<5)
 end
 function c511000132.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c511000132.costfilter,tp,LOCATION_MZONE,0,1,nil) end
+	e:SetLabel(1)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if chk==0 then return ft>-1 and Duel.IsExistingMatchingCard(c511000132.costfilter,tp,LOCATION_MZONE,0,1,nil,ft) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,c511000132.costfilter,tp,LOCATION_MZONE,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,c511000132.costfilter,tp,LOCATION_MZONE,0,1,1,nil,ft)
 	Duel.SendtoGrave(g,REASON_COST)
 end
 function c511000132.filter(c,e,tp)
 	return c:IsCode(2158562) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c511000132.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-		and Duel.IsExistingMatchingCard(c511000132.filter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,e,tp) end
+	if chk==0 then
+		if e:GetLabel()==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return false end
+		e:SetLabel(0)
+		return Duel.IsExistingMatchingCard(c511000132.filter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,e,tp)
+	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,LOCATION_HAND+LOCATION_DECK)
 end
 function c511000132.activate(e,tp,eg,ep,ev,re,r,rp)

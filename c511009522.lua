@@ -160,8 +160,8 @@ function c511009522.spop2(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c511009522.pencost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,nil,0x20f8) end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,nil,0x20f8)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,Card.IsSetCard,1,false,nil,nil,0x20f8) end
+	local g=Duel.SelectReleaseGroupCost(tp,Card.IsSetCard,1,1,false,nil,nil,0x20f8)
 	Duel.Release(g,REASON_COST)
 end
 function c511009522.pentg(e,tp,eg,ep,ev,re,r,rp,chk)

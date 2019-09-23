@@ -35,7 +35,7 @@ function c511001336.initial_effect(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e4:SetValue(c511001336.indes)
+	e4:SetValue(aux.NOT(aux.TargetBoolFunction(Card.IsSetCard,0x48)))
 	c:RegisterEffect(e4)
 end
 c511001336.xyz_number=4
@@ -94,16 +94,12 @@ function c511001336.sumop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(c511001336.spfilter),tp,LOCATION_EXTRA+LOCATION_GRAVE,0,e:GetHandler(),e,tp)
 	local sg=aux.SelectUnselectGroup(g,e,tp,ct,ct,c511001336.rescon,1,tp,HINTMSG_SPSUMMON)
 	if sg:GetCount()<=0 then return end
-	local tc=sg:GetFirst()
-	while tc do
-		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
-		local og=mg:Select(tp,1,1,nil)
-		Duel.Overlay(tc,og)
-		mg:Sub(og)
-		tc=sg:GetNext()
-	end
-	Duel.SpecialSummonComplete()
+	aux.MainAndExtraSpSummonLoop(c511001336.ovop(mg),0,0,0,false,false)(e,tp,eg,ep,ev,re,r,rp,sg)
 end
-function c511001336.indes(e,c)
-	return not c:IsSetCard(0x48)
+function c511001336.ovop(mg)
+	return	function(e,tp,eg,ep,ev,re,r,rp,tc)
+				local og=mg:Select(tp,1,1,nil)
+				Duel.Overlay(tc,og)
+				mg:Sub(og)
+			end
 end

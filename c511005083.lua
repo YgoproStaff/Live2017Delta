@@ -80,7 +80,7 @@ function c511005083.despop(e,tp,eg,ep,ev,re,r,rp)
 			and Duel.IsPlayerCanSpecialSummonMonster(tp,511005082,0,0x4011,300,300,1,RACE_FIEND,ATTRIBUTE_DARK) then
 			for i=1,5 do
 				local token=Duel.CreateToken(tp,511005082)
-				Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
+				Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP)
 				local e1=Effect.CreateEffect(e:GetHandler())
 				e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 				e1:SetCode(EVENT_PRE_BATTLE_DAMAGE)

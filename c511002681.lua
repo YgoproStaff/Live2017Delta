@@ -26,6 +26,13 @@ function c511002681.initial_effect(c)
 	e1:SetTarget(c511002681.reptg)
 	e1:SetOperation(c511002681.repop)
 	c:RegisterEffect(e1)
+	--Double Snare
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetRange(LOCATION_PZONE)
+	e3:SetCode(3682106)
+	c:RegisterEffect(e3)
 end
 function c511002681.tgfilter(c,tp)
 	return c:IsLocation(LOCATION_SZONE) and c:IsControler(tp) and c:GetSequence()<5

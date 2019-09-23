@@ -76,14 +76,16 @@ function c511009517.spcon(e,tp,eg,ep,ev,re,r,rp)
 		if not op or op(e,c) then return false end
 	end
 	local g=Duel.GetReleaseGroup(tp):Filter(Card.IsSetCard,nil,0x20f8)
-	return eg:IsExists(c511009517.spfilter,1,nil,tp) and Duel.IsExistingMatchingCard(c511009517.cfilter,tp,LOCATION_MZONE,0,1,nil)
+	local pg=aux.GetMustBeMaterialGroup(tp,Group.CreateGroup(),tp,nil,nil,REASON_SYNCHRO)
+	return pg:GetCount()<=0 and eg:IsExists(c511009517.spfilter,1,nil,tp) and Duel.IsExistingMatchingCard(c511009517.cfilter,tp,LOCATION_MZONE,0,1,nil)
 		and g:GetCount()>1 and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SYNCHRO,tp,false,true)
 		and aux.SelectUnselectGroup(g,e,tp,2,2,c511009517.rescon,0)
 end
 function c511009517.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local g=Duel.GetReleaseGroup(tp):Filter(Card.IsCode,nil,25955164,62340868,98434877)
-	if g:GetCount()>1 and aux.SelectUnselectGroup(g,e,tp,2,2,c511009517.rescon,0) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SYNCHRO,tp,false,true) 
+	local pg=aux.GetMustBeMaterialGroup(tp,Group.CreateGroup(),tp,nil,nil,REASON_SYNCHRO)
+	if pg:GetCount()<=0 and g:GetCount()>1 and aux.SelectUnselectGroup(g,e,tp,2,2,c511009517.rescon,0) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SYNCHRO,tp,false,true) 
 		and Duel.SelectEffectYesNo(tp,c) then
 		local sg=aux.SelectUnselectGroup(g,e,tp,2,2,c511009517.rescon,1,tp,HINTMSG_RELEASE)
 		Duel.Release(sg,REASON_COST)

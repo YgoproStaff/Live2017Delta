@@ -1,5 +1,4 @@
 --霧の王城
---このカードの「使用していたモンスターカードゾーンに」の部分を再現すると使用不可能にしたゾーンにモンスターが特殊召喚されてしまう為、一部処理を変更しています。
 function c111215001.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -64,23 +63,12 @@ end
 function c111215001.disop(e,tp)
 	local c=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if c==0 then return end
-	local pseq=e:GetLabel()
-	local op
-	if pseq==0 then
-		op=1
-	elseif pseq==1 then
-		op=2
-	elseif pseq==2 then
-		op=4
-	elseif pseq==3 then
-		op=8
-	elseif pseq==4 then
-		op=16
-	end
-	return op
+	return math.pow(2,e:GetLabel())
 end
 function c111215001.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetFlagEffect(tp,111215001)>4
+	return Duel.IsDuelType(SPEED_DUEL) and e:GetHandler():GetFlagEffect(tp,111215001)>2 
+		or e:GetHandler():GetFlagEffect(tp,111215001)>4
+	--Duel.GetLocationCount(tp,LOCATION_MZONE,PLAYER_NONE,LOCATION_REASON_COUNT)==0
 end
 function c111215001.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local hg=Duel.GetFieldGroup(tp,LOCATION_HAND,0)

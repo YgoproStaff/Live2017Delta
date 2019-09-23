@@ -9,13 +9,13 @@ function c513000141.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e1:SetCode(EFFECT_DISABLE)
-	e1:SetTarget(c513000141.distg)
+	e1:SetTarget(function(e,c) return c~=e:GetHandler() end)
 	c:RegisterEffect(e1)
-	--copy	
+	--copy  
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_ADJUST)
-	e2:SetRange(LOCATION_MZONE)	
+	e2:SetRange(LOCATION_MZONE) 
 	e2:SetOperation(c513000141.operation)
 	c:RegisterEffect(e2)
 	--indes
@@ -32,7 +32,7 @@ function c513000141.initial_effect(c)
 	e4:SetCategory(CATEGORY_DESTROY)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e4:SetRange(LOCATION_MZONE)
-	e4:SetProperty(EFFECT_FLAG_CARD_TARGET,EFFECT_FLAG2_XMDETACH)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e4:SetCondition(c513000141.descon)
 	e4:SetCost(c513000141.descost)
@@ -43,8 +43,23 @@ function c513000141.initial_effect(c)
 	local e6=Effect.CreateEffect(c)
 	e6:SetType(EFFECT_TYPE_SINGLE)
 	e6:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e6:SetValue(c513000141.indes)
+	e6:SetValue(function(e,c) return not c:IsSetCard(0x48) end)
 	c:RegisterEffect(e6)
+	--copy
+	local e7=Effect.CreateEffect(c)
+	e7:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e7:SetCode(EVENT_BE_PRE_MATERIAL)
+	e7:SetRange(LOCATION_MZONE)
+	e7:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+	e7:SetOperation(c513000141.reset)
+	c:RegisterEffect(e7)
+	local e8=Effect.CreateEffect(c)
+	e8:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e8:SetCode(EVENT_LEAVE_FIELD)
+	e8:SetRange(LOCATION_MZONE)
+	e8:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+	e8:SetOperation(c513000141.reset)
+	c:RegisterEffect(e8) 
 	if not c513000141.global_check then
 		c513000141.global_check=true
 		local ge2=Effect.CreateEffect(c)
@@ -57,23 +72,27 @@ function c513000141.initial_effect(c)
 	end
 end
 c513000141.xyz_number=69
-function c513000141.distg(e,c)
-	return c~=e:GetHandler()
-end
 function c513000141.copfilter(c)
-	return c:IsFaceup() and c:IsStatus(STATUS_DISABLED)
+	return c:IsFaceup() and c:IsStatus(STATUS_DISABLED) and c:GetFlagEffect(513000141)==0
 end
 function c513000141.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local wg=Duel.GetMatchingGroup(c513000141.copfilter,tp,LOCATION_MZONE,LOCATION_MZONE,c)
-	local wbc=wg:GetFirst()
-	while wbc do
-		local code=wbc:GetOriginalCode()
-		if c:IsFaceup() and c:GetFlagEffect(code)==0 then
-			c:CopyEffect(code,RESET_EVENT+0x1ff0000+EVENT_CHAINING,1)
-			c:RegisterFlagEffect(code,RESET_EVENT+0x1ff0000+EVENT_CHAINING,0,1) 	
-		end	
-		wbc=wg:GetNext()
+	for wbc in aux.Next(wg) do
+		if c:IsFaceup() then
+			local cid=c:CopyEffect(wbc:GetOriginalCode(),RESET_EVENT+0x1ff0000,1)
+			wbc:RegisterFlagEffect(513000141,0,0,0,cid)
+		end 
+	end
+end
+function c513000141.rfilter(c)
+	return c:GetFlagEffect(513000141)>0
+end
+function c513000141.reset(e,tp,eg,ep,ev,re,r,rp)
+	local wg=eg:Filter(c513000141.rfilter,nil)
+	for wbc in aux.Next(wg) do
+		e:GetHandler():ResetEffect(wbc:GetFlagEffectLabel(513000141),RESET_COPY)
+		wbc:ResetFlagEffect(513000141)
 	end
 end
 function c513000141.descon(e,tp,eg,ep,ev,re,r,rp)
@@ -99,7 +118,4 @@ end
 function c513000141.numchk(e,tp,eg,ep,ev,re,r,rp)
 	Duel.CreateToken(tp,2407234)
 	Duel.CreateToken(1-tp,2407234)
-end
-function c513000141.indes(e,c)
-return not c:IsSetCard(0x48)
 end

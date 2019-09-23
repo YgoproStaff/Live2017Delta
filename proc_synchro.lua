@@ -8,14 +8,20 @@ function Auxiliary.NonTunerEx(f,val)
 				return target:IsNotTuner(scard,tp) and f(target,val,scard,sumtype,tp)
 			end
 end
+Auxiliary.SynchroSummonMinCount = nil
+Auxiliary.SynchroSummonMaxCount = nil
 --Synchro monster, m-n tuners + m-n monsters
 function Auxiliary.AddSynchroProcedure(c,...)
-	--parameters (f1,min1,max1,f2,min2,max2,sub1,sub2,req1,reqct1,req2,reqct2,reqm)
+	--parameters (f1,min1,max1,f2,min2,max2,sub1,sub2,req1,req2,reqm)
 	if c.synchro_type==nil then
 		local code=c:GetOriginalCode()
 		local mt=_G["c" .. code]
 		mt.synchro_type=1
 		mt.synchro_parameters={...}
+		if type(mt.synchro_parameters[2])=='function' then
+			Debug.Message("Old Synchro Procedure detected in c"..code..".lua")
+			return
+		end
 	end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -49,10 +55,12 @@ end
 function Auxiliary.NonTunerFilter(c,f2,sub2,sc,tp)
 	return not f2 or f2(c,sc,SUMMON_TYPE_SYNCHRO,tp) or (sub2 and sub2(c,sc,SUMMON_TYPE_SYNCHRO,tp))
 end
-function Auxiliary.SynCondition(f1,min1,max1,f2,min2,max2,sub1,sub2,req1,reqct1,req2,reqct2,reqm)
-	return	function(e,c,smat,mg)
+function Auxiliary.SynCondition(f1,min1,max1,f2,min2,max2,sub1,sub2,req1,req2,reqm)
+	return	function(e,c,smat,mg,min,max)
 				if c==nil then return true end
 				if c:IsType(TYPE_PENDULUM) and c:IsFaceup() then return false end
+				min = min or Auxiliary.SynchroSummonMinCount
+				max = max or Auxiliary.SynchroSummonMaxCount
 				local tp=c:GetControler()
 				local dg
 				local lv=c:GetLevel()
@@ -93,7 +101,7 @@ function Auxiliary.SynCondition(f1,min1,max1,f2,min2,max2,sub1,sub2,req1,reqct1,
 							g2:Merge(ag)
 						end
 					end
-					local res=g2:IsExists(Auxiliary.SynchroCheckP31,1,nil,g2,Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup(),f1,sub1,f2,sub2,min1,max1,min2,max2,req1,reqct1,req2,reqct2,reqm,lv,c,tp,pg,mgchk)
+					local res=g2:IsExists(Auxiliary.SynchroCheckP31,1,nil,g2,Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup(),f1,sub1,f2,sub2,min1,max1,min2,max2,req1,req2,reqm,lv,c,tp,pg,mgchk,min,max)
 					local hg=Duel.GetMatchingGroup(Card.IsHasEffect,tp,LOCATION_HAND+LOCATION_GRAVE,0,nil,EFFECT_HAND_SYNCHRO+EFFECT_SYNCHRO_CHECK)
 					aux.ResetEffects(hg,EFFECT_HAND_SYNCHRO+EFFECT_SYNCHRO_CHECK)
 					Duel.AssumeReset()
@@ -121,7 +129,7 @@ function Auxiliary.SynCondition(f1,min1,max1,f2,min2,max2,sub1,sub2,req1,reqct1,
 						end
 					end
 					local lv=c:GetLevel()
-					local res=tg:IsExists(Auxiliary.SynchroCheckP41,1,nil,tg,ntg,Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup(),min1,max1,min2,max2,req1,reqct1,req2,reqct2,reqm,lv,c,tp,pg,mgchk)
+					local res=tg:IsExists(Auxiliary.SynchroCheckP41,1,nil,tg,ntg,Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup(),min1,max1,min2,max2,req1,req2,reqm,lv,c,tp,pg,mgchk,min,max)
 					local hg=Duel.GetMatchingGroup(Card.IsHasEffect,tp,LOCATION_HAND+LOCATION_GRAVE,0,nil,EFFECT_HAND_SYNCHRO+EFFECT_SYNCHRO_CHECK)
 					aux.ResetEffects(hg,EFFECT_HAND_SYNCHRO+EFFECT_SYNCHRO_CHECK)
 					return res
@@ -129,7 +137,7 @@ function Auxiliary.SynCondition(f1,min1,max1,f2,min2,max2,sub1,sub2,req1,reqct1,
 				return false
 			end
 end
-function Auxiliary.SynchroCheckP31(c,g,tsg,ntsg,sg,f1,sub1,f2,sub2,min1,max1,min2,max2,req1,reqct1,req2,reqct2,reqm,lv,sc,tp,pg,mgchk)
+function Auxiliary.SynchroCheckP31(c,g,tsg,ntsg,sg,f1,sub1,f2,sub2,min1,max1,min2,max2,req1,req2,reqm,lv,sc,tp,pg,mgchk,min,max)
 	local res
 	local rg=Group.CreateGroup()
 	if c:IsHasEffect(EFFECT_SYNCHRO_CHECK) then
@@ -142,20 +150,20 @@ function Auxiliary.SynchroCheckP31(c,g,tsg,ntsg,sg,f1,sub1,f2,sub2,min1,max1,min
 		end
 	end
 	--c has the synchro limit
-	if c:IsHasEffect(73941492+TYPE_SYNCHRO) then
-		local eff={c:GetCardEffect(73941492+TYPE_SYNCHRO)}
+	if c:IsHasEffect(EFFECT_SYNCHRO_MAT_RESTRICTION) then
+		local eff={c:GetCardEffect(EFFECT_SYNCHRO_MAT_RESTRICTION)}
 		for _,f in ipairs(eff) do
-			if sg:IsExists(Auxiliary.TuneMagFilter,1,c,f,f:GetValue()) then return false end
-			local sg1=g:Filter(function(c) return not Auxiliary.TuneMagFilterFus(c,f,f:GetValue()) end,nil)
+			if sg:IsExists(Auxiliary.HarmonizingMagFilter,1,c,f,f:GetValue()) then return false end
+			local sg1=g:Filter(function(c) return not Auxiliary.HarmonizingMagFilterFus(c,f,f:GetValue()) end,nil)
 			rg:Merge(sg1)
 		end
 	end
 	--A card in the selected group has the synchro lmit
-	local g2=sg:Filter(Card.IsHasEffect,nil,73941492+TYPE_SYNCHRO)
+	local g2=sg:Filter(Card.IsHasEffect,nil,EFFECT_SYNCHRO_MAT_RESTRICTION)
 	for tc in aux.Next(g2) do
-		local eff={tc:GetCardEffect(73941492+TYPE_SYNCHRO)}
+		local eff={tc:GetCardEffect(EFFECT_SYNCHRO_MAT_RESTRICTION)}
 		for _,f in ipairs(eff) do
-			if Auxiliary.TuneMagFilter(c,f,f:GetValue()) then return false end
+			if Auxiliary.HarmonizingMagFilter(c,f,f:GetValue()) then return false end
 		end
 	end
 	if not mgchk then
@@ -191,15 +199,21 @@ function Auxiliary.SynchroCheckP31(c,g,tsg,ntsg,sg,f1,sub1,f2,sub2,min1,max1,min
 	g:Sub(rg)
 	tsg:AddCard(c)
 	sg:AddCard(c)
-	if tsg:GetCount()<min1 then
-		res=g:IsExists(Auxiliary.SynchroCheckP31,1,sg,g,tsg,ntsg,sg,f1,sub1,f2,sub2,min1,max1,min2,max2,req1,reqct1,req2,reqct2,reqm,lv,sc,tp,pg,mgchk)
-	elseif tsg:GetCount()<max1 then
-		res=g:IsExists(Auxiliary.SynchroCheckP31,1,sg,g,tsg,ntsg,sg,f1,sub1,f2,sub2,min1,max1,min2,max2,req1,reqct1,req2,reqct2,reqm,lv,sc,tp,pg,mgchk) 
-			or (tsg:IsExists(Auxiliary.TunerFilter,tsg:GetCount(),nil,f1,sub1,sc,tp) and (not req1 or tsg:IsExists(req1,reqct1,nil,tp)) 
-				and g:IsExists(Auxiliary.SynchroCheckP32,1,sg,g,tsg,ntsg,sg,f2,sub2,min2,max2,req2,reqct2,reqm,lv,sc,tp,pg,mgchk))
+	local tsg_count=#tsg
+	if max and (tsg_count>max or (max-tsg_count)<min2) then
+		res = false
+	elseif max and (max-tsg_count)==min2 then
+		res=tsg:IsExists(Auxiliary.TunerFilter,tsg_count,nil,f1,sub1,sc,tp) and (not req1 or req1(tsg,sc,tp)) 
+			and g:IsExists(Auxiliary.SynchroCheckP32,1,sg,g,tsg,ntsg,sg,f2,sub2,min2,max2,req2,reqm,lv,sc,tp,pg,mgchk,min,max)
+	elseif tsg_count<min1 then
+		res=g:IsExists(Auxiliary.SynchroCheckP31,1,sg,g,tsg,ntsg,sg,f1,sub1,f2,sub2,min1,max1,min2,max2,req1,req2,reqm,lv,sc,tp,pg,mgchk,min,max)
+	elseif tsg_count<max1 then
+		res=g:IsExists(Auxiliary.SynchroCheckP31,1,sg,g,tsg,ntsg,sg,f1,sub1,f2,sub2,min1,max1,min2,max2,req1,req2,reqm,lv,sc,tp,pg,mgchk,min,max) 
+			or (tsg:IsExists(Auxiliary.TunerFilter,tsg_count,nil,f1,sub1,sc,tp) and (not req1 or req1(tsg,sc,tp)) 
+				and g:IsExists(Auxiliary.SynchroCheckP32,1,sg,g,tsg,ntsg,sg,f2,sub2,min2,max2,req2,reqm,lv,sc,tp,pg,mgchk,min,max))
 	else
-		res=tsg:IsExists(Auxiliary.TunerFilter,tsg:GetCount(),nil,f1,sub1,sc,tp) and (not req1 or tsg:IsExists(req1,reqct1,nil,tp)) 
-			and g:IsExists(Auxiliary.SynchroCheckP32,1,sg,g,tsg,ntsg,sg,f2,sub2,min2,max2,req2,reqct2,reqm,lv,sc,tp,pg,mgchk)
+		res=tsg:IsExists(Auxiliary.TunerFilter,tsg_count,nil,f1,sub1,sc,tp) and (not req1 or req1(tsg,sc,tp)) 
+			and g:IsExists(Auxiliary.SynchroCheckP32,1,sg,g,tsg,ntsg,sg,f2,sub2,min2,max2,req2,reqm,lv,sc,tp,pg,mgchk,min,max)
 	end
 	g:Merge(rg)
 	tsg:RemoveCard(c)
@@ -209,7 +223,7 @@ function Auxiliary.SynchroCheckP31(c,g,tsg,ntsg,sg,f1,sub1,f2,sub2,min1,max1,min
 	end
 	return res
 end
-function Auxiliary.SynchroCheckP32(c,g,tsg,ntsg,sg,f2,sub2,min2,max2,req2,reqct2,reqm,lv,sc,tp,pg,mgchk)
+function Auxiliary.SynchroCheckP32(c,g,tsg,ntsg,sg,f2,sub2,min2,max2,req2,reqm,lv,sc,tp,pg,mgchk,min,max)
 	local res
 	local rg=Group.CreateGroup()
 	if c:IsHasEffect(EFFECT_SYNCHRO_CHECK) then
@@ -222,20 +236,20 @@ function Auxiliary.SynchroCheckP32(c,g,tsg,ntsg,sg,f2,sub2,min2,max2,req2,reqct2
 		end
 	end
 	--c has the synchro limit
-	if c:IsHasEffect(73941492+TYPE_SYNCHRO) then
-		local eff={c:GetCardEffect(73941492+TYPE_SYNCHRO)}
+	if c:IsHasEffect(EFFECT_SYNCHRO_MAT_RESTRICTION) then
+		local eff={c:GetCardEffect(EFFECT_SYNCHRO_MAT_RESTRICTION)}
 		for _,f in ipairs(eff) do
-			if sg:IsExists(Auxiliary.TuneMagFilter,1,c,f,f:GetValue()) then return false end
-			local sg2=g:Filter(function(c) return not Auxiliary.TuneMagFilterFus(c,f,f:GetValue()) end,nil)
+			if sg:IsExists(Auxiliary.HarmonizingMagFilter,1,c,f,f:GetValue()) then return false end
+			local sg2=g:Filter(function(c) return not Auxiliary.HarmonizingMagFilterFus(c,f,f:GetValue()) end,nil)
 			rg:Merge(sg2)
 		end
 	end
 	--A card in the selected group has the synchro lmit
-	local g2=sg:Filter(Card.IsHasEffect,nil,73941492+TYPE_SYNCHRO)
+	local g2=sg:Filter(Card.IsHasEffect,nil,EFFECT_SYNCHRO_MAT_RESTRICTION)
 	for tc in aux.Next(g2) do
-		local eff={tc:GetCardEffect(73941492+TYPE_SYNCHRO)}
+		local eff={tc:GetCardEffect(EFFECT_SYNCHRO_MAT_RESTRICTION)}
 		for _,f in ipairs(eff) do
-			if Auxiliary.TuneMagFilter(c,f,f:GetValue()) then return false end
+			if Auxiliary.HarmonizingMagFilter(c,f,f:GetValue()) then return false end
 		end
 	end
 	if not mgchk then
@@ -271,16 +285,20 @@ function Auxiliary.SynchroCheckP32(c,g,tsg,ntsg,sg,f2,sub2,min2,max2,req2,reqct2
 	g:Sub(rg)
 	ntsg:AddCard(c)
 	sg:AddCard(c)
-	if ntsg:GetCount()<min2 then
-		res=g:IsExists(Auxiliary.SynchroCheckP32,1,sg,g,tsg,ntsg,sg,f2,sub2,min2,max2,req2,reqct2,reqm,lv,sc,tp,pg,mgchk)
-	elseif ntsg:GetCount()<max2 then
-		res=g:IsExists(Auxiliary.SynchroCheckP32,1,sg,g,tsg,ntsg,sg,f2,sub2,min2,max2,req2,reqct2,reqm,lv,sc,tp,pg,mgchk) 
-			or ((not req2 or ntsg:IsExists(req2,reqct2,nil,tp)) and (not reqm or sg:IsExists(reqm,1,nil,tp)) 
-				and ntsg:IsExists(Auxiliary.NonTunerFilter,ntsg:GetCount(),nil,f2,sub2,sc,tp) 
+	local tsg_count=#tsg
+	local ntsg_count=#ntsg
+	if max and (tsg_count+ntsg_count)>max then
+		res = false
+	elseif ntsg_count<min2 then
+		res=g:IsExists(Auxiliary.SynchroCheckP32,1,sg,g,tsg,ntsg,sg,f2,sub2,min2,max2,req2,reqm,lv,sc,tp,pg,mgchk,min,max)
+	elseif ntsg_count<max2 then
+		res=g:IsExists(Auxiliary.SynchroCheckP32,1,sg,g,tsg,ntsg,sg,f2,sub2,min2,max2,req2,reqm,lv,sc,tp,pg,mgchk,min,max) 
+			or ((not min or (tsg_count+ntsg_count)>=min) and (not req2 or req2(ntsg,sc,tp)) and (not reqm or reqm(sg,sc,tp)) 
+				and ntsg:IsExists(Auxiliary.NonTunerFilter,ntsg_count,nil,f2,sub2,sc,tp) 
 				and sg:Includes(pg) and Auxiliary.SynchroCheckP43(tsg,ntsg,sg,lv,sc,tp))
 	else
-		res=(not req2 or ntsg:IsExists(req2,reqct2,nil,tp)) and (not reqm or sg:IsExists(reqm,1,nil,tp)) 
-			and ntsg:IsExists(Auxiliary.NonTunerFilter,ntsg:GetCount(),nil,f2,sub2,sc,tp)
+		res=(not min or (tsg_count+ntsg_count)>=min) and (not req2 or req2(ntsg,sc,tp)) and (not reqm or reqm(sg,sc,tp)) 
+			and ntsg:IsExists(Auxiliary.NonTunerFilter,ntsg_count,nil,f2,sub2,sc,tp)
 			and sg:Includes(pg) and Auxiliary.SynchroCheckP43(tsg,ntsg,sg,lv,sc,tp)
 	end
 	g:Merge(rg)
@@ -291,27 +309,27 @@ function Auxiliary.SynchroCheckP32(c,g,tsg,ntsg,sg,f2,sub2,min2,max2,req2,reqct2
 	end
 	return res
 end
-function Auxiliary.SynchroCheckP41(c,tg,ntg,tsg,ntsg,sg,min1,max1,min2,max2,req1,reqct1,req2,reqct2,reqm,lv,sc,tp,pg,mgchk)
+function Auxiliary.SynchroCheckP41(c,tg,ntg,tsg,ntsg,sg,min1,max1,min2,max2,req1,req2,reqm,lv,sc,tp,pg,mgchk,min,max)
 	local res
 	local trg=Group.CreateGroup()
 	local ntrg=Group.CreateGroup()
 	--c has the synchro limit
-	if c:IsHasEffect(73941492+TYPE_SYNCHRO) then
-		local eff={c:GetCardEffect(73941492+TYPE_SYNCHRO)}
+	if c:IsHasEffect(EFFECT_SYNCHRO_MAT_RESTRICTION) then
+		local eff={c:GetCardEffect(EFFECT_SYNCHRO_MAT_RESTRICTION)}
 		for _,f in ipairs(eff) do
-			if sg:IsExists(Auxiliary.TuneMagFilter,1,c,f,f:GetValue()) then return false end
-			local sg1=tg:Filter(function(c) return not Auxiliary.TuneMagFilterFus(c,f,f:GetValue()) end,nil)
-			local sg2=ntg:Filter(function(c) return not Auxiliary.TuneMagFilterFus(c,f,f:GetValue()) end,nil)
+			if sg:IsExists(Auxiliary.HarmonizingMagFilter,1,c,f,f:GetValue()) then return false end
+			local sg1=tg:Filter(function(c) return not Auxiliary.HarmonizingMagFilterFus(c,f,f:GetValue()) end,nil)
+			local sg2=ntg:Filter(function(c) return not Auxiliary.HarmonizingMagFilterFus(c,f,f:GetValue()) end,nil)
 			trg:Merge(sg1)
 			ntrg:Merge(sg2)
 		end
 	end
 	--A card in the selected group has the synchro lmit
-	local g2=sg:Filter(Card.IsHasEffect,nil,73941492+TYPE_SYNCHRO)
+	local g2=sg:Filter(Card.IsHasEffect,nil,EFFECT_SYNCHRO_MAT_RESTRICTION)
 	for tc in aux.Next(g2) do
-		local eff={tc:GetCardEffect(73941492+TYPE_SYNCHRO)}
+		local eff={tc:GetCardEffect(EFFECT_SYNCHRO_MAT_RESTRICTION)}
 		for _,f in ipairs(eff) do
-			if Auxiliary.TuneMagFilter(c,f,f:GetValue()) then return false end
+			if Auxiliary.HarmonizingMagFilter(c,f,f:GetValue()) then return false end
 		end
 	end
 	if not mgchk then
@@ -348,14 +366,20 @@ function Auxiliary.SynchroCheckP41(c,tg,ntg,tsg,ntsg,sg,min1,max1,min2,max2,req1
 	ntg:Sub(ntrg)
 	tsg:AddCard(c)
 	sg:AddCard(c)
-	if tsg:GetCount()<min1 then
-		res=tg:IsExists(Auxiliary.SynchroCheckP41,1,sg,tg,ntg,tsg,ntsg,sg,min1,max1,min2,max2,req1,reqct1,req2,reqct2,reqm,lv,sc,tp,pg,mgchk)
-	elseif tsg:GetCount()<max1 then
-		res=tg:IsExists(Auxiliary.SynchroCheckP41,1,sg,tg,ntg,tsg,ntsg,sg,min1,max1,min2,max2,req1,reqct1,req2,reqct2,reqm,lv,sc,tp,pg,mgchk) 
-			or ((not req1 or tsg:IsExists(req1,reqct1,nil,tp)) and ntg:IsExists(Auxiliary.SynchroCheckP42,1,sg,ntg,tsg,ntsg,sg,min2,max2,req2,reqct2,reqm,lv,sc,tp,pg,mgchk))
+	local tsg_count=#tsg
+	if max and (tsg_count>max or (max-tsg_count)<min2) then
+		res = false
+	elseif max and (max-tsg_count)==min2 then
+		res=(not req1 or req1(tsg,sc,tp)) 
+			and ntg:IsExists(Auxiliary.SynchroCheckP42,1,sg,ntg,tsg,ntsg,sg,min2,max2,req2,reqm,lv,sc,tp,pg,mgchk,min,max)
+	elseif tsg_count<min1 then
+		res=tg:IsExists(Auxiliary.SynchroCheckP41,1,sg,tg,ntg,tsg,ntsg,sg,min1,max1,min2,max2,req1,req2,reqm,lv,sc,tp,pg,mgchk,min,max)
+	elseif tsg_count<max1 then
+		res=tg:IsExists(Auxiliary.SynchroCheckP41,1,sg,tg,ntg,tsg,ntsg,sg,min1,max1,min2,max2,req1,req2,reqm,lv,sc,tp,pg,mgchk,min,max) 
+			or ((not req1 or req1(tsg,sc,tp)) and ntg:IsExists(Auxiliary.SynchroCheckP42,1,sg,ntg,tsg,ntsg,sg,min2,max2,req2,reqm,lv,sc,tp,pg,mgchk,min,max))
 	else
-		res=(not req1 or tsg:IsExists(req1,reqct1,nil,tp)) 
-			and ntg:IsExists(Auxiliary.SynchroCheckP42,1,sg,ntg,tsg,ntsg,sg,min2,max2,req2,reqct2,reqm,lv,sc,tp,pg,mgchk)
+		res=(not req1 or req1(tsg,sc,tp)) 
+			and ntg:IsExists(Auxiliary.SynchroCheckP42,1,sg,ntg,tsg,ntsg,sg,min2,max2,req2,reqm,lv,sc,tp,pg,mgchk,min,max)
 	end
 	tg:Merge(trg)
 	ntg:Merge(ntrg)
@@ -363,24 +387,24 @@ function Auxiliary.SynchroCheckP41(c,tg,ntg,tsg,ntsg,sg,min1,max1,min2,max2,req1
 	sg:RemoveCard(c)
 	return res
 end
-function Auxiliary.SynchroCheckP42(c,ntg,tsg,ntsg,sg,min2,max2,req2,reqct2,reqm,lv,sc,tp,pg,mgchk)
+function Auxiliary.SynchroCheckP42(c,ntg,tsg,ntsg,sg,min2,max2,req2,reqm,lv,sc,tp,pg,mgchk,min,max)
 	local res
 	local ntrg=Group.CreateGroup()
 	--c has the synchro limit
-	if c:IsHasEffect(73941492+TYPE_SYNCHRO) then
-		local eff={c:GetCardEffect(73941492+TYPE_SYNCHRO)}
+	if c:IsHasEffect(EFFECT_SYNCHRO_MAT_RESTRICTION) then
+		local eff={c:GetCardEffect(EFFECT_SYNCHRO_MAT_RESTRICTION)}
 		for _,f in ipairs(eff) do
-			if sg:IsExists(Auxiliary.TuneMagFilter,1,c,f,f:GetValue()) then return false end
-			local sg2=ntg:Filter(function(c) return not Auxiliary.TuneMagFilterFus(c,f,f:GetValue()) end,nil)
+			if sg:IsExists(Auxiliary.HarmonizingMagFilter,1,c,f,f:GetValue()) then return false end
+			local sg2=ntg:Filter(function(c) return not Auxiliary.HarmonizingMagFilterFus(c,f,f:GetValue()) end,nil)
 			ntrg:Merge(sg2)
 		end
 	end
 	--A card in the selected group has the synchro lmit
-	local g2=sg:Filter(Card.IsHasEffect,nil,73941492+TYPE_SYNCHRO)
+	local g2=sg:Filter(Card.IsHasEffect,nil,EFFECT_SYNCHRO_MAT_RESTRICTION)
 	for tc in aux.Next(g2) do
-		local eff={tc:GetCardEffect(73941492+TYPE_SYNCHRO)}
+		local eff={tc:GetCardEffect(EFFECT_SYNCHRO_MAT_RESTRICTION)}
 		for _,f in ipairs(eff) do
-			if Auxiliary.TuneMagFilter(c,f,f:GetValue()) then return false end
+			if Auxiliary.HarmonizingMagFilter(c,f,f:GetValue()) then return false end
 		end
 	end
 	if not mgchk then
@@ -416,14 +440,18 @@ function Auxiliary.SynchroCheckP42(c,ntg,tsg,ntsg,sg,min2,max2,req2,reqct2,reqm,
 	ntg:Sub(ntrg)
 	ntsg:AddCard(c)
 	sg:AddCard(c)
-	if ntsg:GetCount()<min2 then
-		res=ntg:IsExists(Auxiliary.SynchroCheckP42,1,sg,ntg,tsg,ntsg,sg,min2,max2,req2,reqct2,reqm,lv,sc,tp,pg,mgchk)
-	elseif ntsg:GetCount()<max2 then
-		res=ntg:IsExists(Auxiliary.SynchroCheckP42,1,sg,ntg,tsg,ntsg,sg,min2,max2,req2,reqct2,reqm,lv,sc,tp,pg,mgchk) 
-			or ((not req2 or ntsg:IsExists(req2,reqct2,nil,tp)) and (not reqm or sg:IsExists(reqm,1,nil,tp)) 
+	local tsg_count=#tsg
+	local ntsg_count=#ntsg
+	if max and (tsg_count+ntsg_count)>max then
+		res = false
+	elseif ntsg_count<min2 then
+		res=ntg:IsExists(Auxiliary.SynchroCheckP42,1,sg,ntg,tsg,ntsg,sg,min2,max2,req2,reqm,lv,sc,tp,pg,mgchk,min,max)
+	elseif ntsg_count<max2 then
+		res=ntg:IsExists(Auxiliary.SynchroCheckP42,1,sg,ntg,tsg,ntsg,sg,min2,max2,req2,reqm,lv,sc,tp,pg,mgchk,min,max) 
+			or ((not min or (tsg_count+ntsg_count)>=min) and (not req2 or req2(ntsg,sc,tp)) and (not reqm or reqm(sg,sc,tp)) 
 				and sg:Includes(pg) and Auxiliary.SynchroCheckP43(tsg,ntsg,sg,lv,sc,tp))
 	else
-		res=(not req2 or ntsg:IsExists(req2,reqct2,nil,tp)) and (not reqm or sg:IsExists(reqm,1,nil,tp)) 
+		res=(not min or (tsg_count+ntsg_count)>=min) and (not req2 or req2(ntsg,sc,tp)) and (not reqm or reqm(sg,sc,tp)) 
 			and sg:Includes(pg) and Auxiliary.SynchroCheckP43(tsg,ntsg,sg,lv,sc,tp)
 	end
 	ntg:Merge(ntrg)
@@ -474,8 +502,10 @@ function Auxiliary.SynchroCheckP43(tsg,ntsg,sg,lv,sc,tp)
 	and ((sc:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCountFromEx(tp,tp,sg,sc)>0)
 		or (not sc:IsLocation(LOCATION_EXTRA) and (Duel.GetLocationCount(tp,LOCATION_MZONE)>0 or sg:IsExists(Auxiliary.FConditionCheckF,nil,tp))))
 end
-function Auxiliary.SynTarget(f1,min1,max1,f2,min2,max2,sub1,sub2,req1,reqct1,req2,reqct2,reqm)
-	return	function(e,tp,eg,ep,ev,re,r,rp,chk,c,smat,mg)
+function Auxiliary.SynTarget(f1,min1,max1,f2,min2,max2,sub1,sub2,req1,req2,reqm)
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk,c,smat,mg,min,max)
+				min = min or Auxiliary.SynchroSummonMinCount
+				max = max or Auxiliary.SynchroSummonMaxCount
 				local sg=Group.CreateGroup()
 				local lv=c:GetLevel()
 				local mgchk
@@ -530,16 +560,16 @@ function Auxiliary.SynTarget(f1,min1,max1,f2,min2,max2,sub1,sub2,req1,reqct1,req
 						local cancel=false
 						if tune then
 							cancel=not mgchk and Duel.GetCurrentChain()<=0 and tsg:GetCount()==0
-							local g3=ntg:Filter(Auxiliary.SynchroCheckP32,sg,g,tsg,ntsg,sg,f2,sub2,min2,max2,req2,reqct2,reqm,lv,c,tp,pg,mgchk)
-							g2=g:Filter(Auxiliary.SynchroCheckP31,sg,g,tsg,ntsg,sg,f1,sub1,f2,sub2,min1,max1,min2,max2,req1,reqct1,req2,reqct2,reqm,lv,c,tp,pg,mgchk)
-							if g3:GetCount()>0 and tsg:GetCount()>=min1 and tsg:IsExists(Auxiliary.TunerFilter,tsg:GetCount(),nil,f1,sub1,c,tp) and (not req1 or tsg:IsExists(req1,reqct1,nil,tp)) then
+							local g3=ntg:Filter(Auxiliary.SynchroCheckP32,sg,g,tsg,ntsg,sg,f2,sub2,min2,max2,req2,reqm,lv,c,tp,pg,mgchk,min,max)
+							g2=g:Filter(Auxiliary.SynchroCheckP31,sg,g,tsg,ntsg,sg,f1,sub1,f2,sub2,min1,max1,min2,max2,req1,req2,reqm,lv,c,tp,pg,mgchk,min,max)
+							if g3:GetCount()>0 and tsg:GetCount()>=min1 and tsg:IsExists(Auxiliary.TunerFilter,tsg:GetCount(),nil,f1,sub1,c,tp) and (not req1 or req1(tsg,c,tp)) then
 								g2:Merge(g3)
 							end
 							Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
 							local tc=Group.SelectUnselect(g2,sg,tp,cancel,cancel)
 							if not tc then
-								if tsg:GetCount()>=min1 and tsg:IsExists(Auxiliary.TunerFilter,tsg:GetCount(),nil,f1,sub1,c,tp) and (not req1 or tsg:IsExists(req1,reqct1,nil,tp))
-									and ntg:Filter(Auxiliary.SynchroCheckP32,sg,g,tsg,ntsg,sg,f2,sub2,min2,max2,req2,reqct2,reqm,lv,c,tp,pg,mgchk):GetCount()>0 then tune=false
+								if tsg:GetCount()>=min1 and tsg:IsExists(Auxiliary.TunerFilter,tsg:GetCount(),nil,f1,sub1,c,tp) and (not req1 or req1(tsg,c,tp))
+									and ntg:Filter(Auxiliary.SynchroCheckP32,sg,g,tsg,ntsg,sg,f2,sub2,min2,max2,req2,reqm,lv,c,tp,pg,mgchk,min,max):GetCount()>0 then tune=false
 								else
 									return false
 								end
@@ -566,25 +596,25 @@ function Auxiliary.SynTarget(f1,min1,max1,f2,min2,max2,sub1,sub2,req1,reqct1,req
 									Duel.AssumeReset()
 								end
 							end
-							if g:FilterCount(Auxiliary.SynchroCheckP31,sg,g,tsg,ntsg,sg,f1,sub1,f2,sub2,min1,max1,min2,max2,req1,reqct1,req2,reqct2,reqm,lv,c,tp,pg,mgchk)==0 or tsg:GetCount()>=max2 then
+							if g:FilterCount(Auxiliary.SynchroCheckP31,sg,g,tsg,ntsg,sg,f1,sub1,f2,sub2,min1,max1,min2,max2,req1,req2,reqm,lv,c,tp,pg,mgchk,min,max)==0 or tsg:GetCount()>=max2 then
 								tune=false
 							end
 						else
-							if (ntsg:GetCount()>=min2 and (not req2 or ntsg:IsExists(req2,reqct2,nil,tp)) and (not reqm or sg:IsExists(reqm,1,nil,tp)) 
+							if (ntsg:GetCount()>=min2 and (not req2 or req2(ntsg,c,tp)) and (not reqm or reqm(sg,c,tp)) 
 								and ntsg:IsExists(Auxiliary.NonTunerFilter,ntsg:GetCount(),nil,f2,sub2,c,tp)
 								and sg:Includes(pg) and Auxiliary.SynchroCheckP43(tsg,ntsg,sg,lv,c,tp)) or (not mgchk and Duel.GetCurrentChain()<=0) then
 									cancel=true
 							end
-							g2=g:Filter(Auxiliary.SynchroCheckP32,sg,g,tsg,ntsg,sg,f2,sub2,min2,max2,req2,reqct2,reqm,lv,c,tp,pg,mgchk)
+							g2=g:Filter(Auxiliary.SynchroCheckP32,sg,g,tsg,ntsg,sg,f2,sub2,min2,max2,req2,reqm,lv,c,tp,pg,mgchk,min,max)
 							if g2:GetCount()==0 then break end
-							local g3=g:Filter(Auxiliary.SynchroCheckP31,sg,g,tsg,ntsg,sg,f1,sub1,f2,sub2,min1,max1,min2,max2,req1,reqct1,req2,reqct2,reqm,lv,c,tp,pg,mgchk)
+							local g3=g:Filter(Auxiliary.SynchroCheckP31,sg,g,tsg,ntsg,sg,f1,sub1,f2,sub2,min1,max1,min2,max2,req1,req2,reqm,lv,c,tp,pg,mgchk,min,max)
 							if g3:GetCount()>0 and ntsg:GetCount()==0 and tsg:GetCount()<max1 then
 								g2:Merge(g3)
 							end
 							Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
 							local tc=Group.SelectUnselect(g2,sg,tp,cancel,cancel)
 							if not tc then
-								if ntsg:GetCount()>=min2 and (not req2 or ntsg:IsExists(req2,reqct2,nil,tp)) and (not reqm or sg:IsExists(reqm,1,nil,tp)) 
+								if ntsg:GetCount()>=min2 and (not req2 or req2(ntsg,c,tp)) and (not reqm or reqm(sg,c,tp)) 
 									and sg:Includes(pg) and Auxiliary.SynchroCheckP43(tsg,ntsg,sg,lv,c,tp) then break end
 								return false
 							end
@@ -622,16 +652,16 @@ function Auxiliary.SynTarget(f1,min1,max1,f2,min2,max2,sub1,sub2,req1,reqct1,req
 						cancel=false
 						if tune then
 							cancel=not mgchk and Duel.GetCurrentChain()<=0 and tsg:GetCount()==0
-							local g3=ntg:Filter(Auxiliary.SynchroCheckP42,sg,ntg,tsg,ntsg,sg,min2,max2,req2,reqct2,reqm,lv,c,tp,pg,mgchk)
-							g2=tg:Filter(Auxiliary.SynchroCheckP41,sg,tg,ntg,tsg,ntsg,sg,min1,max1,min2,max2,req1,reqct1,req2,reqct2,reqm,lv,c,tp,pg,mgchk)
-							if g3:GetCount()>0 and tsg:GetCount()>=min1 and (not req1 or tsg:IsExists(req1,reqct1,nil,tp)) then
+							local g3=ntg:Filter(Auxiliary.SynchroCheckP42,sg,ntg,tsg,ntsg,sg,min2,max2,req2,reqm,lv,c,tp,pg,mgchk,min,max)
+							g2=tg:Filter(Auxiliary.SynchroCheckP41,sg,tg,ntg,tsg,ntsg,sg,min1,max1,min2,max2,req1,req2,reqm,lv,c,tp,pg,mgchk,min,max)
+							if g3:GetCount()>0 and tsg:GetCount()>=min1 and (not req1 or req1(tsg,c,tp)) then
 								g2:Merge(g3)
 							end
 							Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
 							local tc=Group.SelectUnselect(g2,sg,tp,cancel,cancel)
 							if not tc then
-								if tsg:GetCount()>=min1 and (not req1 or tsg:IsExists(req1,reqct1,nil,tp))
-									and ntg:Filter(Auxiliary.SynchroCheckP42,sg,ntg,tsg,ntsg,sg,min2,max2,req2,reqct2,reqm,lv,c,tp,pg,mgchk):GetCount()>0 then tune=false
+								if tsg:GetCount()>=min1 and (not req1 or req1(tsg,c,tp))
+									and ntg:Filter(Auxiliary.SynchroCheckP42,sg,ntg,tsg,ntsg,sg,min2,max2,req2,reqm,lv,c,tp,pg,mgchk,min,max):GetCount()>0 then tune=false
 								else
 									return false
 								end
@@ -649,24 +679,24 @@ function Auxiliary.SynTarget(f1,min1,max1,f2,min2,max2,sub1,sub2,req1,reqct1,req
 									sg:RemoveCard(tc)
 								end
 							end
-							if tg:FilterCount(Auxiliary.SynchroCheckP41,sg,tg,ntg,tsg,ntsg,sg,min1,max1,min2,max2,req1,reqct1,req2,reqct2,reqm,lv,c,tp,pg,mgchk)==0 or tsg:GetCount()>=max1 then
+							if tg:FilterCount(Auxiliary.SynchroCheckP41,sg,tg,ntg,tsg,ntsg,sg,min1,max1,min2,max2,req1,req2,reqm,lv,c,tp,pg,mgchk,min,max)==0 or tsg:GetCount()>=max1 then
 								tune=false
 							end
 						else
-							if ntsg:GetCount()>=min2 and (not req2 or ntsg:IsExists(req2,reqct2,nil,tp)) and (not reqm or sg:IsExists(reqm,1,nil,tp))
+							if ntsg:GetCount()>=min2 and (not req2 or req2(ntsg,c,tp)) and (not reqm or reqm(sg,c,tp))
 								and sg:Includes(pg) and Auxiliary.SynchroCheckP43(tsg,ntsg,sg,lv,c,tp) then
 								cancel=true
 							end
-							g2=ntg:Filter(Auxiliary.SynchroCheckP42,sg,ntg,tsg,ntsg,sg,min2,max2,req2,reqct2,reqm,lv,c,tp,pg,mgchk)
+							g2=ntg:Filter(Auxiliary.SynchroCheckP42,sg,ntg,tsg,ntsg,sg,min2,max2,req2,reqm,lv,c,tp,pg,mgchk,min,max)
 							if g2:GetCount()==0 then break end
-							local g3=tg:Filter(Auxiliary.SynchroCheckP41,sg,tg,ntg,tsg,ntsg,sg,min1,max1,min2,max2,req1,reqct1,req2,reqct2,reqm,lv,c,tp,pg,mgchk)
+							local g3=tg:Filter(Auxiliary.SynchroCheckP41,sg,tg,ntg,tsg,ntsg,sg,min1,max1,min2,max2,req1,req2,reqm,lv,c,tp,pg,mgchk,min,max)
 							if g3:GetCount()>0 and ntsg:GetCount()==0 and tsg:GetCount()<max1 then
 								g2:Merge(g3)
 							end
 							Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
 							local tc=Group.SelectUnselect(g2,sg,tp,cancel,cancel)
 							if not tc then
-								if ntsg:GetCount()>=min2 and (not req2 or ntsg:IsExists(req2,reqct2,nil,tp)) and (not reqm or sg:IsExists(reqm,1,nil,tp))
+								if ntsg:GetCount()>=min2 and (not req2 or req2(ntsg,c,tp)) and (not reqm or reqm(sg,c,tp))
 									and sg:Includes(pg) and Auxiliary.SynchroCheckP43(tsg,ntsg,sg,lv,c,tp) then break end
 								return false
 							end
@@ -707,9 +737,17 @@ function Auxiliary.SynTarget(f1,min1,max1,f2,min2,max2,sub1,sub2,req1,reqct1,req
 			end
 end
 Auxiliary.SynchroSend=0
+function Auxiliary.TatsunecroFilter(c)
+	return c:GetFlagEffect(3096468)~=0
+end
 function Auxiliary.SynOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 	local g=e:GetLabelObject()
 	c:SetMaterial(g)
+	local tg=g:Filter(Auxiliary.TatsunecroFilter,nil)
+	if #tg>0 then
+		Auxiliary.SynchroSend=2
+		for tc in aux.Next(tg) do tc:ResetFlagEffect(3096468) end
+	end
 	if Auxiliary.SynchroSend==1 then
 		Duel.SendtoGrave(g,REASON_MATERIAL+REASON_SYNCHRO+REASON_RETURN)
 	elseif Auxiliary.SynchroSend==2 then
@@ -725,12 +763,13 @@ function Auxiliary.SynOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 	else
 		Duel.SendtoGrave(g,REASON_MATERIAL+REASON_SYNCHRO)
 	end
+	Auxiliary.SynchroSend=0
 	g:DeleteGroup()
 end
 
 --Synchro monster, Majestic
 function Auxiliary.AddMajesticSynchroProcedure(c,f1,cbt1,f2,cbt2,f3,cbt3,...)
-	--parameters: function, can be tuner, required materials (by 2s, functions + number)
+	--parameters: function, can be tuner, reqm
 	if c.synchro_type==nil then
 		local code=c:GetOriginalCode()
 		local mt=_G["c" .. code]
@@ -761,20 +800,20 @@ function Auxiliary.MajesticSynchroCheck1(c,g,sg,card1,card2,card3,lv,sc,tp,pg,f1
 		end
 	end
 	--c has the synchro limit
-	if c:IsHasEffect(73941492+TYPE_SYNCHRO) then
-		local eff={c:GetCardEffect(73941492+TYPE_SYNCHRO)}
+	if c:IsHasEffect(EFFECT_SYNCHRO_MAT_RESTRICTION) then
+		local eff={c:GetCardEffect(EFFECT_SYNCHRO_MAT_RESTRICTION)}
 		for _,f in ipairs(eff) do
-			if sg:IsExists(Auxiliary.TuneMagFilter,1,c,f,f:GetValue()) then return false end
-			local sg1=g:Filter(function(c) return not Auxiliary.TuneMagFilterFus(c,f,f:GetValue()) end,nil)
+			if sg:IsExists(Auxiliary.HarmonizingMagFilter,1,c,f,f:GetValue()) then return false end
+			local sg1=g:Filter(function(c) return not Auxiliary.HarmonizingMagFilterFus(c,f,f:GetValue()) end,nil)
 			rg:Merge(sg1)
 		end
 	end
 	--A card in the selected group has the synchro lmit
-	local g2=sg:Filter(Card.IsHasEffect,nil,73941492+TYPE_SYNCHRO)
+	local g2=sg:Filter(Card.IsHasEffect,nil,EFFECT_SYNCHRO_MAT_RESTRICTION)
 	for tc in aux.Next(g2) do
-		local eff={tc:GetCardEffect(73941492+TYPE_SYNCHRO)}
+		local eff={tc:GetCardEffect(EFFECT_SYNCHRO_MAT_RESTRICTION)}
 		for _,f in ipairs(eff) do
-			if Auxiliary.TuneMagFilter(c,f,f:GetValue()) then return false end
+			if Auxiliary.HarmonizingMagFilter(c,f,f:GetValue()) then return false end
 		end
 	end
 	if c:IsHasEffect(EFFECT_HAND_SYNCHRO+EFFECT_SYNCHRO_CHECK) then
@@ -854,13 +893,7 @@ function Auxiliary.MajesticSynchroCheck2(sg,card1,card2,card3,lv,sc,tp,f1,cbt1,f
 		end
 		c=sg:GetNext()
 	end]]
-	local t={...}
-	local funs={}
-	funs[0]={} --number of those
-	funs[1]={} --required functions
-	for i,v in ipairs(t) do
-		table.insert(funs[i%2],v)
-	end
+	local reqm={...}
 	local tunechk=false
 	if not f1(card1,sc,SUMMON_TYPE_SYNCHRO,tp) or not f2(card2,sc,SUMMON_TYPE_SYNCHRO,tp) or not f3(card3,sc,SUMMON_TYPE_SYNCHRO,tp) then return false end
 	if cbt1 and card1:IsType(TYPE_TUNER,sc,SUMMON_TYPE_SYNCHRO,tp) then tunechk=true end
@@ -868,10 +901,8 @@ function Auxiliary.MajesticSynchroCheck2(sg,card1,card2,card3,lv,sc,tp,f1,cbt1,f
 	if cbt3 and card3:IsType(TYPE_TUNER,sc,SUMMON_TYPE_SYNCHRO,tp) then tunechk=true end
 	if not tunechk then return false end
 	local lvchk=false
-	if #funs[0]>0 then
-		for i=1,#funs[0] do
-			if not sg:IsExists(funs[1][i],funs[0][i],nil) then return false end
-		end
+	for _,reqmat in ipairs(reqm) do
+		if not reqmat(sg,sc,tp) then return false end
 	end
 	if sg:IsExists(Card.IsHasEffect,1,nil,EFFECT_SYNCHRO_MATERIAL_CUSTOM) then
 		local g=sg:Filter(Card.IsHasEffect,nil,EFFECT_SYNCHRO_MATERIAL_CUSTOM)
@@ -894,8 +925,11 @@ function Auxiliary.MajesticSynchroCheck2(sg,card1,card2,card3,lv,sc,tp,f1,cbt1,f
 end
 function Auxiliary.MajesticSynCondition(f1,cbt1,f2,cbt2,f3,cbt3,...)
 	local t={...}
-	return	function(e,c,smat,mg)
+	return	function(e,c,smat,mg,min,max)
 				if c==nil then return true end
+				min = min or Auxiliary.SynchroSummonMinCount
+				max = max or Auxiliary.SynchroSummonMaxCount
+				if (min and min>3) or (max and max<3) then return false end
 				local tp=c:GetControler()
 				local lv=c:GetLevel()
 				local g
@@ -942,7 +976,10 @@ function Auxiliary.MajesticSynCondition(f1,cbt1,f2,cbt2,f3,cbt3,...)
 end
 function Auxiliary.MajesticSynTarget(f1,cbt1,f2,cbt2,f3,cbt3,...)
 	local t={...}
-	return	function(e,tp,eg,ep,ev,re,r,rp,chk,c,smat,mg)
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk,c,smat,mg,min,max)
+				min = min or Auxiliary.SynchroSummonMinCount
+				max = max or Auxiliary.SynchroSummonMaxCount
+				if (min and min>3) or (max and max<3) then return false end
 				local sg=Group.CreateGroup()
 				local lv=c:GetLevel()
 				local mgchk
@@ -1055,7 +1092,7 @@ function Auxiliary.AddDarkSynchroProcedure(c,f1,f2,plv,nlv,...)
 	e1:SetValue(SUMMON_TYPE_SYNCHRO)
 	c:RegisterEffect(e1)
 end
-function Auxiliary.DarkSynchroCheck1(c,g,sg,card1,card2,plv,nlv,sc,tp,smat,pg,f1,f2,...)
+function Auxiliary.DarkSynchroCheck1(c,g,sg,card1,card2,plv,nlv,sc,tp,pg,f1,f2,...)
 	local res
 	local rg=Group.CreateGroup()
 	if c:IsHasEffect(EFFECT_SYNCHRO_CHECK) then
@@ -1067,20 +1104,20 @@ function Auxiliary.DarkSynchroCheck1(c,g,sg,card1,card2,plv,nlv,sc,tp,smat,pg,f1
 		end
 	end
 	--c has the synchro limit
-	if c:IsHasEffect(73941492+TYPE_SYNCHRO) then
-		local eff={c:GetCardEffect(73941492+TYPE_SYNCHRO)}
+	if c:IsHasEffect(EFFECT_SYNCHRO_MAT_RESTRICTION) then
+		local eff={c:GetCardEffect(EFFECT_SYNCHRO_MAT_RESTRICTION)}
 		for _,f in ipairs(eff) do
-			if sg:IsExists(Auxiliary.TuneMagFilter,1,c,f,f:GetValue()) then return false end
-			local sg1=g:Filter(function(c) return not Auxiliary.TuneMagFilterFus(c,f,f:GetValue()) end,nil)
+			if sg:IsExists(Auxiliary.HarmonizingMagFilter,1,c,f,f:GetValue()) then return false end
+			local sg1=g:Filter(function(c) return not Auxiliary.HarmonizingMagFilterFus(c,f,f:GetValue()) end,nil)
 			rg:Merge(sg1)
 		end
 	end
 	--A card in the selected group has the synchro lmit
-	local g2=sg:Filter(Card.IsHasEffect,nil,73941492+TYPE_SYNCHRO)
+	local g2=sg:Filter(Card.IsHasEffect,nil,EFFECT_SYNCHRO_MAT_RESTRICTION)
 	for tc in aux.Next(g2) do
-		local eff={tc:GetCardEffect(73941492+TYPE_SYNCHRO)}
+		local eff={tc:GetCardEffect(EFFECT_SYNCHRO_MAT_RESTRICTION)}
 		for _,f in ipairs(eff) do
-			if Auxiliary.TuneMagFilter(c,f,f:GetValue()) then return false end
+			if Auxiliary.HarmonizingMagFilter(c,f,f:GetValue()) then return false end
 		end
 	end
 	if c:IsHasEffect(EFFECT_HAND_SYNCHRO+EFFECT_SYNCHRO_CHECK) then
@@ -1100,7 +1137,7 @@ function Auxiliary.DarkSynchroCheck1(c,g,sg,card1,card2,plv,nlv,sc,tp,smat,pg,f1
 		if not hanchk then return false end
 	end
 	g2=sg:Filter(Card.IsHasEffect,nil,EFFECT_HAND_SYNCHRO+EFFECT_SYNCHRO_CHECK)
-	for tc in aux.Next(g) do
+	for tc in aux.Next(g2) do
 		local eff={tc:GetCardEffect(EFFECT_HAND_SYNCHRO+EFFECT_SYNCHRO_CHECK)}
 		local hanchk=false
 		for _,te in ipairs(eff) do
@@ -1121,7 +1158,7 @@ function Auxiliary.DarkSynchroCheck1(c,g,sg,card1,card2,plv,nlv,sc,tp,smat,pg,f1
 	if sg:GetCount()<2 then
 		res=g:IsExists(Auxiliary.DarkSynchroCheck1,1,sg,g,sg,card1,card2,plv,nlv,sc,tp,pg,f1,f2,...)
 	else
-		res=sg:IsContains(pg) and Auxiliary.DarkSynchroCheck2(sg,card1,card2,plv,nlv,sc,tp,f1,f2,...)
+		res=sg:Includes(pg) and Auxiliary.DarkSynchroCheck2(sg,card1,card2,plv,nlv,sc,tp,f1,f2,...)
 	end
 	g:Merge(rg)
 	sg:RemoveCard(c)
@@ -1159,10 +1196,8 @@ function Auxiliary.DarkSynchroCheck2(sg,card1,card2,plv,nlv,sc,tp,f1,f2,...)
 	local reqm={...}
 	if (f1 and not f1(card1,sc,SUMMON_TYPE_SYNCHRO,tp)) or (f2 and not f2(card2,sc,SUMMON_TYPE_SYNCHRO,tp)) or not card2:IsType(TYPE_TUNER,sc,SUMMON_TYPE_SYNCHRO,tp) or not card2:IsSetCard(0x600) then return false end
 	local lvchk=false
-	if #reqm>0 then
-		for i=1,#reqm do
-			if not sg:IsExists(reqm[i],1,nil) then return false end
-		end
+	for _,reqmat in ipairs(reqm) do
+		if not reqmat(sg,sc,tp) then return false end
 	end
 	if sg:IsExists(Card.IsHasEffect,1,nil,EFFECT_SYNCHRO_MATERIAL_CUSTOM) then
 		local g=sg:Filter(Card.IsHasEffect,nil,EFFECT_SYNCHRO_MATERIAL_CUSTOM)
@@ -1183,13 +1218,13 @@ function Auxiliary.DarkSynchroCheck2(sg,card1,card2,plv,nlv,sc,tp,f1,f2,...)
 	end
 	if lvchk then return true end
 	local ntlv=card1:GetSynchroLevel(sc)
-	local ntlv1=bit.band(ntlv,0xffff)
-	local ntlv2=bit.rshift(ntlv,16)
+	local ntlv1=ntlv&0xffff
+	local ntlv2=ntlv>>16
 	local tlv=card2:GetSynchroLevel(sc)
-	local tlv1=bit.band(tlv,0xffff)
-	local tlv2=bit.rshift(tlv,16)
+	local tlv1=tlv&0xffff
+	local tlv2=tlv>>16
 	if card1:GetFlagEffect(100000147)>0 then
-		if tlv1==nlv-lv1 then return true end
+		if tlv1==nlv-ntlv1 then return true end
 		if (tlv2>0 or card2:IsStatus(STATUS_NO_LEVEL)) and (ntlv2>0 or card1:IsStatus(STATUS_NO_LEVEL)) then
 			return tlv2==nlv-ntlv1 or tlv1==nlv-ntlv2 or tlv2==nlv-ntlv2
 		elseif tlv2>0 or card2:IsStatus(STATUS_NO_LEVEL) then
@@ -1212,8 +1247,11 @@ function Auxiliary.DarkSynchroCheck2(sg,card1,card2,plv,nlv,sc,tp,f1,f2,...)
 end
 function Auxiliary.DarkSynCondition(f1,f2,plv,nlv,...)
 	local t={...}
-	return	function(e,c,smat,mg)
+	return	function(e,c,smat,mg,min,max)
 				if c==nil then return true end
+				min = min or Auxiliary.SynchroSummonMinCount
+				max = max or Auxiliary.SynchroSummonMaxCount
+				if (min and min>3) or (max and max<3) then return false end
 				local plv=plv
 				local nlv=nlv
 				if plv==nil then
@@ -1267,7 +1305,10 @@ function Auxiliary.DarkSynCondition(f1,f2,plv,nlv,...)
 end
 function Auxiliary.DarkSynTarget(f1,f2,plv,nlv,...)
 	local t={...}
-	return	function(e,tp,eg,ep,ev,re,r,rp,chk,c,smat,mg)
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk,c,smat,mg,min,max)
+				min = min or Auxiliary.SynchroSummonMinCount
+				max = max or Auxiliary.SynchroSummonMaxCount
+				if (min and min>3) or (max and max<3) then return false end
 				local sg=Group.CreateGroup()
 				local plv=plv
 				local nlv=nlv

@@ -39,7 +39,7 @@ function c100000291.operation(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local rg=tg:Filter(Card.IsRelateToEffect,nil,e)
 	if rg:GetCount()>0 then 
-		Duel.Destroy(rg,nil,REASON_EFFECT)
+		Duel.Destroy(rg,REASON_EFFECT)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_PHASE+PHASE_END)

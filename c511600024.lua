@@ -1,4 +1,4 @@
---Markers Charge
+--Arrows Charge
 --マーカーズ・チャージ
 --scripted by Larry126
 function c511600024.initial_effect(c)

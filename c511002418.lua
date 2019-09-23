@@ -1,12 +1,13 @@
---青眼の光龍
+--青眼の光龍 (Anime)
+--Blue-Eyes Shining Dragon (Anime)
 function c511002418.initial_effect(c)
-	c:EnableReviveLimit()
+	c:EnableUnsummonable()
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetRange(LOCATION_HAND)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(aux.FALSE)
 	c:RegisterEffect(e1)
 	--special summon
 	local e2=Effect.CreateEffect(c)
@@ -32,6 +33,7 @@ function c511002418.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_QUICK_O)
 	e4:SetCode(EVENT_CHAINING)
 	e4:SetRange(LOCATION_MZONE)
+	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e4:SetCondition(c511002418.discon)
 	e4:SetTarget(c511002418.distg)
 	e4:SetOperation(c511002418.disop)
@@ -47,13 +49,26 @@ function c511002418.initial_effect(c)
 	e5:SetTarget(c511002418.destg)
 	e5:SetOperation(c511002418.desop)
 	c:RegisterEffect(e5)
+	--Double Snare
+	local e6=Effect.CreateEffect(c)
+	e6:SetType(EFFECT_TYPE_SINGLE)
+	e6:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
+	e6:SetRange(LOCATION_MZONE)
+	e6:SetCode(3682106)
+	c:RegisterEffect(e6)
+end
+c511002418.listed_names={23995346}
+function c511002418.spfilter(c,ft,tp)
+	return c:IsCode(23995346) and (ft>0 or (c:IsControler(tp) and c:GetSequence()<5)) and (c:IsControler(tp) or c:IsFaceup())
 end
 function c511002418.spcon(e,c)
 	if c==nil then return true end
-	return Duel.CheckReleaseGroup(c:GetControler(),Card.IsCode,1,nil,23995346)
+	local tp=c:GetControler()
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	return ft>-1 and Duel.CheckReleaseGroup(tp,c511002418.spfilter,1,nil,ft,tp)
 end
 function c511002418.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.SelectReleaseGroup(c:GetControler(),Card.IsCode,1,1,nil,23995346)
+	local g=Duel.SelectReleaseGroup(tp,c511002418.spfilter,1,1,nil,Duel.GetLocationCount(tp,LOCATION_MZONE),tp)
 	Duel.Release(g,REASON_COST)
 end
 function c511002418.val(e,c)
@@ -61,8 +76,7 @@ function c511002418.val(e,c)
 end
 function c511002418.discon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsStatus(STATUS_BATTLE_DESTROYED) then return false end
-	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return end
+	if c:IsStatus(STATUS_BATTLE_DESTROYED) or not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
 	local loc,tg=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION,CHAININFO_TARGET_CARDS)
 	if not tg or not tg:IsContains(c) then return false end
 	return Duel.IsChainDisablable(ev) and loc~=LOCATION_DECK

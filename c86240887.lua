@@ -1,5 +1,7 @@
 --竜破壊の剣士－バスター・ブレイダー
-function c86240887.initial_effect(c)
+--Buster Blader, the Dragon Destroyer Swordsman
+local s,id=GetID()
+function s.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
 	aux.AddFusionProcMix(c,true,true,78193831,aux.FilterBoolFunctionEx(Card.IsRace,RACE_DRAGON))
@@ -14,7 +16,7 @@ function c86240887.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetValue(c86240887.val)
+	e2:SetValue(s.val)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
 	e3:SetCode(EFFECT_UPDATE_DEFENSE)
@@ -31,7 +33,7 @@ function c86240887.initial_effect(c)
 	e5:SetType(EFFECT_TYPE_FIELD)
 	e5:SetCode(EFFECT_SET_POSITION)
 	e5:SetRange(LOCATION_MZONE)
-	e5:SetTarget(c86240887.target)
+	e5:SetTarget(s.target)
 	e5:SetTargetRange(0,LOCATION_MZONE)
 	e5:SetValue(POS_FACEUP_DEFENSE)
 	c:RegisterEffect(e5)
@@ -42,7 +44,7 @@ function c86240887.initial_effect(c)
 	e6:SetCode(EFFECT_CANNOT_ACTIVATE)
 	e6:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e6:SetTargetRange(0,1)
-	e6:SetValue(c86240887.aclimit)
+	e6:SetValue(s.aclimit)
 	c:RegisterEffect(e6)
 	--pierce
 	local e7=Effect.CreateEffect(c)
@@ -50,16 +52,16 @@ function c86240887.initial_effect(c)
 	e7:SetCode(EFFECT_PIERCE)
 	c:RegisterEffect(e7)
 end
-c86240887.material_setcode=0xd7
-function c86240887.val(e,c)
-	return Duel.GetMatchingGroupCount(c86240887.filter,c:GetControler(),0,LOCATION_GRAVE+LOCATION_MZONE,nil)*1000
+s.material_setcode=0xd7
+function s.val(e,c)
+	return Duel.GetMatchingGroupCount(s.filter,c:GetControler(),0,LOCATION_GRAVE+LOCATION_MZONE,nil)*1000
 end
-function c86240887.filter(c)
+function s.filter(c)
 	return c:IsRace(RACE_DRAGON) and (c:IsLocation(LOCATION_GRAVE) or c:IsFaceup())
 end
-function c86240887.target(e,c)
+function s.target(e,c)
 	return c:IsRace(RACE_DRAGON)
 end
-function c86240887.aclimit(e,re,tp)
-	return re:GetHandler():IsRace(RACE_DRAGON) and re:IsActiveType(TYPE_MONSTER) and not re:GetHandler():IsImmuneToEffect(e)
+function s.aclimit(e,re,tp)
+	return re:GetHandler():IsRace(RACE_DRAGON) and re:IsActiveType(TYPE_MONSTER)
 end

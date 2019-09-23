@@ -17,18 +17,17 @@ function c511024006.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 end
 function c511024006.cfilter(c,e,tp)
-	return c:IsType(TYPE_XYZ) and c:IsAbleToGraveAsCost() 
+	return c:IsType(TYPE_XYZ) and c:IsAbleToGraveAsCost() and Duel.GetLocationCountFromEx(tp,tp,c)>0 
 		and Duel.IsExistingMatchingCard(c511024006.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c:GetRank())
 end
 function c511024006.spfilter(c,e,tp,rk)
-	return c:GetRank()==rk and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsRank(rk) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c511024006.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()~=1 then return false end
 		e:SetLabel(0)
-		return e:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-			and Duel.IsExistingMatchingCard(c511024006.cfilter,tp,LOCATION_MZONE,0,1,nil,e,tp)
+		return e:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsExistingMatchingCard(c511024006.cfilter,tp,LOCATION_MZONE,0,1,nil,e,tp)
 	end
 	e:SetLabel(0)
 	local g=Duel.SelectMatchingCard(tp,c511024006.cfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
@@ -37,7 +36,7 @@ function c511024006.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function c511024006.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	if Duel.GetLocationCountFromEx(tp)<=0 then return end
 	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sc=Duel.SelectMatchingCard(tp,c511024006.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)):GetFirst()

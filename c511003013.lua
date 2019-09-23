@@ -65,18 +65,20 @@ function c511003013.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	if not Duel.IsExistingMatchingCard(c511003013.cfilter,tp,LOCATION_ONFIELD,0,1,nil)  then return false end
-	if c:GetLevel()<=4 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-	elseif c:GetLevel()>=7 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-2 and Duel.CheckReleaseGroup(tp,nil,2,nil)
-	else return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 and Duel.CheckReleaseGroup(tp,nil,1,nil) end
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	local rg=Duel.GetReleaseGroup(tp)
+	if c:IsLevelBelow(4) then return ft>0
+	elseif c:IsLevelAbove(7) then return ft>-2 and aux.SelectUnselectGroup(rg,e,tp,2,2,aux.ChkfMMZ(1),0)
+	else return ft>-1 and aux.SelectUnselectGroup(rg,e,tp,1,1,aux.ChkfMMZ(1),0) end
 end
 function c511003013.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local tp=c:GetControler()
-	if c:GetLevel()==5 or c:GetLevel()==6 then
-		local g=Duel.SelectReleaseGroup(tp,nil,1,1,nil)
-		Duel.Release(g,REASON_COST)
-	elseif c:GetLevel()>=7 then
-		local g=Duel.SelectReleaseGroup(tp,nil,2,2,nil)
-		Duel.Release(g,REASON_COST)
+	local rg=Duel.GetReleaseGroup(tp)
+	if c:IsLevel(5) or c:IsLevel(6) then
+		local sg=aux.SelectUnselectGroup(rg,e,tp,1,1,aux.ChkfMMZ(1),1,tp,HINTMSG_RELEASE)
+		Duel.Release(sg,REASON_COST)
+	elseif c:IsLevelAbove(7) then
+		local sg=aux.SelectUnselectGroup(rg,e,tp,2,2,aux.ChkfMMZ(1),1,tp,HINTMSG_RELEASE)
+		Duel.Release(sg,REASON_COST)
 	end
 end
 function c511003013.sfilter(c)

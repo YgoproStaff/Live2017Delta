@@ -19,7 +19,9 @@ function c511002544.filter(c,e,tp)
 	return c:IsRace(RACE_WINDBEAST) and not c:IsCode(50920465) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c511002544.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c511002544.filter,tp,LOCATION_HAND,0,1,nil,e,tp) end
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if e:GetHandler():GetSequence()<5 then ft=ft+1 end
+	if chk==0 then return ft>0 and Duel.IsExistingMatchingCard(c511002544.filter,tp,LOCATION_HAND,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,LOCATION_HAND)
 end
 function c511002544.operation(e,tp,eg,ep,ev,re,r,rp)

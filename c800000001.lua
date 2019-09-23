@@ -1,5 +1,6 @@
 -- Deep Forest
 -- scripted by: UnknownGuest
+--fixed by MLD
 function c800000001.initial_effect(c)
 	-- activate
 	local e1=Effect.CreateEffect(c)
@@ -17,5 +18,5 @@ function c800000001.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c800000001.tg(e,c)
-	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_EARTH) and c:IsLevelBelow(4)
+	return c:IsLevelBelow(4) and c:IsRace(RACE_INSECT+RACE_BEAST+RACE_PLANT+RACE_BEASTWARRIOR)
 end

@@ -20,7 +20,7 @@ function c100000067.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c100000067.valcon(e,re,r,rp)
-	return r&REASON_BATTLE==0
+	return r&REASON_BATTLE>0
 end
 function c100000067.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsReason(REASON_EFFECT)

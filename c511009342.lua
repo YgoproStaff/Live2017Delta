@@ -36,7 +36,6 @@ function c511009342.activate(e,tp,eg,ep,ev,re,r,rp)
 	c:AddMonsterAttribute(TYPE_EFFECT)
 	Duel.SpecialSummonStep(c,1,tp,tp,true,false,POS_FACEUP_ATTACK)
 	c:AddMonsterAttributeComplete()
-	
 	--equip change
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(40884383,0))
@@ -94,8 +93,7 @@ function c511009342.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c511009342.drcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	Debug.Message("c:GetEquipCount())
-	 return e:GetHandler():GetEquipCount()>1
+	return e:GetHandler():GetEquipCount()>1
 end
 
 function c511009342.drtg(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -6,22 +6,21 @@ function c100000222.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EVENT_PRE_BATTLE_DAMAGE)
-	e1:SetCost(c100000222.cost)
 	e1:SetCondition(c100000222.condition)
+	e1:SetCost(c100000222.cost)
 	e1:SetTarget(c100000222.target)
 	e1:SetOperation(c100000222.activate)
 	c:RegisterEffect(e1)
 end
+function c100000222.condition(e,tp,eg,ep,ev,re,r,rp)
+	return tp==ep
+end
 function c100000222.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,nil,0x6f) end
-	local sg=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,nil,0x6f)
-	local tc=sg:GetFirst()
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,Card.IsSetCard,1,false,nil,nil,0x6f) end
+	local tc=Duel.SelectReleaseGroupCost(tp,Card.IsSetCard,1,1,false,nil,nil,0x6f):GetFirst()
 	local atk=tc:GetAttack()
 	Duel.Release(tc,REASON_COST)
 	e:SetLabel(atk)
-end
-function c100000222.condition(e,tp,eg,ep,ev,re,r,rp)
-	return tp==ep
 end
 function c100000222.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

@@ -31,32 +31,37 @@ function c511001268.initial_effect(c)
 	e4:SetOperation(c511001268.desop2)
 	c:RegisterEffect(e4)
 end
-function c511001268.filter(c,e,tp)
+function c511001268.filter(c,e,tp,ft)
 	local lv=c:GetLevel()
-	return lv>0 and Duel.IsExistingMatchingCard(c511001268.spfilter,tp,LOCATION_GRAVE,0,1,nil,lv,e,tp)
+	return lv>0 and (ft>0 or c:GetSequence()<5) and Duel.IsExistingMatchingCard(c511001268.spfilter,tp,LOCATION_GRAVE,0,1,nil,lv,e,tp)
 end
 function c511001268.spfilter(c,lv,e,tp)
-	return c:GetLevel()==lv*2 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsLevel(lv*2) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c511001268.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c511001268.filter,1,nil,e,tp) end
-	local rg=Duel.SelectReleaseGroup(tp,c511001268.filter,1,1,nil,e,tp)
-	Duel.Release(rg,REASON_COST)
-	e:SetLabel(rg:GetFirst():GetLevel())
+	e:SetLabel(1)
+	return true
 end
 function c511001268.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 end
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if chk==0 then
+		if e:GetLabel()~=1 then return false end
+		e:SetLabel(0)
+		return ft>-1 and Duel.CheckReleaseGroupCost(tp,c511001268.filter,1,false,nil,nil,e,tp,ft)
+	end
+	local rg=Duel.SelectReleaseGroupCost(tp,c511001268.filter,1,1,false,nil,nil,e,tp,ft)
+	Duel.Release(rg,REASON_COST)
+	Duel.SetTargetParam(rg:GetFirst():GetLevel())
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
 end
 function c511001268.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local lv=e:GetLabel()
+	local c=e:GetHandler()
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 or not c:IsRelateToEffect(e) then return end
+	local lv=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c511001268.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,lv,e,tp)
-	if g:GetCount()>0 then
-		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
-		e:GetHandler():SetCardTarget(g:GetFirst())
+	local tc=Duel.SelectMatchingCard(tp,c511001268.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,lv,e,tp):GetFirst()
+	if tc and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then
+		c:SetCardTarget(tc)
 	end
 end
 function c511001268.checkop(e,tp,eg,ep,ev,re,r,rp)

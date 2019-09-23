@@ -12,12 +12,14 @@ function c511000225.initial_effect(c)
 end
 function c511000225.filter(c,e,tp)
 	local rk=c:GetRank()
-	return rk>0 and c:IsLocation(LOCATION_GRAVE) and c:IsType(TYPE_XYZ) and c:GetPreviousControler()==tp and c:IsSetCard(0x48)
-		and Duel.IsExistingMatchingCard(c511000225.sfilter,tp,LOCATION_EXTRA,0,1,nil,rk,e,tp) 
+	local pg=aux.GetMustBeMaterialGroup(tp,Group.FromCards(c),tp,nil,nil,REASON_XYZ)
+	return pg:GetCount()<=1 and rk>0 and c:IsLocation(LOCATION_GRAVE) and c:GetPreviousControler()==tp and c:IsSetCard(0x48)
+		and Duel.IsExistingMatchingCard(c511000225.sfilter,tp,LOCATION_EXTRA,0,1,nil,rk,e,tp,c,pg) 
 		and c:IsCanBeEffectTarget(e)
 end
-function c511000225.sfilter(c,rk,e,tp)
-	return c:GetRank()<rk and c:IsType(TYPE_XYZ) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
+function c511000225.sfilter(c,rk,e,tp,mc,pg)
+	return mc:IsType(TYPE_XYZ,c,SUMMON_TYPE_XYZ,tp) and c:GetRank()<rk and c:IsType(TYPE_XYZ) and mc:IsCanBeXyzMaterial(c,tp) 
+		and (pg:GetCount()<=0 or pg:IsContains(mc)) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function c511000225.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCountFromEx(tp)>0 and eg:IsExists(c511000225.filter,1,nil,e,tp) end
@@ -30,9 +32,11 @@ function c511000225.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCountFromEx(tp)<=0 then return end
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
+		local pg=aux.GetMustBeMaterialGroup(tp,Group.FromCards(tc),tp,nil,nil,REASON_XYZ)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local sc=Duel.SelectMatchingCard(tp,c511000225.sfilter,tp,LOCATION_EXTRA,0,1,1,nil,tc:GetRank(),e,tp):GetFirst()
+		local sc=Duel.SelectMatchingCard(tp,c511000225.sfilter,tp,LOCATION_EXTRA,0,1,1,nil,tc:GetRank(),e,tp,tc,pg):GetFirst()
 		if sc then
+			sc:SetMaterial(Group.FromCards(tc))
 			Duel.Overlay(sc,Group.FromCards(tc))
 			Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 			sc:CompleteProcedure()

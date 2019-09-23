@@ -14,7 +14,7 @@ function c511000607.condition(e,tp,eg,ep,ev,re,r,rp)
 	return false
 end
 function c511000607.filter(c)
-	return c:IsFaceup() and c:IsDestructable() and c:IsType(TYPE_SPELL+TYPE_TRAP)
+	return c:IsFaceup() and c:IsType(TYPE_SPELL+TYPE_TRAP)
 end
 function c511000607.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
@@ -23,7 +23,7 @@ function c511000607.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,0,0)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,0)
 end
 function c511000607.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g1=nil
@@ -46,20 +46,15 @@ function c511000607.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 or Duel.GetLocationCount(1-tp,LOCATION_MZONE)<=0
 		or not Duel.IsPlayerCanSpecialSummonMonster(tp,511000608,0,0x4011,0,800,2,RACE_FAIRY,ATTRIBUTE_LIGHT) then return end
-	local p=0
-	for i=1,2 do
+	for i=0,1 do
 		local token=Duel.CreateToken(tp,511000608)
-		if p==0 then
-			Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP_DEFENSE)
-		else
-			Duel.SpecialSummonStep(token,0,tp,1-tp,false,false,POS_FACEUP_DEFENSE)
-		end
+		Duel.SpecialSummonStep(token,0,tp,math.abs(i-tp),false,false,POS_FACEUP_DEFENSE)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_ADD_TYPE)
 		e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
-		token:RegisterEffect(e1)
+		token:RegisterEffect(e1,true)
 		local e2=Effect.CreateEffect(e:GetHandler())
 		e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetCode(EFFECT_UNRELEASABLE_SUM)
@@ -67,7 +62,6 @@ function c511000607.activate(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetValue(1)
 		e2:SetReset(RESET_EVENT+0x1fe0000)
 		token:RegisterEffect(e2,true)
-		p=1
 	end
 	Duel.SpecialSummonComplete()
 end

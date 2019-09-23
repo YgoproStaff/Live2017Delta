@@ -18,6 +18,12 @@ function c511002793.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(511002793)
 	c:RegisterEffect(e3)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e4:SetCode(EVENT_BE_MATERIAL)
+	e4:SetCondition(c511002793.regcon)
+	e4:SetOperation(c511002793.regop)
+	c:RegisterEffect(e4)
 end
 function c511002793.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -29,4 +35,10 @@ end
 function c511002793.xyzlimit(e,c)
 	if not c then return false end
 	return not e:GetHandler():IsLocation(LOCATION_GRAVE)
+end
+function c511002793.regcon(e,tp,eg,ep,ev,re,r,rp)
+	return r==REASON_XYZ
+end
+function c511002793.regop(e,tp,eg,ep,ev,re,r,rp)
+	e:GetHandler():RegisterFlagEffect(511002794,RESET_EVENT+0x1fa0000,0,0)
 end

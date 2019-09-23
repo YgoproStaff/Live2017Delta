@@ -13,6 +13,13 @@ function c511002039.initial_effect(c)
 	e2:SetTarget(c511002039.distg)
 	e2:SetOperation(c511002039.disop)
 	c:RegisterEffect(e2)
+	--Double Snare
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCode(3682106)
+	c:RegisterEffect(e1)
 end
 c511002039.material_setcode=0x544
 function c511002039.distg(e,tp,eg,ep,ev,re,r,rp,chk)

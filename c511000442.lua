@@ -6,6 +6,7 @@ function c511000442.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e1:SetCondition(c511000442.condition)
+	e1:SetCost(aux.RemainFieldCost)
 	e1:SetTarget(c511000442.target)
 	e1:SetOperation(c511000442.activate)
 	c:RegisterEffect(e1)
@@ -18,10 +19,10 @@ function c511000442.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c511000442.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) or c:IsStatus(STATUS_LEAVE_CONFIRMED) then return end
 	local tc=Duel.GetAttacker()
-	if c:IsRelateToEffect(e) and tc and tc:IsRelateToBattle() and tc:IsFaceup() then
+	if tc and tc:IsRelateToBattle() and tc:IsFaceup() then
 		Duel.Equip(tp,c,tc)
-		c:CancelToGrave()
 		--battle
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD)
@@ -40,6 +41,8 @@ function c511000442.activate(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetValue(1)
 		e2:SetReset(RESET_EVENT+0x1fe0000)
 		c:RegisterEffect(e2)
+	else
+		c:CancelToGrave(false)
 	end
 end
 function c511000442.indtg(e,c)

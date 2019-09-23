@@ -1,3 +1,5 @@
 --ハーピィ・レディ・SB
-function c80316585.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 end
+s.listed_names={CARD_HARPIE_LADY}

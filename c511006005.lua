@@ -8,6 +8,7 @@ function c511006005.initial_effect(c)
 	e1:SetHintTiming(TIMING_DAMAGE_STEP)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCondition(c511006005.condition)
+	e1:SetCost(aux.RemainFieldCost)
 	e1:SetTarget(c511006005.target)
 	e1:SetOperation(c511006005.operation)
 	c:RegisterEffect(e1)
@@ -24,11 +25,10 @@ function c511006005.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c511006005.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsLocation(LOCATION_SZONE) then return end
+	if not c:IsLocation(LOCATION_SZONE) or not c:IsRelateToEffect(e) or c:IsStatus(STATUS_LEAVE_CONFIRMED) then return end
 	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
+	if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		Duel.Equip(tp,c,tc)
-		c:CancelToGrave()
 		--Atkup
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_EQUIP)
@@ -55,6 +55,8 @@ function c511006005.operation(e,tp,eg,ep,ev,re,r,rp)
 		e4:SetValue(c511006005.atkval)
 		e4:SetReset(RESET_EVENT+0x1fe0000)
 		c:RegisterEffect(e4)
+	else
+		c:CancelToGrave(false)
 	end
 end
 function c511006005.atkcon(e)

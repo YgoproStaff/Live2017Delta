@@ -10,30 +10,49 @@ function c100000025.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c100000025.filter1(c,e)
-	return c:IsCanBeFusionMaterial() and c:IsAbleToRemove() and (not e or not c:IsImmuneToEffect(e)) and aux.SpElimFilter(c,true)
+	return c:IsType(TYPE_MONSTER) and c:IsCanBeFusionMaterial() and c:IsAbleToRemove() and (not e or not c:IsImmuneToEffect(e))
 end
-function c100000025.filter2(c,e,tp,m)
-	return c:IsType(TYPE_FUSION) and c:IsSetCard(0x512) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false)
+function c100000025.filter2(c,e,tp,m,f)
+	return c:IsType(TYPE_FUSION) and c:IsSetCard(0x521) and (not f or f(c)) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false)
 		and c:CheckFusionMaterial(m,nil,tp)
+end
+function c100000025.fcheck(tp,sg,fc)
+	if not sg then
+		return true
+	elseif sg:GetCount()==1 then
+		return sg:GetFirst():IsLocation(LOCATION_GRAVE) and sg:GetFirst():IsControler(tp)
+	else
+		local g=sg:Filter(Card.IsLocation,nil,LOCATION_GRAVE)
+		return g:GetCount()>1 and g:IsExists(c100000025.chk,1,nil,g,tp)
+	end
+end
+function c100000025.chk(c,sg,tp)
+	return c:IsControler(tp) and sg:IsExists(Card.IsControler,1,c,1-tp)
 end
 function c100000025.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		local mg1=Duel.GetMatchingGroup(c100000025.filter1,tp,LOCATION_MZONE+LOCATION_GRAVE,LOCATION_MZONE+LOCATION_GRAVE,nil)
+		if Duel.IsPlayerAffectedByEffect(tp,69832741) then return false end
+		local mg1=Duel.GetMatchingGroup(c100000025.filter1,tp,LOCATION_GRAVE,LOCATION_GRAVE,nil)
+		Auxiliary.FCheckAdditional=c100000025.fcheck
 		local res=Duel.IsExistingMatchingCard(c100000025.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg1)
 		if not res then
 			local ce=Duel.GetChainMaterial(tp)
 			if ce~=nil then
 				local fgroup=ce:GetTarget()
 				local mg2=fgroup(ce,e,tp)
-				res=Duel.IsExistingMatchingCard(c100000025.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg2)
+				local mf=ce:GetValue()
+				res=Duel.IsExistingMatchingCard(c100000025.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg2,mf)
 			end
 		end
+		Auxiliary.FCheckAdditional=nil
 		return res
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function c100000025.activate(e,tp,eg,ep,ev,re,r,rp)
-	local mg1=Duel.GetMatchingGroup(c100000025.filter1,tp,LOCATION_MZONE+LOCATION_GRAVE,LOCATION_MZONE+LOCATION_GRAVE,nil,e)
+	if Duel.IsPlayerAffectedByEffect(tp,69832741) then return end
+	local mg1=Duel.GetMatchingGroup(c100000025.filter1,tp,LOCATION_GRAVE,LOCATION_GRAVE,nil,e)
+	Auxiliary.FCheckAdditional=c100000025.fcheck
 	local sg1=Duel.GetMatchingGroup(c100000025.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg1)
 	local mg2=nil
 	local sg2=nil
@@ -41,7 +60,8 @@ function c100000025.activate(e,tp,eg,ep,ev,re,r,rp)
 	if ce~=nil then
 		local fgroup=ce:GetTarget()
 		mg2=fgroup(ce,e,tp)
-		sg2=Duel.GetMatchingGroup(c100000025.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg2)
+		local mf=ce:GetValue()
+		sg2=Duel.GetMatchingGroup(c100000025.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg2,mf)
 	end
 	if sg1:GetCount()>0 or (sg2~=nil and sg2:GetCount()>0) then
 		local sg=sg1:Clone()
@@ -62,4 +82,5 @@ function c100000025.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 		tc:CompleteProcedure()
 	end
+	Auxiliary.FCheckAdditional=nil
 end

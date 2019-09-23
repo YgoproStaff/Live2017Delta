@@ -18,18 +18,9 @@ function c511010173.initial_effect(c)
 	local e6=Effect.CreateEffect(c)
 	e6:SetType(EFFECT_TYPE_SINGLE)
 	e6:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e6:SetValue(c511010173.indes)
+	e6:SetValue(aux.NOT(aux.TargetBoolFunction(Card.IsSetCard,0x48)))
 	c:RegisterEffect(e6)
-	if not c511010173.global_check then
-		c511010173.global_check=true
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_ADJUST)
-		ge2:SetCountLimit(1)
-		ge2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
-		ge2:SetOperation(c511010173.numchk)
-		Duel.RegisterEffect(ge2,0)
-	end
+	aux.CallToken(96864105)
 end
 c511010173.xyz_number=73
 function c511010173.atkcon(e,tp,eg,ep,ev,re,r,rp)
@@ -46,19 +37,12 @@ end
 function c511010173.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	if c:IsRelateToBattle() and c:IsFaceup() and bc:IsRelateToBattle() and bc:IsFaceup() then
+	if c:IsRelateToBattle() and c:IsFaceup() and bc and bc:IsRelateToBattle() and bc:IsFaceup() then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
+		e1:SetReset(RESET_EVENT+0x1ff0000)
 		e1:SetValue(bc:GetAttack())
 		c:RegisterEffect(e1)
 	end
-end
-function c511010173.numchk(e,tp,eg,ep,ev,re,r,rp)
-	Duel.CreateToken(tp,96864105)
-	Duel.CreateToken(1-tp,96864105)
-end
-function c511010173.indes(e,c)
-	return not c:IsSetCard(0x48)
 end

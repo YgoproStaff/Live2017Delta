@@ -10,15 +10,28 @@ function c511009546.initial_effect(c)
 	e1:SetTarget(c511009546.target)
 	e1:SetOperation(c511009546.activate)
 	c:RegisterEffect(e1)
+	Duel.AddCustomActivityCounter(51109546,ACTIVITY_ATTACK,c511009546.counterfilter)
+end
+function c511009546.counterfilter(c)
+    return not c:IsCode(41209827)
 end
 function c511009546.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local g=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
 		g:RemoveCard(e:GetHandler())
-		return g:GetCount()>0 and g:FilterCount(Card.IsDiscardable,nil)==g:GetCount()
+		return g:GetCount()>0 and g:FilterCount(Card.IsDiscardable,nil)==g:GetCount() 
+			and Duel.GetCustomActivityCount(51109546,tp,ACTIVITY_ATTACK)==0
 	end
 	local g=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
 	Duel.SendtoGrave(g,REASON_COST+REASON_DISCARD)
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
+	e1:SetProperty(EFFECT_FLAG_OATH+EFFECT_FLAG_IGNORE_IMMUNE)
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsCode,41209827))
+	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
 end
 function c511009546.cfilter(c)
 	return c:IsFaceup() and c:IsCode(41209827)

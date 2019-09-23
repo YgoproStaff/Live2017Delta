@@ -15,8 +15,8 @@ function c511001753.condition(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainDisablable(ev)
 end
 function c511001753.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,1,nil) end
-	local sg=Duel.SelectReleaseGroup(tp,nil,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,nil,1,false,nil,eg) end
+	local sg=Duel.SelectReleaseGroupCost(tp,nil,1,1,false,nil,eg)
 	Duel.Release(sg,REASON_COST)
 end
 function c511001753.target(e,tp,eg,ep,ev,re,r,rp,chk)

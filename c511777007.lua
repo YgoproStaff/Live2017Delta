@@ -22,7 +22,7 @@ end
 function c511777007.cfilter(c,e)
 	return c:GetSequence()<5
 end
-function c511777007.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function c511777007.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(c511777007.cfilter,tp,LOCATION_SZONE,0,e:GetHandler())
 	if chk==0 then return g:GetCount()>0 and g:FilterCount(Card.IsDestructable,nil,e)==g:GetCount() end
 	Duel.Destroy(g,REASON_COST)

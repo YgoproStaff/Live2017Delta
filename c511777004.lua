@@ -16,9 +16,9 @@ function c511777004.cfilter(c)
 end
 function c511777004.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
-	if chk==0 then return Duel.IsExistingMatchingCard(c511777004.cfilter,tp,LOCATION_MZONE,0,3,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,c511777004.cfilter,tp,LOCATION_MZONE,0,3,3,nil)
+	local g=Duel.GetMatchingGroup(c511777004.cfilter,tp,LOCATION_MZONE,0,nil)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-3 and g:GetCount()>2 and aux.SelectUnselectGroup(g,e,tp,3,3,aux.ChkfMMZ(1),0) end
+	local sg=aux.SelectUnselectGroup(g,e,tp,3,3,aux.ChkfMMZ(1),1,tp,HINTMSG_TOGRAVE)
 	Duel.SendtoGrave(g,REASON_COST)
 end
 function c511777004.filter(c,e,tp)

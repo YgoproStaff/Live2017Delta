@@ -4,7 +4,7 @@ function c511001435.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(16719802,0))
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetTarget(c511001435.tg)
 	e1:SetOperation(c511001435.op)
@@ -14,14 +14,15 @@ function c511001435.filter(c)
 	return c:IsFaceup() and c:GetLevel()>0
 end
 function c511001435.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c511001435.filter(chkc) and chkc~=e:GetHandler() end
-	if chk==0 then return Duel.IsExistingTarget(c511001435.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler()) end
+	local c=e:GetHandler()
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c511001435.filter(chkc) and chkc~=c end
+	if chk==0 then return Duel.IsExistingTarget(c511001435.filter,tp,LOCATION_MZONE,0,1,c) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,c511001435.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,e:GetHandler())
+	Duel.SelectTarget(tp,c511001435.filter,tp,LOCATION_MZONE,0,1,1,c)
 end
 function c511001435.op(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(14812659,0))
 		local ac=Duel.AnnounceNumber(tp,1,2)
 		local e1=Effect.CreateEffect(e:GetHandler())

@@ -38,25 +38,27 @@ function c511000670.initial_effect(c)
 	e5:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e5:SetCode(EVENT_CHAINING)
 	e5:SetRange(LOCATION_MZONE)
-	e5:SetCondition(c511000670.condition)
-	e5:SetCost(c511000670.cost)
-	e5:SetTarget(c511000670.target)
-	e5:SetOperation(c511000670.operation)
+	e5:SetCondition(c511000670.negcon)
+	e5:SetCost(c511000670.negcost)
+	e5:SetTarget(c511000670.negtg)
+	e5:SetOperation(c511000670.negop)
 	c:RegisterEffect(e5)
 end
 function c511000670.val(e,c)
 	return Duel.GetMatchingGroupCount(Card.IsRace,c:GetControler(),LOCATION_GRAVE,0,nil,RACE_DRAGON)*400
 end
-function c511000670.rfilter(c)
-	return c:IsCode(96561011) and c:GetEquipGroup():IsExists(Card.IsCode,1,nil,511000669)
+function c511000670.rfilter(c,ft,tp)
+	return c:IsCode(96561011) and c:GetEquipGroup():IsExists(Card.IsCode,1,nil,511000669) and (ft>0 or (c:IsControler(tp) and c:GetSequence()<5)) 
+		and (c:IsControler(tp) or c:IsFaceup())
 end
 function c511000670.spcon(e,c)
 	if c==nil then return true end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
-		and Duel.CheckReleaseGroup(c:GetControler(),c511000670.rfilter,1,nil)
+	local tp=c:GetControler()
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	return ft>-1 and Duel.CheckReleaseGroup(tp,c511000670.rfilter,1,nil,ft,tp)
 end
 function c511000670.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.SelectReleaseGroup(c:GetControler(),c511000670.rfilter,1,1,nil)
+	local g=Duel.SelectReleaseGroup(c:GetControler(),c511000670.rfilter,1,1,nil,Duel.GetLocationCount(tp,LOCATION_MZONE),tp)
 	Duel.Release(g,REASON_COST)
 end
 function c511000670.discon(e,tp,eg,ep,ev,re,r,rp)
@@ -74,25 +76,24 @@ end
 function c511000670.disop(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.NegateEffect(ev)
 end
-function c511000670.condition(e,tp,eg,ep,ev,re,r,rp)
+function c511000670.negcon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and re:IsActiveType(TYPE_SPELL) and Duel.IsChainNegatable(ev) and rp~=tp
 end
-function c511000670.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function c511000670.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD,e:GetHandler())
 end
-function c511000670.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c511000670.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
+	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
-function c511000670.operation(e,tp,eg,ep,ev,re,r,rp)
+function c511000670.negop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsFacedown() or not c:IsRelateToEffect(e) then return end
-	Duel.NegateActivation(ev)
-	if re:GetHandler():IsRelateToEffect(re) then
+	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end

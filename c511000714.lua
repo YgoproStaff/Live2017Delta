@@ -5,52 +5,45 @@ function c511000714.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--check
-	local e0=Effect.CreateEffect(c)
-	e0:SetCode(EVENT_ATTACK_ANNOUNCE)
-	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e0:SetRange(0x7F)
-	e0:SetOperation(c511000714.checkop)
-	e0:SetLabel(0)
-	c:RegisterEffect(e0)
-	--send 5 cards
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e2:SetCode(EVENT_DAMAGE)
-	e2:SetRange(LOCATION_SZONE)
-	e2:SetDescription(aux.Stringid(511000714,0))
-	e2:SetCondition(c511000714.con)
-	e2:SetTarget(c511000714.tg)
-	e2:SetOperation(c511000714.op)
-	e2:SetLabelObject(e0)
-	c:RegisterEffect(e2)
-	--reset
+	--send
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetCategory(CATEGORY_DECKDES)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_PHASE+PHASE_BATTLE)
-	e3:SetRange(0x7F)
+	e3:SetRange(LOCATION_SZONE)
 	e3:SetCountLimit(1)
-	e3:SetOperation(c511000714.resop)
-	e3:SetLabelObject(e0)
+	e3:SetTarget(c511000714.ddtg)
+	e3:SetOperation(c511000714.ddop)
 	c:RegisterEffect(e3)
 end
-function c511000714.checkop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetLabel()==0 then
-		e:SetLabel(1)
-	elseif e:GetLabel()==1 then
-		e:SetLabel(2)
-	end
-end
-function c511000714.resop(e,tp,eg,ep,ev,re,r,rp)
-	e:GetLabelObject():SetLabel(0)
-end
-function c511000714.con(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(r,REASON_BATTLE)>0 and ep~=Duel.GetTurnPlayer() and e:GetLabelObject():GetLabel()==1
-end
-function c511000714.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+function c511000714.ddtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,Duel.GetTurnPlayer(),5)
+	local p=PLAYER_NONE
+	if Duel.GetActivityCount(tp,ACTIVITY_ATTACK)>0 and Duel.GetActivityCount(1-tp,ACTIVITY_ATTACK)>0 then
+		p=PLAYER_ALL
+	elseif Duel.GetActivityCount(tp,ACTIVITY_ATTACK)>0 then
+		p=tp
+	elseif Duel.GetActivityCount(1-tp,ACTIVITY_ATTACK)>0 then
+		p=1-tp
+	end
+	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,p,5)
 end
-function c511000714.op(e,tp,eg,ep,ev,re,r,rp)
-	Duel.DiscardDeck(Duel.GetTurnPlayer(),5,REASON_EFFECT)
+function c511000714.ddop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
+	local p=PLAYER_NONE
+	if Duel.GetActivityCount(tp,ACTIVITY_ATTACK)>0 and Duel.GetActivityCount(1-tp,ACTIVITY_ATTACK)>0 then
+		p=PLAYER_ALL
+	elseif Duel.GetActivityCount(tp,ACTIVITY_ATTACK)>0 then
+		p=tp
+	elseif Duel.GetActivityCount(1-tp,ACTIVITY_ATTACK)>0 then
+		p=1-tp
+	end
+	if p~=PLAYER_NONE then
+		if p==PLAYER_ALL then
+			Duel.DiscardDeck(tp,5,REASON_EFFECT)
+			Duel.DiscardDeck(1-tp,5,REASON_EFFECT)
+		else
+			Duel.DiscardDeck(p,5,REASON_EFFECT)
+		end
+	end
 end

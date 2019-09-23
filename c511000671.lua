@@ -26,10 +26,10 @@ function c511000671.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()~=1 then return false end
 		e:SetLabel(0)
-		return Duel.CheckReleaseGroup(tp,c511000671.cfilter,1,eq)
+		return Duel.CheckReleaseGroupCost(tp,c511000671.cfilter,1,false,nil,eq)
 	end
 	e:SetLabel(0)
-	local g=Duel.SelectReleaseGroup(tp,c511000671.cfilter,1,1,eq)
+	local g=Duel.SelectReleaseGroupCost(tp,c511000671.cfilter,1,1,false,nil,eq)
 	Duel.Release(g,REASON_COST)
 	local atk=g:GetFirst():GetAttack()
 	if atk<0 then atk=0 end

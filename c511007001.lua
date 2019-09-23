@@ -1,61 +1,41 @@
 --coded by Lyris
---Absolute Buster
+--DDイービル
 function c511007001.initial_effect(c)
-	--This turn, negate all Spell/Trap Card effects that would negate an attack and/or prevent a card(s) from being destroyed. [Trap Stun & Necrovalley]
+	aux.EnablePendulumAttribute(c)
+	--When your opponent Pendulum Summons monsters: You can negate the effects of those monsters, also they cannot attack.
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetOperation(c511007001.activate)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetRange(LOCATION_PZONE)
+	e1:SetCategory(CATEGORY_DISABLE)
+	e1:SetCondition(c511007001.atkcon)
+	e1:SetOperation(c511007001.atkop)
 	c:RegisterEffect(e1)
 end
-function c511007001.activate(e,tp,eg,ep,ev,re,r,rp)
+function c511007001.cfilter(c,tp)
+	return c:IsControler(tp) and c:IsSummonType(SUMMON_TYPE_PENDULUM)
+end
+function c511007001.atkcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(c511007001.cfilter,1,nil,1-tp)
+end
+function c511007001.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	--disable
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_DISABLE)
-	e1:SetTargetRange(LOCATION_SZONE,LOCATION_SZONE)
-	e1:SetTarget(c511007001.distarget)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1,tp)
-	--disable effect
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_CHAIN_SOLVING)
-	e2:SetOperation(c511007001.disoperation)
-	e2:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e2,tp)
-	--disable trap monster
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
-	e3:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e3:SetTarget(c511007001.distarget)
-	e3:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e3,tp)
-end
-function c511007001.distarget(e,c)
-	return c~=e:GetHandler() and c:IsType(TYPE_SPELL+TYPE_TRAP) and
-		--prevents destruction
-		(c:IsHasEffect(EFFECT_INDESTRUCTABLE_BATTLE) or c:IsHasEffect(EFFECT_INDESTRUCTABLE_EFFECT) or c:IsHasEffect(EFFECT_INDESTRUCTABLE_COUNT) or c:IsHasEffect(EFFECT_DESTROY_REPLACE))
-end
-function c511007001.disoperation(e,tp,eg,ep,ev,re,r,rp)
-	local ec=Duel.GetAttacker()
-	local rc=re:GetHandler()
-	local targets=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	local res=true
-	--Checks if the effect to be negated makes the attacking monster leave the field; most cards don't do that if they negate attacks
-	local category={CATEGORY_DESTROY,CATEGORY_RELEASE,CATEGORY_REMOVE,CATEGORY_TODECK,CATEGORY_TOGRAVE,CATEGORY_TOHAND}
-	for i=0,5 do
-		local ex,tg,ct,p,v=Duel.GetOperationInfo(ev,category[i])
-		if ex then
-			if tg and tg:GetCount()>0 then
-				if tg:IsContains(ec) then res=false end
-			end
-		end
-	end
-	--Note: This cannot negate non-Targeting attack negation.
-	if re:IsActiveType(TYPE_SPELL+TYPE_TRAP) and (res or (rc:IsHasEffect(EFFECT_INDESTRUCTABLE_BATTLE) or rc:IsHasEffect(EFFECT_INDESTRUCTABLE_EFFECT) or rc:IsHasEffect(EFFECT_INDESTRUCTABLE_COUNT))) then
-		Duel.NegateEffect(ev)
+	if not c:IsRelateToEffect(e) then return end
+	local g=eg:Filter(c511007001.cfilter,nil,1-tp)
+	local tc=g:GetFirst()
+	while tc do
+		local e0=Effect.CreateEffect(c)
+		e0:SetType(EFFECT_TYPE_SINGLE)
+		e0:SetCode(EFFECT_DISABLE)
+		e0:SetReset(RESET_EVENT+0x1fe0000)
+		tc:RegisterEffect(e0)
+		local e1=e0:Clone()
+		e1:SetCode(EFFECT_CANNOT_ATTACK)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		tc:RegisterEffect(e1)
+		local e2=e0:Clone()
+		e2:SetCode(EFFECT_DISABLE_EFFECT)
+		tc:RegisterEffect(e2)
+		tc=g:GetNext()
 	end
 end

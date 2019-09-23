@@ -18,18 +18,18 @@ function c100000074.initial_effect(c)
 	e3:SetOperation(c100000074.atop)
 	c:RegisterEffect(e3)
 end
-function c100000074.spfilter(c,code)
-	return c:GetCode()==code
+function c100000074.spfilter(c,ft,tp)
+	return c:IsCode(48649353) and (ft>0 or (c:IsControler(tp) and c:GetSequence()<5)) and (c:IsControler(tp) or c:IsFaceup())
 end
 function c100000074.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-		and Duel.CheckReleaseGroup(tp,c100000074.spfilter,1,nil,48649353)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	return ft>-1 and Duel.CheckReleaseGroup(tp,c100000074.spfilter,1,nil,ft,tp)
 end
 function c100000074.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g1=Duel.SelectReleaseGroup(tp,c100000074.spfilter,1,1,nil,48649353)
-	Duel.Release(g1,REASON_COST)
+	local g=Duel.SelectReleaseGroup(tp,c100000074.spfilter,1,1,nil,Duel.GetLocationCount(tp,LOCATION_MZONE),tp)
+	Duel.Release(g,REASON_COST)
 end
 function c100000074.atop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ChainAttack()

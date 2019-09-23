@@ -1,27 +1,28 @@
+--シンクロ・プロミネンス
 --Synchro Prominence
-function c511001154.initial_effect(c)
+--fixed by Larry126
+local s,id=GetID()
+function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DAMAGE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,TIMING_DRAW_PHASE)
-	e1:SetTarget(c511001154.target)
-	e1:SetOperation(c511001154.activate)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
-function c511001154.filter(c)
+function s.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_SYNCHRO)
 end
-function c511001154.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c511001154.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
-	local dam=Duel.GetMatchingGroupCount(c511001154.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)*1000
-	Duel.SetTargetPlayer(1-tp)
-	Duel.SetTargetParam(dam)
-	if dam>0 then Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,dam) end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 end
-function c511001154.activate(e,tp,eg,ep,ev,re,r,rp)
-	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
-	local dam=Duel.GetMatchingGroupCount(c511001154.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)*1000
-	Duel.Damage(p,dam,REASON_EFFECT)
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
+	for p=0,1 do
+		if Duel.IsExistingMatchingCard(s.filter,p,LOCATION_MZONE,0,1,nil) and Duel.SelectYesNo(p,aux.Stringid(114932,0)) then
+			Duel.Damage(1-p,1000,REASON_EFFECT)
+		end
+	end
 end

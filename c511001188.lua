@@ -6,6 +6,7 @@ function c511001188.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCost(aux.RemainFieldCost)
 	e1:SetTarget(c511001188.target)
 	e1:SetOperation(c511001188.operation)
 	c:RegisterEffect(e1)
@@ -35,10 +36,9 @@ function c511001188.eqlimit(e,c)
 end
 function c511001188.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) or c:IsStatus(STATUS_LEAVE_CONFIRMED) then return end
 	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) then
-		if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)==0 then return end
-		c:CancelToGrave()
+	if tc and tc:IsRelateToEffect(e) and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then
 		Duel.Equip(tp,c,tc,true)
 		--Add Equip limit
 		local e1=Effect.CreateEffect(c)
@@ -71,6 +71,8 @@ function c511001188.operation(e,tp,eg,ep,ev,re,r,rp)
 		e5:SetRange(LOCATION_SZONE)
 		e5:SetReset(RESET_EVENT+0x1fe0000)
 		c:RegisterEffect(e5)
+	else
+		c:CancelToGrave(false)
 	end
 end
 function c511001188.operation2(e,tp,eg,ep,ev,re,r,rp)

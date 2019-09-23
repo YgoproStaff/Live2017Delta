@@ -24,7 +24,7 @@ function c511002997.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c511002997.filter1(c,e)
-	return c:IsCanBeFusionMaterial() and c:IsAbleToGrave() and not c:IsImmuneToEffect(e)
+	return c:IsType(TYPE_MONSTER) and c:IsCanBeFusionMaterial() and c:IsAbleToGrave() and not c:IsImmuneToEffect(e)
 end
 function c511002997.filter2(c,m)
 	return c:IsType(TYPE_FUSION) and c:CheckFusionMaterial(m) and not c:IsForbidden()
@@ -82,6 +82,7 @@ function c511002997.procop(e,tp,eg,ep,ev,re,r,rp)
 	c:SetTurnCounter(ct)
 	if ct==2 then
 		local code=e:GetLabel()
+		if aux.GetMustBeMaterialGroup(tp,nil,tp,c,nil,REASON_FUSION):GetCount()>0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local tc=Duel.SelectMatchingCard(tp,c511002997.procfilter,tp,LOCATION_EXTRA,0,1,1,nil,code,e,tp):GetFirst()
 		if not tc then return end

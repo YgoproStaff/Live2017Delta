@@ -2,7 +2,7 @@
 function c511002217.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetTarget(c511002217.target)
@@ -38,7 +38,7 @@ function c511002217.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return c511002217[tp]>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>=c511002217[tp] 
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,28062326,0,0x4011,800,500,1,RACE_PLANT,ATTRIBUTE_EARTH) end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,c511002217[tp],0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,c511002217[tp],0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,c511002217[tp],tp,0)
 end
 function c511002217.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
@@ -47,10 +47,10 @@ function c511002217.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)>=ft
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,28062326,0,0x4011,800,500,1,RACE_PLANT,ATTRIBUTE_EARTH) then
 		for i=1,ft do
-		local token=Duel.CreateToken(tp,28062326)
-		Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP)
-	end
-	Duel.SpecialSummonComplete()
+			local token=Duel.CreateToken(tp,28062326)
+			Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP)
+		end
+		Duel.SpecialSummonComplete()
 	end
 end
 function c511002217.clear(e,tp,eg,ep,ev,re,r,rp)

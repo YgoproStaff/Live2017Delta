@@ -34,7 +34,7 @@ function c140000083.initial_effect(c)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetTargetRange(0,LOCATION_MZONE)
 	e4:SetCondition(c140000083.atcon)
-	e4:SetValue(c140000083.atlimit)
+	e4:SetValue(aux.NOT(aux.TargetBoolFunction(Card.IsCode,140000085)))
 	c:RegisterEffect(e4)
 end
 function c140000083.efilter(e,te)
@@ -56,7 +56,4 @@ function c140000083.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c140000083.atcon(e)
 	return Duel.IsExistingMatchingCard(Card.IsCode,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil,140000085)
-end
-function c140000083.atlimit(e,c)
-	return c:GetCode()~=140000085
 end

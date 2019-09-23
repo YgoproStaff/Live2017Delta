@@ -1,6 +1,6 @@
 --見下した条約
 function c511001214.initial_effect(c)
-	--Activate
+	Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -11,7 +11,7 @@ end
 function c511001214.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp
 end
-function c511001214.operation(e,tp,eg,ep,ev,re,r,rp)
+--[[function c511001214.operation(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetLabel(1)
 	e1:SetReset(RESET_PHASE+PHASE_END)
@@ -119,4 +119,4 @@ end
 function c511001214.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,511001214)
 	Duel.Damage(tp,1000,REASON_EFFECT)
-end
+end]]

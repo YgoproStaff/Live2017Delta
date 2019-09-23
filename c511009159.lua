@@ -20,6 +20,7 @@ end
 function c511009159.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
 	if chk==0 then return true end
+	aux.RemainFieldCost(e,tp,eg,ep,ev,re,r,rp,1)
 end
 function c511009159.filter(c,tp,chkcost)
 	return c:IsFaceup() and (not chkcost or not Duel.IsExistingMatchingCard(c511009159.cfilter,tp,LOCATION_MZONE,0,1,c))
@@ -55,11 +56,10 @@ function c511009159.ftarget(e,c)
 end
 function c511009159.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsLocation(LOCATION_SZONE) then return end
+	if not c:IsLocation(LOCATION_SZONE) or not c:IsRelateToEffect(e) or c:IsStatus(STATUS_LEAVE_CONFIRMED) then return end
 	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
+	if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		Duel.Equip(tp,c,tc)
-		c:CancelToGrave()
 		--Atkup
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_EQUIP)
@@ -75,6 +75,8 @@ function c511009159.operation(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetValue(c511009159.eqlimit)
 		e2:SetReset(RESET_EVENT+0x1fe0000)
 		c:RegisterEffect(e2)
+	else
+		c:CancelToGrave(false)
 	end
 end
 function c511009159.eqlimit(e,c)

@@ -14,9 +14,9 @@ function c511002355.cfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c)
 end
 function c511002355.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c511002355.cfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,LOCATION_MZONE+LOCATION_GRAVE,2,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c511002355.cfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,2,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local cg=Duel.SelectMatchingCard(tp,c511002355.cfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,LOCATION_MZONE+LOCATION_GRAVE,2,2,nil)
+	local cg=Duel.SelectMatchingCard(tp,c511002355.cfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,2,2,nil)
 	Duel.Remove(cg,POS_FACEUP,REASON_COST)
 end
 function c511002355.activate(e,tp,eg,ep,ev,re,r,rp)

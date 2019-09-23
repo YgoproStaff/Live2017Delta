@@ -2,7 +2,7 @@
 --fixed by MLD
 function c511021003.initial_effect(c)
 	--synchro summon
-	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)
+	aux.AddSynchroProcedure(c,nil,1,1,aux.NonTuner(nil),1,99)
 	c:EnableReviveLimit()
 	--cannot be battle target
 	local e4=Effect.CreateEffect(c)
@@ -33,5 +33,5 @@ function c511021003.atlimit(e,c)
 	return c~=e:GetHandler() and c:IsFaceup()
 end
 function c511021003.valcon(e,re,r,rp)
-	return bit.band(r,REASON_BATTLE)~=0
+	return r&REASON_BATTLE~=0
 end

@@ -1,19 +1,11 @@
 --Booster Draft Duel (HIJACK)
 -- - Works with Single Duel
 
-local function getID()
-	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
-	str=string.sub(str,1,string.len(str)-4)
-	local scard=_G[str]
-	local s_id=tonumber(string.sub(str,2))
-	return scard,s_id
-end
-
-local scard,s_id=getID()
+local s,id=GetID()
 
 --before anything
-if not scard.rc_ovr then
-	scard.rc_ovr=true
+if not s.rc_ovr then
+	s.rc_ovr=true
 	local c_getrace=Card.GetRace
 	Card.GetRace=function(c)
 		if c:IsType(TYPE_MONSTER) then return 0xffffff end
@@ -36,16 +28,8 @@ if not scard.rc_ovr then
 	end
 end
 
-function scard.initial_effect(c)
-	if scard.regok then return end
-	scard.regok=true
-	--Pre-draw
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_PREDRAW)
-	e1:SetCountLimit(1)
-	e1:SetOperation(scard.op)
-	Duel.RegisterEffect(e1,0)
+function s.initial_effect(c)
+	aux.EnableExtraRules(c,s,s.op)
 end
 
 --define pack
@@ -96,53 +80,22 @@ local handnum={[0]=5;[1]=5}
 
 local skip_effects={}
 
-function scard.op(e,tp,eg,ep,ev,re,r,rp)
-	if packopen then e:Reset() return end
-	packopen=true
+function s.op(c)
 	Duel.DisableShuffleCheck()
 	--Hint
-	Duel.Hint(HINT_CARD,0,s_id)
-	for p=0,1 do
-		local c=Duel.CreateToken(p,s_id)
-		Duel.Remove(c,POS_FACEUP,REASON_RULE)
-		Duel.Hint(HINT_CODE,p,s_id)
-		--protection (steal Boss Duel xD)
-		local e10=Effect.CreateEffect(c)
-		e10:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-		e10:SetType(EFFECT_TYPE_SINGLE)
-		e10:SetCode(EFFECT_CANNOT_TO_GRAVE)
-		c:RegisterEffect(e10)
-		local e11=e10:Clone()
-		e11:SetCode(EFFECT_CANNOT_TO_HAND)
-		c:RegisterEffect(e11)
-		local e12=e10:Clone()
-		e12:SetCode(EFFECT_CANNOT_TO_DECK) 
-		c:RegisterEffect(e12)
-		local e13=e10:Clone()
-		e13:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-		c:RegisterEffect(e13)
-	end
+	Duel.Hint(HINT_CARD,0,id)
 	--note hand card
 	handnum[0]=5 --Duel.GetFieldGroupCount(0,LOCATION_HAND,0)
 	handnum[1]=5 --Duel.GetFieldGroupCount(1,LOCATION_HAND,0)
 	--SetLP
 	Duel.SetLP(0,8000)
 	Duel.SetLP(1,8000)
-	--FOR RANDOOM
-	local rseed=0
-	for i=1,6 do
-		local r={Duel.TossCoin(i%2,5)}
-		for n=1,5 do
-			rseed=bit.lshift(rseed,1)+r[n]
-		end
-	end
-	math.randomseed(rseed)
 	local fg=Duel.GetFieldGroup(0,0x43,0x43)
 	--remove all cards
 	Duel.SendtoDeck(fg,nil,-2,REASON_RULE)
 	--Open packs
 	--SKIP
-	local e1=Effect.CreateEffect(e:GetHandler())
+	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SKIP_DP)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_PLAYER_TARGET)
@@ -154,7 +107,6 @@ function scard.op(e,tp,eg,ep,ev,re,r,rp)
 	local e3=e1:Clone()
 	e3:SetCode(EFFECT_SKIP_BP)
 	Duel.RegisterEffect(e3,0)
-	e:Reset()
 	local e4=e1:Clone()
 	e3:SetCode(EFFECT_SKIP_M2)
 	Duel.RegisterEffect(e4,0)
@@ -174,23 +126,22 @@ function scard.op(e,tp,eg,ep,ev,re,r,rp)
 	table.insert(skip_effects,e5)
 	table.insert(skip_effects,e6)
 	table.insert(skip_effects,e7)
-	local e5=Effect.CreateEffect(e:GetHandler())
+	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e5:SetCode(EVENT_PHASE_START+PHASE_STANDBY)
 	e5:SetCountLimit(1)
-	e5:SetCondition(scard.nt_cd)
-	e5:SetOperation(scard.nt_op)
+	e5:SetCondition(s.nt_cd)
+	e5:SetOperation(s.nt_op)
 	Duel.RegisterEffect(e5,0)
-	e:Reset()
 end
 
 --Checks
 
-function scard.flag_chk(c)
-	return c:GetFlagEffect(s_id)==0
+function s.flag_chk(c)
+	return c:GetFlagEffect(id)==0
 end
 
-function scard.nt_cd(e,tp,eg,ep,ev,re,r,rp)
+function s.nt_cd(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnCount()>1
 end
 
@@ -202,11 +153,11 @@ local p2_exists=false
 local p3_exists=false
 local postprocess=false
 
-function scard.nt_op(e,tp,eg,ep,ev,re,r,rp)
+function s.nt_op(e,tp,eg,ep,ev,re,r,rp)
 	local tcount=Duel.GetTurnCount()
 	local tplayer=Duel.GetTurnPlayer()
 	if tcount<=4 then --determine 3rd/4th player
-		if Duel.IsExistingMatchingCard(scard.flag_chk,tplayer,0x43,0,1,nil) then
+		if Duel.IsExistingMatchingCard(s.flag_chk,tplayer,0x43,0,1,nil) then
 			local fg=Duel.GetFieldGroup(tplayer,0x43,0x43)
 			--remove all cards
 			Duel.SendtoDeck(fg,nil,-2,REASON_RULE)
@@ -235,7 +186,7 @@ function scard.nt_op(e,tp,eg,ep,ev,re,r,rp)
 			for p=1,3 do
 				for i=1,5 do
 					local cpack=pack[i]
-					local c=cpack[math.random(#cpack)]
+					local c=cpack[Duel.GetRandomNumber(#cpack)]
 					playerpack:AddCard(Duel.CreateToken(tplayer,c))
 				end
 			end

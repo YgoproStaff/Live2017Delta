@@ -1,4 +1,5 @@
---リトマスの死の剣士
+--リトマスの死の剣士 (VG)
+--Litmus Doom Swordsman (VG)
 function c100001010.initial_effect(c)
 	c:EnableReviveLimit()
 
@@ -30,6 +31,7 @@ function c100001010.initial_effect(c)
 	e4:SetCode(EFFECT_SET_BASE_DEFENSE)
 	c:RegisterEffect(e4)
 end
+c100001010.listed_names={8955148}
 function c100001010.efilter(e,te)
 	return te:IsActiveType(TYPE_TRAP)
 end

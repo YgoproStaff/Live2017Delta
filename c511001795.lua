@@ -12,18 +12,14 @@ function c511001795.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c511001795.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local lsc1=Duel.GetFieldCard(tp,LOCATION_SZONE,6)
-	local rsc1=Duel.GetFieldCard(tp,LOCATION_SZONE,7)
-	local lsc2=Duel.GetFieldCard(1-tp,LOCATION_SZONE,6)
-	local rsc2=Duel.GetFieldCard(1-tp,LOCATION_SZONE,7)
-	local g=Group.FromCards(lsc1,rsc1,lsc2,rsc2):Filter(Card.IsDestructable,nil)
+	local g=Duel.GetFieldGroup(tp,LOCATION_PZONE,LOCATION_PZONE):Filter(Card.IsDestructable,nil)
 	local ct=g:FilterCount(Card.IsControler,nil,1-tp)
 	local desct=Duel.GetTargetCount(c511001795.filter,tp,0,LOCATION_ONFIELD,e:GetHandler())
 	if chk==0 then return g:GetCount()>0 and desct-ct>0 end
 	Duel.Destroy(g,REASON_COST)
 end
 function c511001795.filter(c)
-	return c:IsDestructable() and c:IsType(TYPE_SPELL+TYPE_TRAP)
+	return c:IsType(TYPE_SPELL+TYPE_TRAP)
 end
 function c511001795.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and c511001795.filter(chkc) and chkc~=e:GetHandler() end

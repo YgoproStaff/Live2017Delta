@@ -35,6 +35,13 @@ function c511002079.initial_effect(c)
 	e5:SetCode(EFFECT_IMMUNE_EFFECT)
 	e5:SetValue(c511002079.unval)
 	c:RegisterEffect(e5)
+	--Double Snare
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCode(3682106)
+	c:RegisterEffect(e4)
 end
 function c511002079.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
@@ -87,12 +94,12 @@ function c511002079.regop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 	c:RegisterEffect(e1)
 end
-function c511002079.matfilter(c)
-	return c:IsSetCard(0xba) and c:IsType(TYPE_XYZ)
+function c511002079.matfilter(c,sc)
+	return c:IsSetCard(0xba) and c:IsType(TYPE_XYZ,sc,SUMMON_TYPE_XYZ)
 end
 function c511002079.valcheck(e,c)
 	local g=c:GetMaterial()
-	if g:IsExists(c511002079.matfilter,1,nil) then
+	if g:IsExists(c511002079.matfilter,1,nil,c) then
 		e:GetLabelObject():SetLabel(1)
 	else
 		e:GetLabelObject():SetLabel(0)

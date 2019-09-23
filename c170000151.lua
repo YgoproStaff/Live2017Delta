@@ -22,7 +22,7 @@ function c170000151.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c170000151.spfilter(c,e,tp)
 	local code=c.material_trap
-	if not code or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,true,false) then return false end
+	if not code or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,true,false) or not c:CheckFusionMaterial() then return false end
 	return Duel.IsExistingMatchingCard(c170000151.tgfilter,tp,LOCATION_ONFIELD,0,1,nil,code,c)
 end
 function c170000151.tgfilter(c,code,sc)

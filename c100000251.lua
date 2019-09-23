@@ -12,13 +12,15 @@ function c100000251.initial_effect(c)
 end
 function c100000251.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
-	if chk==0 then return true end
+	return true
 end
-function c100000251.cfilter(c,e,tp)
-	return Duel.IsExistingMatchingCard(c100000251.rmfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,c,e,tp)
+function c100000251.cfilter(c,e,tp,ft)
+	local ct=c:IsControler(tp) and c:GetSequence()<5 and 1 or 0
+	return Duel.IsExistingMatchingCard(c100000251.rmfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,c,e,tp,ft+ct)
 end
-function c100000251.rmfilter(c,e,tp)
-	if not c:IsSetCard(0x41) or not c:IsAbleToRemoveAsCost() or not aux.SpElimFilter(c,true) then return false end
+function c100000251.rmfilter(c,e,tp,ft)
+	local ct=c:IsLocation(LOCATION_MZONE) and c:GetSequence()<5 and 1 or 0
+	if not c:IsSetCard(0x41) or not c:IsAbleToRemoveAsCost() or not aux.SpElimFilter(c,true) or ct+ft<=0 then return false end
 	local code=c:GetCode()
 	local class=_G["c"..code]
 	return Duel.IsExistingMatchingCard(c100000251.spfilter,tp,LOCATION_DECK,0,1,nil,class,e,tp)
@@ -31,15 +33,18 @@ function c100000251.spfilter(c,class,e,tp)
 	return false
 end
 function c100000251.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if chk==0 then
 		if e:GetLabel()~=1 then return false end
 		e:SetLabel(0)
-		return Duel.CheckReleaseGroup(tp,c100000251.cfilter,1,nil,e,tp) and Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 end
-	local g1=Duel.SelectReleaseGroup(tp,c100000251.cfilter,1,1,nil,e,tp)
+		return ft>-2 and Duel.CheckReleaseGroupCost(tp,c100000251.cfilter,1,false,nil,nil,e,tp,ft)
+	end
+	local tc=Duel.SelectReleaseGroupCost(tp,c100000251.cfilter,1,1,false,nil,nil,e,tp,ft):GetFirst()
+	local ct=tc:IsControler(tp) and tc:GetSequence()<5 and 1 or 0
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g2=Duel.SelectMatchingCard(tp,c100000251.rmfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,1,nil,e,tp)
+	local g2=Duel.SelectMatchingCard(tp,c100000251.rmfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,1,tc,e,tp,ct+ft)
 	local code=g2:GetFirst():GetCode()
-	Duel.Release(g1,REASON_COST)
+	Duel.Release(tc,REASON_COST)
 	Duel.Remove(g2,POS_FACEUP,REASON_COST)
 	Duel.SetTargetParam(code)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)

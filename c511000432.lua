@@ -1,4 +1,5 @@
---Pumpkin Carriage
+--カボチャの馬車 (Anime)
+--Pumpkin Carriage (Anime)
 function c511000432.initial_effect(c)
 	--direct attack
 	local e1=Effect.CreateEffect(c)
@@ -9,6 +10,7 @@ function c511000432.initial_effect(c)
 	e1:SetTarget(c511000432.datg)
 	c:RegisterEffect(e1)
 end
+c511000432.listed_names={78527720}
 function c511000432.datg(e,c)
-	return c:IsCode(511000431)
+	return c:IsCode(78527720)
 end

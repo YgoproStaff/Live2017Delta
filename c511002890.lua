@@ -16,15 +16,16 @@ function c511002890.cfilter(c,tp)
 end
 function c511002890.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
-	if chk==0 then return true end
+	return true
 end
 function c511002890.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and chkc:IsFaceup() end
 	if chk==0 then
 		if e:GetLabel()~=1 then return false end
 		e:SetLabel(0)
-		return Duel.CheckReleaseGroup(tp,c511002890.cfilter,1,nil) end
-	local g=Duel.SelectReleaseGroup(tp,c511002890.cfilter,1,1,nil)
+		return Duel.CheckReleaseGroupCost(tp,c511002890.cfilter,1,false,nil,nil,tp)
+	end
+	local g=Duel.SelectReleaseGroupCost(tp,c511002890.cfilter,1,1,false,nil,nil,tp)
 	local atk=g:GetFirst():GetAttack()
 	Duel.Release(g,REASON_COST)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)

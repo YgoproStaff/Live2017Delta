@@ -18,8 +18,8 @@ function c511000105.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c511000105.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsRace,1,nil,RACE_PLANT) end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsRace,1,1,nil,RACE_PLANT)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,Card.IsRace,1,false,nil,nil,RACE_PLANT) end
+	local g=Duel.SelectReleaseGroupCost(tp,Card.IsRace,1,1,false,nil,nil,RACE_PLANT)
 	Duel.Release(g,REASON_COST)
 end
 function c511000105.damtg(e,tp,eg,ep,ev,re,r,rp,chk)

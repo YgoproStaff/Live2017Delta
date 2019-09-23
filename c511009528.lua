@@ -73,14 +73,14 @@ function c511009528.costfilter(c,tp,sg,tc)
 end
 function c511009528.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return eg:IsExists(c511009528.spfilter,1,nil,tp) and Duel.IsExistingMatchingCard(c511009528.cfilter,tp,LOCATION_MZONE,0,1,nil)
+	return c:CheckFusionMaterial() and eg:IsExists(c511009528.spfilter,1,nil,tp) and Duel.IsExistingMatchingCard(c511009528.cfilter,tp,LOCATION_MZONE,0,1,nil)
 		and Duel.CheckReleaseGroup(tp,c511009528.costfilter,1,nil,tp,Group.CreateGroup(),c) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,true)
 end
 function c511009528.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local sg=Group.CreateGroup()
 	if Duel.CheckReleaseGroup(tp,c511009528.costfilter,1,nil,tp,sg,c) and e:GetHandler():IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,true) 
-		and Duel.SelectYesNo(tp,aux.Stringid(4003,6)) then
+		and c:CheckFusionMaterial() and Duel.SelectYesNo(tp,aux.Stringid(4003,6)) then
 		while sg:GetCount()<2 do
 			local g=Duel.SelectReleaseGroup(tp,c511009528.costfilter,1,1,sg,tp,sg,c)
 			sg:Merge(g)

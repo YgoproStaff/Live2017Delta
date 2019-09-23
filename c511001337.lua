@@ -45,7 +45,7 @@ function c511001337.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c511001337.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		local atk=tc:GetAttack()
 		if Duel.Destroy(tc,REASON_EFFECT)>0 then
 			Duel.BreakEffect()
@@ -87,13 +87,12 @@ function c511001337.sumop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(c511001337.spfilter),tp,LOCATION_EXTRA+LOCATION_GRAVE,0,e:GetHandler(),e,tp)
 	local sg=aux.SelectUnselectGroup(g,e,tp,ct,ct,c511001337.rescon,1,tp,HINTMSG_SPSUMMON)
 	if sg:GetCount()<=0 then return end
-	local tc=sg:GetFirst()
-	while tc do
-		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
-		local og=mg:Select(tp,1,1,nil)
-		Duel.Overlay(tc,og)
-		mg:Sub(og)
-		tc=sg:GetNext()
-	end
-	Duel.SpecialSummonComplete()
+	aux.MainAndExtraSpSummonLoop(c511001337.ovop(mg),0,0,0,false,false)(e,tp,eg,ep,ev,re,r,rp,sg)
+end
+function c511001337.ovop(mg)
+	return	function(e,tp,eg,ep,ev,re,r,rp,tc)
+				local og=mg:Select(tp,1,1,nil)
+				Duel.Overlay(tc,og)
+				mg:Sub(og)
+			end
 end

@@ -1,4 +1,5 @@
---無限光アイン・ソフ・オウル
+--無限光アイン・ソフ・オウル (VG)
+--Infinite Light (VG)
 function c100000014.initial_effect(c)
 	--Activate to Grave
 	local e1=Effect.CreateEffect(c)
@@ -54,8 +55,9 @@ function c100000014.initial_effect(c)
 	e5:SetTargetRange(LOCATION_MZONE,0)
 	c:RegisterEffect(e5)
 end
+c100000014.listed_names={36894320}
 function c100000014.cfilter(c)
-	return c:IsFaceup() and c:IsCode(100000013) and c:IsAbleToGraveAsCost()
+	return c:IsFaceup() and c:IsCode(36894320) and c:IsAbleToGraveAsCost()
 end
 function c100000014.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c100000014.cfilter,tp,LOCATION_ONFIELD,0,1,nil) end

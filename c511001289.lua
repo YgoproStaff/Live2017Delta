@@ -14,9 +14,9 @@ function c511001289.initial_effect(c)
 end
 c511001289.material_setcode=0xdf
 function c511001289.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,e:GetHandler(),0xdf)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,Card.IsSetCard,1,false,nil,e:GetHandler(),0xdf) 
 		and e:GetHandler():GetFlagEffect(511001289)==0 end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,e:GetHandler(),0xdf)
+	local g=Duel.SelectReleaseGroupCost(tp,Card.IsSetCard,1,1,false,nil,e:GetHandler(),0xdf)
 	Duel.Release(g,REASON_COST)
 end
 function c511001289.operation(e,tp,eg,ep,ev,re,r,rp)

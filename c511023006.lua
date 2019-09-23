@@ -1,4 +1,5 @@
---E・HERO マグマ・ネオス
+--E・HERO マグマ・ネオス (Anime)
+--Elemental HERO Magma Neos (Anime)
 --cleaned up by MLD
 function c511023006.initial_effect(c)
 	--fusion material
@@ -30,7 +31,8 @@ function c511023006.initial_effect(c)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetValue(c511023006.atkval)
 	c:RegisterEffect(e5)
-	end
+end
+c511023006.listed_names={89943723,89621922,80344569,24094653}
 c511023006.material_setcode=0x8
 function c511023006.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA)

@@ -1,5 +1,7 @@
 --天岩戸
-function c32181268.initial_effect(c)
+--Amano-Iwato
+local s,id=GetID()
+function s.initial_effect(c)
 	--spirit return
 	aux.EnableSpiritReturn(c,EVENT_SUMMON_SUCCESS,EVENT_FLIP)
 	--cannot special summon
@@ -16,9 +18,9 @@ function c32181268.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetTargetRange(1,1)
-	e2:SetValue(c32181268.aclimit)
+	e2:SetValue(s.aclimit)
 	c:RegisterEffect(e2)
 end
-function c32181268.aclimit(e,re,tp)
-	return not re:GetHandler():IsType(TYPE_SPIRIT) and re:IsActiveType(TYPE_MONSTER) and not re:GetHandler():IsImmuneToEffect(e)
+function s.aclimit(e,re,tp)
+	return not re:GetHandler():IsType(TYPE_SPIRIT) and re:IsActiveType(TYPE_MONSTER)
 end

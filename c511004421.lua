@@ -11,13 +11,14 @@ function c511004421.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c511004421.filter(c,e,tp)
-	return c:IsSetCard(0xe5) and c:IsCanBeEffectTarget(e) and (rk>0 or c:IsStatus(STATUS_NO_LEVEL)) 
-		and Duel.IsExistingMatchingCard(c511004421.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,c:GetRank()+1)
+	local pg=aux.GetMustBeMaterialGroup(tp,Group.FromCards(c),tp,nil,nil,REASON_XYZ)
+	return pg:GetCount()<=1 and c:IsSetCard(0xe5) and c:IsCanBeEffectTarget(e) and (c:GetRank()>0 or c:IsStatus(STATUS_NO_LEVEL)) 
+		and Duel.IsExistingMatchingCard(c511004421.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,c:GetRank()+1,pg)
 end
-function c511004421.spfilter(c,e,tp,mc,rk)
+function c511004421.spfilter(c,e,tp,mc,rk,pg)
 	if c.rum_limit and not c.rum_limit(mc,e) then return false end
 	return c:IsType(TYPE_XYZ) and mc:IsType(TYPE_XYZ,c,SUMMON_TYPE_XYZ,tp) and c:IsSetCard(0xe5) and c:IsRank(rk) and mc:IsCanBeXyzMaterial(c,tp) 
-		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
+		and (pg:GetCount()<=0 or pg:IsContains(mc)) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function c511004421.target(e,tp,eg,ev,ep,re,r,rp,chk,chkc)
 	local a=Duel.GetAttacker()
@@ -45,8 +46,8 @@ function c511004421.operation(e,tp,eg,ev,ep,re,r,rp)
 	local c=e:GetHandler()
 	local fid=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
 	local tc=Duel.GetFirstTarget()
-	if not tc or tc:IsFacedown() or not tc:IsRelateToEffect(e) or tc:IsControler(1-tp) or tc:IsImmuneToEffect(e) then return end
-	if Duel.GetLocationCountFromEx(tp,tp,tc)<=0 then return end
+	if not tc or tc:IsFacedown() or not tc:IsRelateToEffect(e) or tc:IsControler(1-tp) or tc:IsImmuneToEffect(e) 
+		or Duel.GetLocationCountFromEx(tp,tp,tc)<=0 then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
@@ -83,8 +84,9 @@ end
 function c511004421.sumop(e,tp,eg,ev,ep,re,r,rp)
 	local tc=e:GetLabelObject()
 	Duel.SkipPhase(Duel.GetTurnPlayer(),PHASE_BATTLE,RESET_PHASE+PHASE_BATTLE,1)
+	local pg=aux.GetMustBeMaterialGroup(tp,Group.FromCards(tc),tp,nil,nil,REASON_XYZ)
 	Duel.BreakEffect()
-	local sg=Duel.SelectMatchingCard(tp,c511004421.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc,tc:GetRank()+1)
+	local sg=Duel.SelectMatchingCard(tp,c511004421.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc,tc:GetRank()+1,pg)
 	local sc=sg:GetFirst()
 	if sc then
 		local mg=tc:GetOverlayGroup()

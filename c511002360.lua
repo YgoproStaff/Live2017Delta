@@ -30,7 +30,7 @@ function c511002360.rescon(sg,e,tp,mg)
 	return Duel.IsExistingMatchingCard(c511002360.filter,tp,LOCATION_EXTRA+LOCATION_GRAVE,0,1,sg,e,tp,sg)
 end
 function c511002360.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local chkcost=e:GetLabel()==1 and true or false
+	local chkcost=e:GetLabel()==1
 	local cg=Duel.GetMatchingGroup(c511002360.cfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,nil)
 	if chk==0 then
 		if chkcost then
@@ -42,7 +42,7 @@ function c511002360.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	if chkcost then
 		local rg=aux.SelectUnselectGroup(cg,e,tp,2,2,c511002360.rescon,1,tp,HINTMSG_REMOVE)
-		Duel.Remove(g,POS_FACEUP,REASON_COST)
+		Duel.Remove(rg,POS_FACEUP,REASON_COST)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA+LOCATION_GRAVE)
 end

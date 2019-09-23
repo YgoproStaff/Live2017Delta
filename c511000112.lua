@@ -37,8 +37,8 @@ function c511000112.filter(c,e,tp,mc,code)
 	return false
 end
 function c511000112.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c511000112.cfilter,1,nil,e,tp) end
-	local g=Duel.SelectReleaseGroup(tp,c511000112.cfilter,1,1,nil,e,tp)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,c511000112.cfilter,1,false,nil,nil,e,tp) end
+	local g=Duel.SelectReleaseGroupCost(tp,c511000112.cfilter,1,1,false,nil,nil,e,tp)
 	local code=g:GetFirst():GetCode()
 	if g:GetFirst():IsCode(511000110) and g:GetFirst():IsCode(511000111) then
 		code=0

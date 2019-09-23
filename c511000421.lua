@@ -1,4 +1,5 @@
---Goddess Urd's Verdict
+--女神ウルドの裁断 (Anime)
+--Goddess Urd's Verdict (Anime)
 function c511000421.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -6,7 +7,7 @@ function c511000421.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(511000421,0))
+	e2:SetDescription(aux.Stringid(100243010,0))
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetCountLimit(1)
 	e2:SetRange(LOCATION_SZONE)

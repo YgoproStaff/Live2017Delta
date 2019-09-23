@@ -8,6 +8,7 @@ function c511007022.initial_effect(c)
 	e1:SetCode(EFFECT_DISABLE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(LOCATION_SZONE,LOCATION_SZONE)
+	e1:SetCondition(c511007022.discon)
 	e1:SetTarget(c511007022.distg)
 	c:RegisterEffect(e1)
 	--disable effect
@@ -15,6 +16,7 @@ function c511007022.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_CHAIN_SOLVING)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCondition(c511007022.discon)
 	e2:SetOperation(c511007022.disop)
 	c:RegisterEffect(e2)
 	--draw
@@ -28,22 +30,30 @@ function c511007022.initial_effect(c)
 	e3:SetTarget(c511007022.target)
 	e3:SetOperation(c511007022.operation)
 	c:RegisterEffect(e3)
+	--Double Snare
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCondition(c511007022.discon)
+	e4:SetCode(3682106)
+	c:RegisterEffect(e4)
+end
+function c511007022.discon(e)
+	return e:GetHandler():IsAttackPos()
 end
 function c511007022.disfilter(c,tp,n)
 	if n~=0 and not c:IsLocation(LOCATION_MZONE) then return false end
 	return c:IsControler(tp) and c:IsFaceup() and c:IsRace(RACE_MACHINE)
 end
 function c511007022.distg(e,c)
-	if not e:GetHandler():IsAttackPos() then return false end
 	local tc=c:GetCardTarget()
 	return tc:IsExists(c511007022.disfilter,1,nil,e:GetHandlerPlayer(),0)
 end
 function c511007022.disop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsAttackPos() or re:IsActiveType(TYPE_MONSTER) then return end
-	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return end
+	if re:IsActiveType(TYPE_MONSTER) or not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	if not g then return end
-	if g:IsExists(c511007022.disfilter,1,nil,tp,1) and Duel.SelectEffectYesNo(tp,e:GetHandler()) then
+	if g and g:IsExists(c511007022.disfilter,1,nil,tp,1) and Duel.SelectEffectYesNo(tp,e:GetHandler()) then
 		Duel.NegateEffect(ev)
 	end
 end

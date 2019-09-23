@@ -1,4 +1,5 @@
---ヘル・テンペスト
+--ヘル・テンペスト (Anime)
+--Inferno Tempest (Anime)
 function c511002523.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -11,7 +12,7 @@ function c511002523.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c511002523.condition(e,tp,eg,ep,ev,re,r,rp)
-	return ep==tp and ev>=4000
+	return ep==tp and Duel.GetBattleDamage(tp)>=3000
 end
 function c511002523.filter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsAbleToRemove() and (c:IsLocation(LOCATION_DECK) or aux.SpElimFilter(c))

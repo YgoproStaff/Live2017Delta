@@ -1,5 +1,7 @@
 --古代の機械混沌巨人
-function c51788412.initial_effect(c)
+--Chaos Ancient Gear Giant
+local s,id=GetID()
+function s.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
 	aux.AddFusionProcMixN(c,true,true,aux.FilterBoolFunction(Card.IsFusionSetCard,0x7),4)
@@ -16,7 +18,7 @@ function c51788412.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetCode(EFFECT_IMMUNE_EFFECT)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetValue(c51788412.efilter)
+	e2:SetValue(s.efilter)
 	c:RegisterEffect(e2)
 	--activate limit
 	local e3=Effect.CreateEffect(c)
@@ -25,8 +27,8 @@ function c51788412.initial_effect(c)
 	e3:SetCode(EFFECT_CANNOT_ACTIVATE)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetTargetRange(0,1)
-	e3:SetCondition(c51788412.actcon)
-	e3:SetValue(c51788412.actlimit)
+	e3:SetCondition(s.actcon)
+	e3:SetValue(s.actlimit)
 	c:RegisterEffect(e3)
 	--attack all
 	local e4=Effect.CreateEffect(c)
@@ -40,14 +42,14 @@ function c51788412.initial_effect(c)
 	e5:SetCode(EFFECT_PIERCE)
 	c:RegisterEffect(e5)
 end
-c51788412.material_setcode=0x7
-function c51788412.efilter(e,te)
+s.material_setcode=0x7
+function s.efilter(e,te)
 	return te:IsActiveType(TYPE_SPELL+TYPE_TRAP)
 end
-function c51788412.actcon(e)
+function s.actcon(e)
 	local ph=Duel.GetCurrentPhase()
 	return ph>=PHASE_BATTLE_START and ph<=PHASE_BATTLE
 end
-function c51788412.actlimit(e,re,tp)
-	return re:IsActiveType(TYPE_MONSTER) and not re:GetHandler():IsImmuneToEffect(e)
+function s.actlimit(e,re,tp)
+	return re:IsActiveType(TYPE_MONSTER)
 end

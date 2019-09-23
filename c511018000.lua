@@ -1,4 +1,5 @@
 --Winged Kuriboh LV9 (Manga)
+--fixed by MLD
 function c511018000.initial_effect(c)
 	--cannot be special summoned
 	local e1=Effect.CreateEffect(c)
@@ -25,6 +26,7 @@ function c511018000.initial_effect(c)
 	e4:SetCode(EVENT_PHASE+PHASE_END)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCountLimit(1)
+	e4:SetCondition(c511018000.descon)
 	e4:SetTarget(c511018000.destg)
 	e4:SetOperation(c511018000.desop)
 	c:RegisterEffect(e4)
@@ -35,19 +37,16 @@ end
 function c511018000.filter(c)
 	return c:GetReasonEffect() and c:GetReasonEffect():GetOwner():IsCode(100000246)
 end
-function c511018000.vatk(e)
-	local c=e:GetHandler()
-	local tp=c:GetControler()
-	local rg=Duel.GetMatchingGroup(c511018000.filter,tp,LOCATION_REMOVED,LOCATION_REMOVED,nil)
-	local val=rg:GetSum(Card.GetAttack)
-	return val
+function c511018000.vatk(e,c)
+	local rg=Duel.GetMatchingGroup(c511018000.filter,0,LOCATION_REMOVED,LOCATION_REMOVED,nil)
+	return rg:GetSum(Card.GetAttack)
 end
-function c511018000.vdef(e)
-	local c=e:GetHandler()
-	local tp=c:GetControler()
-	local rg=Duel.GetMatchingGroup(c511018000.filter,tp,LOCATION_REMOVED,LOCATION_REMOVED,nil)
-	local val=rg:GetSum(Card.GetDefense)
-	return val
+function c511018000.vdef(e,c)
+	local rg=Duel.GetMatchingGroup(c511018000.filter,0,LOCATION_REMOVED,LOCATION_REMOVED,nil)
+	return rg:GetSum(Card.GetDefense)
+end
+function c511018000.descon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsStatus(STATUS_SUMMON_TURN+STATUS_FLIP_SUMMON_TURN+STATUS_SPSUMMON_TURN)
 end
 function c511018000.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -58,4 +57,3 @@ function c511018000.desop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 	end
 end
---100000246 alchemy

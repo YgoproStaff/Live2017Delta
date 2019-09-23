@@ -18,15 +18,18 @@ end
 function c511000935.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_SYNCHRO)
 end
+function c511000935.filter2(c)
+	return c:IsFaceup() and c:IsType(TYPE_MONSTER)
+end
 function c511000935.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c511000935 .filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) end
 	if chk==0 then return Duel.IsExistingTarget(c511000935.filter,tp,LOCATION_MZONE,0,1,nil) 
-	and Duel.IsExistingTarget(c511000935.filter,tp,0,LOCATION_MZONE,1,nil) end
+	and Duel.IsExistingTarget(c511000935.filter2,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local g1=Duel.SelectTarget(tp,c511000935.filter,tp,LOCATION_MZONE,0,1,1,nil)
 	e:SetLabelObject(g1:GetFirst())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local g2=Duel.SelectTarget(tp,c511000935.filter,tp,0,LOCATION_MZONE,1,1,nil)
+	local g2=Duel.SelectTarget(tp,c511000935.filter2,tp,0,LOCATION_MZONE,1,1,nil)
 end
 function c511000935.activate(e,tp,eg,ep,ev,re,r,rp)
 	local hc=e:GetLabelObject()

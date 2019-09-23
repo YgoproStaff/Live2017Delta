@@ -81,39 +81,41 @@ end
 function c511002034.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if not tc or not tc:IsRelateToEffect(e) then return end
+	if not tc or not tc:IsRelateToEffect(e) or tc:IsDisabled() then return end
 	Duel.NegateRelatedChain(tc,RESET_TURN_SET)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetCode(EFFECT_DISABLE)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
+	tc:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetCode(EFFECT_DISABLE_EFFECT)
 	e2:SetValue(RESET_TURN_SET)
 	e2:SetReset(RESET_EVENT+0x1fe0000)
-	local e3=nil
+	tc:RegisterEffect(e2)
+	local e3
 	if tc:IsType(TYPE_TRAPMONSTER) then
 		e3=Effect.CreateEffect(c)
 		e3:SetType(EFFECT_TYPE_SINGLE)
 		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
 		e3:SetReset(RESET_EVENT+0x1fe0000)
+		tc:RegisterEffect(e3)
 	end
 	local i=tc:GetFlagEffectLabel(51102034)
 	local te=Duel.GetChainInfo(i,CHAININFO_TRIGGERING_EFFECT)
-	if tc:RegisterEffect(e1) and tc:RegisterEffect(e2) and (e3==nil or tc:RegisterEffect(e3)) and tc:IsRelateToEffect(te) and Duel.Destroy(tc,REASON_EFFECT)>0 then
-		if c:IsRelateToEffect(e) and c:IsFaceup() then
-			local atk=tc:GetTextAttack()
-			if atk<=0 then return end
-			local e1=Effect.CreateEffect(c)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_UPDATE_ATTACK)
-			e1:SetValue(atk)
-			e1:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_END)
-			c:RegisterEffect(e1)
-		end
+	if not tc:IsImmuneToEffect(e1) and not tc:IsImmuneToEffect(e2) and (not e3 or not tc:IsImmuneToEffect(e3)) and tc:IsRelateToEffect(te) 
+		and Duel.Destroy(tc,REASON_EFFECT)>0 and c:IsRelateToEffect(e) and c:IsFaceup() then
+		local atk=tc:GetTextAttack()
+		if atk<=0 then return end
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_UPDATE_ATTACK)
+		e1:SetValue(atk)
+		e1:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_END)
+		c:RegisterEffect(e1)
 	end
 end

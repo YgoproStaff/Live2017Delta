@@ -15,7 +15,6 @@ function c511018004.target(e,tp,eg,ev,ep,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(c511018004.filter,tp,LOCATION_MZONE,0,1,nil) end
 	local tc=Duel.SelectMatchingCard(tp,c511018004.filter,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.SetTargetCard(tc)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,0,Duel.GetLocationCount(tp,LOCATION_MZONE),0,0)
 end
 function c511018004.operation(e,tp,eg,ev,ep,re,r,rp)
 	local tc=Duel.GetFirstTarget()
@@ -25,7 +24,7 @@ function c511018004.operation(e,tp,eg,ev,ep,re,r,rp)
 	local g=Group.CreateGroup()
 	g:KeepAlive()
 	for i=1,ft do
-		local tk=Duel.CreateToken(tp,511018005)
+		local tk=Duel.CreateToken(tp,511002428)
 		if Duel.MoveToField(tk,tp,tp,LOCATION_MZONE,POS_FACEUP,true) then
 			g:AddCard(tk)
 		end
@@ -35,9 +34,9 @@ function c511018004.operation(e,tp,eg,ev,ep,re,r,rp)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_CANNOT_ATTACK)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e1)
-		tc:RegisterFlagEffect(511018004,RESET_EVENT+0x1fe0000,0,1)
+		tc:RegisterFlagEffect(511018004,RESET_EVENT+RESETS_STANDARD,0,1)
 		tc=g:GetNext()
 	end
 	local e1=Effect.CreateEffect(e:GetHandler())

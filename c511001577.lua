@@ -11,8 +11,8 @@ function c511001577.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c511001577.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,nil,0x48) end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,nil,0x48)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,Card.IsSetCard,1,false,nil,nil,0x48) end
+	local g=Duel.SelectReleaseGroupCost(tp,Card.IsSetCard,1,1,false,nil,nil,0x48)
 	Duel.Release(g,REASON_COST)
 end
 function c511001577.filter(c,tp,eg,ep,ev,re,r,rp)
@@ -48,14 +48,21 @@ function c511001577.operation(e,tp,eg,ep,ev,re,r,rp)
 			Duel.ClearTargetCard()
 			e:SetCategory(te:GetCategory())
 			e:SetProperty(te:GetProperty())
-			if bit.band(tpe,TYPE_FIELD)~=0 then
-				local of=Duel.GetFieldCard(tp,LOCATION_SZONE,5)
-				if of and Duel.Destroy(of,REASON_RULE)==0 then Duel.SendtoGrave(tc,REASON_RULE) end
+			if tpe&TYPE_FIELD~=0 then
+				local fc=Duel.GetFieldCard(1-tp,LOCATION_SZONE,5)
+				if Duel.IsDuelType(DUEL_OBSOLETE_RULING) then
+					if fc then Duel.Destroy(fc,REASON_RULE) end
+					fc=Duel.GetFieldCard(tp,LOCATION_SZONE,5)
+					if fc and Duel.Destroy(fc,REASON_RULE)==0 then Duel.SendtoGrave(tc,REASON_RULE) end
+				else
+					fc=Duel.GetFieldCard(tp,LOCATION_SZONE,5)
+					if fc and Duel.SendtoGrave(fc,REASON_RULE)==0 then Duel.SendtoGrave(tc,REASON_RULE) end
+				end
 			end
 			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 			Duel.Hint(HINT_CARD,0,tc:GetCode())
 			tc:CreateEffectRelation(te)
-			if bit.band(tpe,TYPE_EQUIP+TYPE_CONTINUOUS+TYPE_FIELD)==0 then
+			if tpe&TYPE_EQUIP+TYPE_CONTINUOUS+TYPE_FIELD==0 then
 				tc:CancelToGrave(false)
 			end
 			if co then co(te,tp,eg,ep,ev,re,r,rp,1) end

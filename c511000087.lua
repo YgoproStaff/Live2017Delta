@@ -39,9 +39,9 @@ end
 function c511000087.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local ct=c:GetCounter(0x1105)
-	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() and Duel.CheckReleaseGroup(tp,nil,1,nil) 
-	and Duel.GetLocationCount(tp,LOCATION_MZONE)>=ct and Duel.IsExistingMatchingCard(c511000087.spfilter,tp,LOCATION_HAND,0,ct,nil,e,tp) end
-	local g=Duel.SelectReleaseGroup(tp,aux.TRUE,1,1,nil)
+	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() and Duel.CheckReleaseGroupCost(tp,nil,1,false,nil,nil) 
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>=ct and Duel.IsExistingMatchingCard(c511000087.spfilter,tp,LOCATION_HAND,0,ct,nil,e,tp) end
+	local g=Duel.SelectReleaseGroupCost(tp,nil,1,1,false,nil,nil)
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
 	Duel.Release(g,REASON_COST)
 	e:SetLabel(ct)

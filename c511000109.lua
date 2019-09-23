@@ -1,6 +1,6 @@
 --Z－メタル·キャタピラー
 function c511000109.initial_effect(c)
-	aux.AddUnionProcedure(c,aux.FilterBoolFunction(Card.IsCode,511000107),true)
+	aux.AddUnionProcedure(c,aux.FilterBoolFunction(Card.IsCode,511000107),true,false)
 	--Atk up
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_EQUIP)
@@ -13,3 +13,4 @@ function c511000109.initial_effect(c)
 	e2:SetCode(EFFECT_UPDATE_DEFENSE)
 	c:RegisterEffect(e2)
 end
+c511000109.listed_names={511000107}

@@ -32,6 +32,6 @@ function c511000747.op(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,c511000747.filter,tp,LOCATION_MZONE,0,1,1,nil)
 	if g:GetCount()>0 then
 		local tc=g:GetFirst()
-		Duel.Damage(1-tp,tc:GetLevel()*300,REASON_EFFECT)
+		Duel.Damage(1-tp,tc:GetLevel()*100,REASON_EFFECT)
 	end
 end

@@ -26,17 +26,18 @@ function c511000461.condition(e)
 	end
 	return false
 end
-function c511000461.filter(c,e,tp)
+function c511000461.filter(c,e,tp,ft)
 	local g=Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_HAND,0,c,TYPE_MONSTER)
 	local tg=g:GetMaxGroup(Card.GetAttack)
-	return c:IsAbleToHand() and tg and tg:IsExists(Card.IsCanBeSpecialSummoned,1,nil,e,0,tp,false,false,c:GetPosition(),tp)
+	return c:IsAbleToHand() and (ft>0 or c:GetSequence()<5) and tg 
+		and tg:IsExists(Card.IsCanBeSpecialSummoned,1,nil,e,0,tp,false,false,c:GetPosition(),tp)
 end
 function c511000461.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c511000461.filter(chkc,e,tp) end
-	if chk==0 then return Duel.IsExistingTarget(c511000461.filter,tp,LOCATION_MZONE,0,1,nil,e,tp) 
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 end
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c511000461.filter(chkc,e,tp,ft) end
+	if chk==0 then return ft>-1 and Duel.IsExistingTarget(c511000461.filter,tp,LOCATION_MZONE,0,1,nil,e,tp,ft) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectTarget(tp,c511000461.filter,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
+	local g=Duel.SelectTarget(tp,c511000461.filter,tp,LOCATION_MZONE,0,1,1,nil,e,tp,ft)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
 end
 function c511000461.activate(e,tp,eg,ep,ev,re,r,rp)

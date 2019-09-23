@@ -26,19 +26,9 @@ function c511002749.initial_effect(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e4:SetValue(c511002749.indes)
+	e4:SetValue(aux.NOT(aux.TargetBoolFunction(Card.IsSetCard,0x48)))
 	c:RegisterEffect(e4)
-	if not c511002749.global_check then
-		c511002749.global_check=true
-		--register
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_ADJUST)
-		ge2:SetCountLimit(1)
-		ge2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
-		ge2:SetOperation(c511002749.numchk)
-		Duel.RegisterEffect(ge2,0)
-	end
+	aux.CallToken(76067258)
 end
 c511002749.xyz_number=66
 function c511002749.cost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -59,7 +49,7 @@ function c511002749.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
-		tc:RegisterFlagEffect(76067258,RESET_EVENT+0x1fe0000,0,0)
+		tc:RegisterFlagEffect(76067258,RESET_EVENT+RESETS_STANDARD,0,0)
 		if c:IsFaceup() and c:IsRelateToEffect(e) then
 			c:SetCardTarget(tc)
 			--indes
@@ -68,7 +58,7 @@ function c511002749.operation(e,tp,eg,ep,ev,re,r,rp)
 			e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 			e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 			e2:SetValue(1)
-			e2:SetReset(RESET_EVENT+0x1fe0000)
+			e2:SetReset(RESET_EVENT+RESETS_STANDARD)
 			tc:RegisterEffect(e2)
 		end
 	end
@@ -84,11 +74,4 @@ function c511002749.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.SendtoGrave(g,REASON_EFFECT)
 		return true
 	else return false end
-end
-function c511002749.numchk(e,tp,eg,ep,ev,re,r,rp)
-	Duel.CreateToken(tp,76067258)
-	Duel.CreateToken(1-tp,76067258)
-end
-function c511002749.indes(e,c)
-	return not c:IsSetCard(0x48)
 end

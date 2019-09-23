@@ -31,7 +31,7 @@ function c511600038.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local chkcost=e:GetLabel()==1 and true or false
 	if chk==0 then
 		if chkcost then
-			return Duel.CheckReleaseGroup(tp,nil,2,nil) and Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 
+			return Duel.CheckReleaseGroupCost(tp,nil,2,false,nil,nil) and Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 
 				and Duel.IsExistingMatchingCard(c511600038.filter,tp,LOCATION_HAND,0,1,nil,e,tp)
 		else
 			e:SetLabel(0)
@@ -40,7 +40,7 @@ function c511600038.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	e:SetLabel(0)
 	if chkcost then
-		local g=Duel.SelectReleaseGroup(tp,nil,2,2,nil)
+		local g=Duel.SelectReleaseGroup(tp,nil,2,2,false,nil,nil)
 		Duel.Release(g,REASON_COST)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)

@@ -22,7 +22,7 @@ function c511001675.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_DICE,nil,0,tp,1)
 end
 function c511001675.spfilter(c,lv,e,tp)
-	return c:GetLevel()==lv and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsLevel(lv) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c511001675.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
@@ -35,13 +35,13 @@ function c511001675.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(dice)
 		tc:RegisterEffect(e1)
 		local g=Duel.GetMatchingGroup(c511001675.spfilter,tp,LOCATION_HAND,0,nil,tc:GetLevel(),e,tp)
-		if tc:IsReleasableByEffect() and Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 and g:GetCount()>0 
+		if tc:IsReleasableByEffect() and (Duel.GetLocationCount(tp,LOCATION_MZONE)>0 or c:GetSequence()<5) and g:GetCount()>0 
 			and Duel.SelectYesNo(tp,aux.Stringid(102380,0)) then
 			Duel.Release(tc,REASON_EFFECT)
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 			local sg=g:Select(tp,1,1,nil)
 			Duel.BreakEffect()
-			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+			Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 		end
 	end
 end

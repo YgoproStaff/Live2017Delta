@@ -36,18 +36,16 @@ function c511000183.initial_effect(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e4:SetValue(c511000183.indes)
+	e4:SetValue(aux.NOT(aux.TargetBoolFunction(Card.IsSetCard,0x48)))
 	c:RegisterEffect(e4)
-	if not c511000183.global_check then
-		c511000183.global_check=true
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_ADJUST)
-		ge2:SetCountLimit(1)
-		ge2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
-		ge2:SetOperation(c511000183.numchk)
-		Duel.RegisterEffect(ge2,0)
-	end
+	--Double Snare
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetCode(3682106)
+	c:RegisterEffect(e5)
+	aux.CallToken(66547759)
 end
 c511000183.xyz_number=23
 function c511000183.condition(e,tp,eg,ep,ev,re,r,rp)
@@ -83,11 +81,4 @@ function c511000183.negtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c511000183.negop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateEffect(ev)
-end
-function c511000183.numchk(e,tp,eg,ep,ev,re,r,rp)
-	Duel.CreateToken(tp,66547759)
-	Duel.CreateToken(1-tp,66547759)
-end
-function c511000183.indes(e,c)
-	return not c:IsSetCard(0x48)
 end

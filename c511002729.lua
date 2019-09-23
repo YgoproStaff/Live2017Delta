@@ -29,22 +29,20 @@ function c511002729.initial_effect(c)
 	e3:SetOperation(c511002729.lpop)
 	c:RegisterEffect(e3)
 end
+function c511002729.rescon(sg,e,tp,mg)
+	return aux.ChkfMMZ(1)(sg,e,tp,mg) and sg:IsExists(Card.IsSetCard,1,nil,0xc008)
+end
 function c511002729.spcon(e,c)
 	if c==nil then return true end
-	local g=Duel.GetReleaseGroup(c:GetControler())
-	local d=g:FilterCount(Card.IsSetCard,nil,0xc008)
-	local ct=g:GetCount()
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-3 and d>0 and ct>2
+	local tp=c:GetControler()
+	local rg=Duel.GetReleaseGroup(tp)
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-3 and rg:GetCount()>2 and rg:IsExists(Card.IsSetCard,1,nil,0xc008) 
+		and aux.SelectUnselectGroup(rg,e,tp,3,3,c511002729.rescon,0)
 end
 function c511002729.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetReleaseGroup(c:GetControler())
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg1=g:FilterSelect(tp,Card.IsSetCard,1,1,nil,0xc008)
-	g:RemoveCard(sg1:GetFirst())
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg2=g:Select(tp,2,2,nil)
-	sg2:Merge(sg1)
-	Duel.Release(sg2,REASON_COST)
+	local g=Duel.GetReleaseGroup(tp)
+	local sg=aux.SelectUnselectGroup(g,e,tp,3,3,c511002729.rescon,1,tp,HINTMSG_RELEASE)
+	Duel.Release(sg,REASON_COST)
 end
 function c511002729.lpcon(e,tp,eg,ep,ev,re,r,rp)
 	return tp~=Duel.GetTurnPlayer()

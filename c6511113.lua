@@ -1,5 +1,7 @@
 --フレシアの蟲惑魔
-function c6511113.initial_effect(c)
+--Traptrix Rafflesia
+local s,id=GetID()
+function s.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
@@ -9,8 +11,8 @@ function c6511113.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_IMMUNE_EFFECT)
-	e1:SetCondition(c6511113.imcon)
-	e1:SetValue(c6511113.efilter)
+	e1:SetCondition(s.imcon)
+	e1:SetValue(s.efilter)
 	c:RegisterEffect(e1)
 	--indes
 	local e2=Effect.CreateEffect(c)
@@ -18,7 +20,7 @@ function c6511113.initial_effect(c)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetTarget(c6511113.imtg)
+	e2:SetTarget(s.imtg)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
@@ -32,59 +34,59 @@ function c6511113.initial_effect(c)
 	c:RegisterEffect(e4)
 	--copy trap
 	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(6511113,0))
+	e5:SetDescription(aux.Stringid(id,0))
 	e5:SetType(EFFECT_TYPE_QUICK_O)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetCode(EVENT_FREE_CHAIN)
 	e5:SetHintTiming(0x3c0)
 	e5:SetCountLimit(1)
-	e5:SetCondition(c6511113.condition)
-	e5:SetCost(c6511113.cost)
-	e5:SetTarget(c6511113.target)
-	e5:SetOperation(c6511113.operation)
-	c:RegisterEffect(e5,false,1)
+	e5:SetCondition(s.condition)
+	e5:SetCost(s.cost)
+	e5:SetTarget(s.target)
+	e5:SetOperation(s.operation)
+	c:RegisterEffect(e5,false,REGISTER_FLAG_DETACH_XMAT)
 	local e6=Effect.CreateEffect(c)
-	e6:SetDescription(aux.Stringid(6511113,1))
+	e6:SetDescription(aux.Stringid(id,1))
 	e6:SetType(EFFECT_TYPE_QUICK_O)
 	e6:SetRange(LOCATION_MZONE)
 	e6:SetCode(EVENT_CHAINING)
 	e6:SetCountLimit(1)
-	e6:SetCost(c6511113.cost)
-	e6:SetTarget(c6511113.target2)
-	e6:SetOperation(c6511113.operation)
-	c:RegisterEffect(e6,false,1)
+	e6:SetCost(s.cost)
+	e6:SetTarget(s.target2)
+	e6:SetOperation(s.operation)
+	c:RegisterEffect(e6,false,REGISTER_FLAG_DETACH_XMAT)
 end
-function c6511113.imcon(e)
+function s.imcon(e)
 	return e:GetHandler():GetOverlayCount()>0
 end
-function c6511113.efilter(e,te)
+function s.efilter(e,te)
 	return te:IsActiveType(TYPE_TRAP)
 end
-function c6511113.imtg(e,c)
-	return c:IsSetCard(0x108a) and not c:IsCode(6511113)
+function s.imtg(e,c)
+	return c:IsSetCard(0x108a) and not c:IsCode(id)
 end
-function c6511113.condition(e,tp,eg,ep,ev,re,r,rp)
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return not Duel.CheckEvent(EVENT_CHAINING)
 end
-function c6511113.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
-	if chk==0 then return e:GetHandler():GetFlagEffect(6511113)==0 end
-	e:GetHandler():RegisterFlagEffect(6511113,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+	if chk==0 then return e:GetHandler():GetFlagEffect(id)==0 end
+	e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 end
-function c6511113.filter1(c)
+function s.filter1(c)
 	return c:GetType()==TYPE_TRAP and (c:IsSetCard(0x4c) or c:IsSetCard(0x89)) and c:IsAbleToGraveAsCost()
 		and c:CheckActivateEffect(false,true,false)~=nil
 end
-function c6511113.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()==0 then return false end
 		e:SetLabel(0)
 		return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST)
-			and Duel.IsExistingMatchingCard(c6511113.filter1,tp,LOCATION_DECK,0,1,nil)
+			and Duel.IsExistingMatchingCard(s.filter1,tp,LOCATION_DECK,0,1,nil)
 	end
 	e:SetLabel(0)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,c6511113.filter1,tp,LOCATION_DECK,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.filter1,tp,LOCATION_DECK,0,1,1,nil)
 	local te,ceg,cep,cev,cre,cr,crp=g:GetFirst():CheckActivateEffect(false,true,true)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 	Duel.SendtoGrave(g,REASON_COST)
@@ -96,14 +98,14 @@ function c6511113.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabelObject(te)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,0,0,0)
 end
-function c6511113.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local te=e:GetLabelObject()
 	if not te then return end
 	e:SetLabelObject(te:GetLabelObject())
 	local op=te:GetOperation()
 	if op then op(e,tp,eg,ep,ev,re,r,rp) end
 end
-function c6511113.filter2(c,e,tp,eg,ep,ev,re,r,rp)
+function s.filter2(c,e,tp,eg,ep,ev,re,r,rp)
 	if c:GetType()==TYPE_TRAP and (c:IsSetCard(0x4c) or c:IsSetCard(0x89)) and c:IsAbleToGraveAsCost() then
 		if c:CheckActivateEffect(false,true,false)~=nil then return true end
 		local te=c:GetActivateEffect()
@@ -115,18 +117,28 @@ function c6511113.filter2(c,e,tp,eg,ep,ev,re,r,rp)
 		return true
 	else return false end
 end
-function c6511113.target2(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.filter3(c)
+	return c:GetFlagEffect(id+1) > 0
+end
+function s.target2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()==0 then return false end
 		e:SetLabel(0)
-		return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST)
-			and Duel.IsExistingMatchingCard(c6511113.filter2,tp,LOCATION_DECK,0,1,nil,e,tp,eg,ep,ev,re,r,rp)
+		local g=Duel.GetMatchingGroup(s.filter2,tp,LOCATION_DECK,0,nil,e,tp,eg,ep,ev,re,r,rp)
+		if #g>0 then
+			for tc in aux.Next(g) do
+				tc:RegisterFlagEffect(id+1,RESET_CHAIN,0,1)
+			end
+			return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST)
+		else
+			return false
+		end
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,c6511113.filter2,tp,LOCATION_DECK,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.SelectMatchingCard(tp,s.filter3,tp,LOCATION_DECK,0,1,1,nil)
 	local tc=g:GetFirst()
 	local te,ceg,cep,cev,cre,cr,crp
-	local fchain=c6511113.filter1(tc)
+	local fchain=s.filter1(tc)
 	if fchain then
 		te,ceg,cep,cev,cre,cr,crp=tc:CheckActivateEffect(false,true,true)
 	else

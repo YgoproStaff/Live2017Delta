@@ -1,28 +1,29 @@
 --副作用？
-function c30922149.initial_effect(c)
+--Side Effects?
+local s,id=GetID()
+function s.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DRAW+CATEGORY_RECOVER)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetTarget(c30922149.target)
-	e1:SetOperation(c30922149.activate)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
-function c30922149.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(1-tp,1) end
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,1-tp,1)
 end
-function c30922149.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	if not Duel.IsPlayerCanDraw(p) then return end
 	local ct=Duel.GetFieldGroupCount(p,LOCATION_DECK,0)
-	local ac=0
-	if ct==0 then ac=1 end
+	local ac=1
 	if ct>1 then
-		Duel.Hint(HINT_SELECTMSG,p,aux.Stringid(30922149,0))
+		Duel.Hint(HINT_SELECTMSG,p,aux.Stringid(id,0))
 		if ct==2 then ac=Duel.AnnounceNumber(p,1,2)
 		else ac=Duel.AnnounceNumber(p,1,2,3) end
 	end

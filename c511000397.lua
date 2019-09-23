@@ -17,7 +17,14 @@ function c511000397.initial_effect(c)
 	local e3=e2:Clone()
 	e3:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	c:RegisterEffect(e3)
+	local e4=e2:Clone()
+	e4:SetCode(EFFECT_IMMUNE_EFFECT)
+	e4:SetValue(c511000397.efilter)
+	c:RegisterEffect(e4)
 end
 function c511000397.infilter(e,c)
-	return c:IsFaceup() and c:IsLevelBelow(3) and c:IsAttribute(ATTRIBUTE_WATER)
+	return c:IsLevelBelow(3) and c:IsAttribute(ATTRIBUTE_WATER)
+end
+function c511000397.efilter(e,te)
+	return te:GetOwner()~=e:GetOwner()
 end

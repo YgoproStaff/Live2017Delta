@@ -1,4 +1,4 @@
---Fuda Shikomi
+--Card Preparation
 function c511002478.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -11,7 +11,7 @@ function c511002478.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c511002478.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0xe3) and c:GetLevel()~=2
+	return c:IsFaceup() and c:IsSetCard(0xe6) and c:GetLevel()~=2
 end
 function c511002478.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c511002478.filter(chkc) end

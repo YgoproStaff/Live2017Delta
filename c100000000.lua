@@ -1,4 +1,5 @@
 --カオス・エンド・ルーラー －開闢と終焉の支配者－
+--Chaos End Ruler - Ruler of the Beginning and the End
 function c100000000.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon
@@ -28,12 +29,6 @@ function c100000000.initial_effect(c)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e3:SetOperation(c100000000.sumsuc)
 	c:RegisterEffect(e3)
-	--Cannot be responded
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_CANNOT_DISABLE_SPSUMMON)
-	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	c:RegisterEffect(e4)
 end
 function c100000000.sumsuc(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SetChainLimitTillChainEnd(aux.FALSE)

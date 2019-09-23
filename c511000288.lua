@@ -1,25 +1,30 @@
---Gem Fortress
-function c511000288.initial_effect(c)
+--宝玉の砦
+--Crystal Fortress
+--re-scripted by Larry126
+--cleaned up by MLD
+local s,id=GetID()
+function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCondition(c511000288.condition)
-	e1:SetOperation(c511000288.activate)
+	e1:SetCondition(s.condition)
+	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
-function c511000288.cfilter(c)
+function s.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x1034)
 end
-function c511000288.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c511000288.cfilter,tp,LOCATION_ONFIELD,0,4,nil)
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
-function c511000288.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
+	local atk=Duel.GetMatchingGroupCount(s.cfilter,tp,LOCATION_MZONE,0,nil)*1000
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
+	e1:SetCode(EFFECT_CANNOT_ATTACK)
 	e1:SetTargetRange(0,LOCATION_MZONE)
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsAttackBelow,atk))
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end

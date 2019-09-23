@@ -1,8 +1,10 @@
 --悪魔竜ブラック・デーモンズ・ドラゴン
-function c45349196.initial_effect(c)
-	c:SetSPSummonOnce(45349196)
+--Archfiend Black Skull Dragon
+local s,id=GetID()
+function s.initial_effect(c)
+	c:SetSPSummonOnce(id)
 	--fusion material
-	aux.AddFusionProcMix(c,true,true,c45349196.mfilter1,c45349196.mfilter2)
+	aux.AddFusionProcMix(c,true,true,s.mfilter1,s.mfilter2)
 	c:EnableReviveLimit()
 	--aclimit
 	local e1=Effect.CreateEffect(c)
@@ -11,8 +13,8 @@ function c45349196.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetTargetRange(0,1)
-	e1:SetCondition(c45349196.accon)
-	e1:SetValue(c45349196.aclimit)
+	e1:SetCondition(s.accon)
+	e1:SetValue(1)
 	c:RegisterEffect(e1)
 	--damage
 	local e2=Effect.CreateEffect(c)
@@ -22,41 +24,38 @@ function c45349196.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCountLimit(1)
-	e2:SetCondition(c45349196.damcon)
-	e2:SetTarget(c45349196.damtg)
-	e2:SetOperation(c45349196.damop)
+	e2:SetCondition(s.damcon)
+	e2:SetTarget(s.damtg)
+	e2:SetOperation(s.damop)
 	c:RegisterEffect(e2)
 end
-c45349196.material_setcode={0x3b,0x45}
-function c45349196.mfilter1(c,fc,sumtype,tp)
+s.material_setcode={0x3b,0x45}
+function s.mfilter1(c,fc,sumtype,tp)
 	return c:IsFusionSetCard(0x45) and c:IsType(TYPE_NORMAL,fc,sumtype,tp) and c:GetLevel()==6
 end
-function c45349196.mfilter2(c,fc,sumtype,tp)
+function s.mfilter2(c,fc,sumtype,tp)
 	return c:IsFusionSetCard(0x3b) and c:IsType(TYPE_NORMAL,fc,sumtype,tp)
 end
-function c45349196.accon(e)
+function s.accon(e)
 	return Duel.GetAttacker()==e:GetHandler() or Duel.GetAttackTarget()==e:GetHandler()
 end
-function c45349196.aclimit(e,re,tp)
-	return not re:GetHandler():IsImmuneToEffect(e)
-end
-function c45349196.damcon(e,tp,eg,ep,ev,re,r,rp)
+function s.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsSummonType(SUMMON_TYPE_FUSION) and c:GetBattledGroupCount()>0
 end
-function c45349196.filter(c)
+function s.filter(c)
 	return c:IsSetCard(0x3b) and c:IsType(TYPE_NORMAL) and c:IsAbleToDeck()
 end
-function c45349196.damtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c45349196.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c45349196.filter,tp,LOCATION_GRAVE,0,1,nil) end
+function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local g=Duel.SelectTarget(tp,c45349196.filter,tp,LOCATION_GRAVE,0,1,1,nil)
+	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil)
 	local atk=g:GetFirst():GetBaseAttack()
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,atk)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,0,0)
 end
-function c45349196.damop(e,tp,eg,ep,ev,re,r,rp)
+function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) and Duel.Damage(1-tp,tc:GetBaseAttack(),REASON_EFFECT)~=0 then
 		Duel.BreakEffect()

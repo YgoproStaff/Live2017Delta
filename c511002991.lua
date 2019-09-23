@@ -39,6 +39,15 @@ function c511002991.initial_effect(c)
 	e4:SetCondition(c511002991.con)
 	e4:SetOperation(c511002991.disop)
 	c:RegisterEffect(e4)
+	--Double Snare
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetCode(3682106)
+	e5:SetLabel(3)
+	e5:SetCondition(c511002991.con)
+	c:RegisterEffect(e5)
 end
 c511002991.material_setcode=0x93
 function c511002991.con(e)

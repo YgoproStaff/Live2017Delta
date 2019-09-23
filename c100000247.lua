@@ -17,6 +17,7 @@ function c100000247.initial_effect(c)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetLabel(0)
 	e2:SetTarget(c100000247.target)
+	e2:SetOperation(c100000247.activate)
 	c:RegisterEffect(e2)
 end
 function c100000247.cfilter(c,tp)
@@ -61,13 +62,18 @@ function c100000247.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		e:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 		e:SetProperty(0)
 		Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
-		e:SetOperation(c100000247.activate1)
 	else
 		e:SetCategory(CATEGORY_ATKCHANGE)
 		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 		Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,0,1,1,nil)
-		e:SetOperation(c100000247.activate2)
+	end
+end
+function c100000247.activate(e,tp,eg,ep,ev,re,r,rp)
+	if e:GetLabel()<3 then
+		c100000247.activate1(e,tp,eg,ep,ev,re,r,rp)
+	else
+		c100000247.activate2(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c100000247.activate1(e,tp,eg,ep,ev,re,r,rp)
