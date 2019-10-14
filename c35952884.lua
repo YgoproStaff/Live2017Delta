@@ -1,5 +1,6 @@
 --シューティング・クェーサー・ドラゴン
-function c35952884.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunctionEx(Card.IsType,TYPE_SYNCHRO),1,1,aux.NonTunerEx(Card.IsType,TYPE_SYNCHRO),2,99)
 	c:EnableReviveLimit()
@@ -14,38 +15,38 @@ function c35952884.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetCondition(c35952884.mtcon)
-	e2:SetOperation(c35952884.mtop)
+	e2:SetCondition(s.mtcon)
+	e2:SetOperation(s.mtop)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_MATERIAL_CHECK)
-	e3:SetValue(c35952884.valcheck)
+	e3:SetValue(s.valcheck)
 	e3:SetLabelObject(e2)
 	c:RegisterEffect(e3)
 	--negate
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(35952884,0))
+	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_CHAINING)
 	e3:SetCountLimit(1)
 	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCondition(c35952884.discon)
-	e3:SetTarget(c35952884.distg)
-	e3:SetOperation(c35952884.disop)
+	e3:SetCondition(s.discon)
+	e3:SetTarget(s.distg)
+	e3:SetOperation(s.disop)
 	c:RegisterEffect(e3)
 	--Special Summon
 	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(35952884,1))
+	e4:SetDescription(aux.Stringid(id,1))
 	e4:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
 	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e4:SetCode(EVENT_TO_GRAVE)
-	e4:SetCondition(c35952884.sumcon)
-	e4:SetTarget(c35952884.sumtg)
-	e4:SetOperation(c35952884.sumop)
+	e4:SetCondition(s.sumcon)
+	e4:SetTarget(s.sumtg)
+	e4:SetOperation(s.sumop)
 	c:RegisterEffect(e4)
 	local e5=e4:Clone()
 	e5:SetCode(EVENT_REMOVE)
@@ -54,18 +55,20 @@ function c35952884.initial_effect(c)
 	e6:SetCode(EVENT_TO_DECK)
 	c:RegisterEffect(e6)
 end
-function c35952884.mfilter(c)
+s.synchro_tuner_required=1
+s.synchro_nt_required=2
+function s.mfilter(c)
 	return not c:IsType(TYPE_TUNER)
 end
-function c35952884.valcheck(e,c)
+function s.valcheck(e,c)
 	local g=c:GetMaterial()
-	local ct=g:FilterCount(c35952884.mfilter,nil)
+	local ct=g:FilterCount(s.mfilter,nil)
 	e:GetLabelObject():SetLabel(ct)
 end
-function c35952884.mtcon(e,tp,eg,ep,ev,re,r,rp)
+function s.mtcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_SYNCHRO) and e:GetLabel()>0
 end
-function c35952884.mtop(e,tp,eg,ep,ev,re,r,rp)
+function s.mtop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local ct=e:GetLabel()
 	local e1=Effect.CreateEffect(c)
@@ -75,34 +78,34 @@ function c35952884.mtop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetValue(ct-1)
 	c:RegisterEffect(e1)
 end
-function c35952884.discon(e,tp,eg,ep,ev,re,r,rp)
+function s.discon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainNegatable(ev)
 end
-function c35952884.distg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
-function c35952884.disop(e,tp,eg,ep,ev,re,r,rp)
+function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end
-function c35952884.sumcon(e,tp,eg,ep,ev,re,r,rp)
+function s.sumcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousPosition(POS_FACEUP) and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
-function c35952884.filter(c,e,tp)
+function s.filter(c,e,tp)
 	return c:IsCode(24696097) and c:IsCanBeSpecialSummoned(e,0,tp,false,true)
 end
-function c35952884.sumtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.sumtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCountFromEx(tp)>0
-		and Duel.IsExistingMatchingCard(c35952884.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
+		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
-function c35952884.sumop(e,tp,eg,ep,ev,re,r,rp)
-	local tg=Duel.GetFirstMatchingCard(c35952884.filter,tp,LOCATION_EXTRA,0,nil,e,tp)
+function s.sumop(e,tp,eg,ep,ev,re,r,rp)
+	local tg=Duel.GetFirstMatchingCard(s.filter,tp,LOCATION_EXTRA,0,nil,e,tp)
 	if tg then
 		Duel.SpecialSummon(tg,0,tp,tp,false,true,POS_FACEUP)
 	end
