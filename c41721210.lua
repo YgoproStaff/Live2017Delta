@@ -1,6 +1,7 @@
---Dark Magician the Dragon Knight
+--竜騎士ブラック・マジシャン
 --Scripted by Eerie Code
-function c41721210.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
 	aux.AddFusionProcMix(c,true,true,46986414,aux.FilterBoolFunctionEx(Card.IsRace,RACE_DRAGON))
@@ -20,7 +21,7 @@ function c41721210.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetTargetRange(LOCATION_ONFIELD,0)
 	e3:SetTarget(aux.TargetBoolFunction(Card.IsType,TYPE_SPELL+TYPE_TRAP))
-	e3:SetValue(c41721210.indval)
+	e3:SetValue(s.indval)
 	c:RegisterEffect(e3)
 	--indes
 	local e4=e3:Clone()
@@ -29,7 +30,8 @@ function c41721210.initial_effect(c)
 	e4:SetValue(aux.tgoval)
 	c:RegisterEffect(e4)
 end
-c41721210.material_setcode=0x10a2
-function c41721210.indval(e,re,rp)
+s.material_setcode=0x10a2
+s.listed_names={46986414}
+function s.indval(e,re,rp)
 	return rp~=e:GetHandlerPlayer()
 end
