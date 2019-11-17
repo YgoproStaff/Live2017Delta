@@ -1,4 +1,5 @@
 --踊りによる誘発
-function c43417563.initial_effect(c)
-	aux.AddRitualProcGreaterCode(c,4849037)
+local s,id=GetID()
+function s.initial_effect(c)
+	aux.AddRitualProcGreaterCode(c,6,nil,4849037)
 end

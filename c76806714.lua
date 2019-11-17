@@ -1,4 +1,5 @@
 --亀の誓い
-function c76806714.initial_effect(c)
-	aux.AddRitualProcGreaterCode(c,91782219)
+local s,id=GetID()
+function s.initial_effect(c)
+	aux.AddRitualProcGreaterCode(c,8,nil,91782219)
 end

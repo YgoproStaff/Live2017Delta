@@ -1,4 +1,5 @@
 --灼熱の試練
-function c33031674.initial_effect(c)
-	aux.AddRitualProcGreaterCode(c,60258960)
+local s,id=GetID()
+function s.initial_effect(c)
+	aux.AddRitualProcGreaterCode(c,7,nil,60258960)
 end

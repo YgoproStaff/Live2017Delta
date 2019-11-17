@@ -1,4 +1,5 @@
 --イリュージョンの儀式
-function c41426869.initial_effect(c)
-	aux.AddRitualProcGreaterCode(c,64631466)
+local s,id=GetID()
+function s.initial_effect(c)
+	aux.AddRitualProcGreaterCode(c,1,nil,64631466)
 end
