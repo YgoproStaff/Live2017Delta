@@ -24,15 +24,18 @@ end
 function c56611470.filter(c,e)
 	return c:IsFaceup() and c:IsSetCard(0x97) and c:IsCanBeEffectTarget(e)
 end
-function c56611470.xyzfilter(c,mg)
-	return c:IsXyzSummonable(mg,2,2)
+function c56611470.xyzfilter(c,mg,tp,chk)
+	return c:IsXyzSummonable(mg,2,2) and (not chk or Duel.GetLocationCountFromEx(tp,tp,mg,c)>0)
 end
 function c56611470.mfilter1(c,mg,exg,tp)
 	return mg:IsExists(c56611470.mfilter2,1,c,c,exg,tp)
 end
+function c56611470.zonecheck(c,tp,g)
+	return Duel.GetLocationCountFromEx(tp,tp,g,c)>0 and c:IsXyzSummonable(g)
+end
 function c56611470.mfilter2(c,mc,exg,tp)
 	local g=Group.FromCards(c,mc)
-	return exg:IsExists(Card.IsXyzSummonable,1,nil,g) and Duel.GetLocationCountFromEx(tp,tp,g)>0
+	return exg:IsExists(c56611470.zonecheck,1,nil,tp,g)
 end
 function c56611470.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
@@ -61,8 +64,7 @@ function c56611470.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(c56611470.tfilter,nil,e)
 	if g:GetCount()<2 then return end
-	if Duel.GetLocationCountFromEx(tp,tp,g)<=0 then return end
-	local xyzg=Duel.GetMatchingGroup(c56611470.xyzfilter,tp,LOCATION_EXTRA,0,nil,g)
+	local xyzg=Duel.GetMatchingGroup(c56611470.xyzfilter,tp,LOCATION_EXTRA,0,nil,g,tp,true)
 	if xyzg:GetCount()>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local xyz=xyzg:Select(tp,1,1,nil):GetFirst()

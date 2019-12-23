@@ -11,13 +11,12 @@ function c21143940.initial_effect(c)
 	e1:SetOperation(c21143940.activate)
 	c:RegisterEffect(e1)
 end
-function c21143940.tfilter(c,att,e,tp)
-	return c:IsSetCard(0xa008) and c:IsAttribute(att) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
+function c21143940.tfilter(c,att,e,tp,mc)
+	return c:IsSetCard(0xa008) and c:IsAttribute(att) and Duel.GetLocationCountFromEx(tp,tp,mc,c)>0 and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end
 function c21143940.filter(c,e,tp)
 	return c:IsFaceup() and c:IsSetCard(0x8)
-		and Duel.IsExistingMatchingCard(c21143940.tfilter,tp,LOCATION_EXTRA,0,1,nil,c:GetAttribute(),e,tp)
-		and Duel.GetLocationCountFromEx(tp,tp,c)>0
+		and Duel.IsExistingMatchingCard(c21143940.tfilter,tp,LOCATION_EXTRA,0,1,nil,c:GetAttribute(),e,tp,c)
 end
 function c21143940.chkfilter(c,att)
 	return c:IsFaceup() and c:IsSetCard(0x8) and c:IsAttribute(att)

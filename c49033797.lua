@@ -11,14 +11,13 @@ function c49033797.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c49033797.cfilter(c,tpe)
-	return c:IsFaceup() and c:IsType(tpe)
+	return c:IsFaceup() and c:IsType(tpe) and 
 end
 function c49033797.filter(c,e,tp,cat)
-	return c:IsSetCard(cat) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(cat) and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c49033797.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		if Duel.GetLocationCountFromEx(tp)<=0 then return false end
 		local flag=0
 		if Duel.IsExistingMatchingCard(c49033797.cfilter,tp,LOCATION_MZONE,0,1,nil,TYPE_FUSION) then flag=flag+1 end
 		if Duel.IsExistingMatchingCard(c49033797.cfilter,tp,LOCATION_MZONE,0,1,nil,TYPE_SYNCHRO) then flag=flag+2 end
@@ -35,7 +34,6 @@ function c49033797.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function c49033797.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCountFromEx(tp)<=0 then return end
 	local flag=e:GetLabel()
 	if flag==3 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

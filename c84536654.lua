@@ -10,13 +10,12 @@ function c84536654.initial_effect(c)
 	e1:SetOperation(c84536654.activate)
 	c:RegisterEffect(e1)
 end
-function c84536654.spfilter(c,code,lv,e,tp)
-	return c:GetLevel()==lv and c:IsSetCard(0xa008) and not c:IsCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
+function c84536654.spfilter(c,code,lv,e,tp,mc)
+	return c:GetLevel()==lv and c:IsSetCard(0xa008) and not c:IsCode(code) and Duel.GetLocationCountFromEx(tp,tp,mc,c)>0 and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end
 function c84536654.filter(c,e,tp)
 	return c:IsFaceup() and c:IsSetCard(0x8) and c:IsType(TYPE_FUSION) and c:IsAbleToExtra()
-		and Duel.IsExistingMatchingCard(c84536654.spfilter,tp,LOCATION_EXTRA,0,1,nil,c:GetCode(),c:GetOriginalLevel(),e,tp)
-		and Duel.GetLocationCountFromEx(tp,tp,c)>0
+		and Duel.IsExistingMatchingCard(c84536654.spfilter,tp,LOCATION_EXTRA,0,1,nil,c:GetCode(),c:GetOriginalLevel(),e,tp,c)
 end
 function c84536654.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c84536654.filter(chkc,e,tp) end
@@ -28,7 +27,6 @@ function c84536654.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c84536654.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if Duel.GetLocationCountFromEx(tp,tp,tc)<=0 then return end
 	if not tc:IsRelateToEffect(e) then return end
 	local code=tc:GetCode()
 	local lv=tc:GetOriginalLevel()

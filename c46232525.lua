@@ -18,11 +18,10 @@ function c46232525.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c46232525.tgfilter(c,e,tp)
-	return c:IsType(TYPE_MONSTER) and Duel.IsExistingMatchingCard(c46232525.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c:GetRace())
-		and Duel.GetLocationCountFromEx(tp,tp,c)>0
+	return c:IsType(TYPE_MONSTER) and Duel.IsExistingMatchingCard(c46232525.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c:GetRace(),c)
 end
-function c46232525.spfilter(c,e,tp,race)
-	return c:IsType(TYPE_FUSION) and c.material_race and c:IsCanBeSpecialSummoned(e,0,tp,true,false) and race==c.material_race
+function c46232525.spfilter(c,e,tp,race,mc)
+	return c:IsType(TYPE_FUSION) and c.material_race and Duel.GetLocationCountFromEx(tp,tp,mc,c)>0 and c:IsCanBeSpecialSummoned(e,0,tp,true,false) and race==c.material_race
 end
 function c46232525.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c46232525.tgfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,nil,e,tp) end

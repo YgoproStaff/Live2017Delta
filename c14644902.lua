@@ -15,10 +15,10 @@ function c14644902.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c14644902.rfilter(c,e,tp)
 	return c:IsReleasableByEffect() and not c:IsImmuneToEffect(e)
-		and Duel.GetLocationCountFromEx(tp,tp,c)>0
+		and Duel.IsExistingMatchingCard(c14644902.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c)
 end
-function c14644902.filter(c,e,tp)
-	return c:IsType(TYPE_FUSION) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function c14644902.filter(c,e,tp,mc)
+	return c:IsType(TYPE_FUSION) and Duel.GetLocationCountFromEx(tp,tp,mc,c)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c14644902.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

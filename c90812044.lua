@@ -14,7 +14,7 @@ function c90812044.cfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
 end
 function c90812044.filter(c,e,tp,rk)
-	return c:IsType(TYPE_XYZ) and c:GetRank()<rk
+	return c:IsType(TYPE_XYZ) and c:GetRank()<rk and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0 
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c90812044.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -22,7 +22,6 @@ function c90812044.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local rg,rk=g:GetMinGroup(Card.GetRank)
 	if chkc then return rg:IsContains(chkc) end
 	if chk==0 then return g:GetCount()>=2 and rg:IsExists(Card.IsCanBeEffectTarget,1,nil,e)
-		and Duel.GetLocationCountFromEx(tp)>0
 		and Duel.IsExistingMatchingCard(c90812044.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp,rk) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local sg=rg:FilterSelect(tp,Card.IsCanBeEffectTarget,1,1,nil,e)
@@ -30,7 +29,6 @@ function c90812044.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function c90812044.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCountFromEx(tp)<=0 then return end
 	local tc=Duel.GetFirstTarget()
 	if not tc:IsRelateToEffect(e) or tc:IsFacedown() then return end
 	local rk=tc:GetRank()

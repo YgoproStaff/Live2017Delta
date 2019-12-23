@@ -37,20 +37,17 @@ function c33280639.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(g1,REASON_COST)
 end
 function c33280639.filter(c,e,tp)
-	return c:IsCode(11790356) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsCode(11790356) and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c33280639.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local loc=0
+	local loc=LOCATION_EXTRA
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then loc=loc+LOCATION_GRAVE end
-	if Duel.GetLocationCountFromEx(tp)>0 then loc=loc+LOCATION_EXTRA end
-	if chk==0 then return loc~=0 and Duel.IsExistingMatchingCard(c33280639.filter,tp,loc,0,1,nil,e,tp) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c33280639.filter,tp,loc,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,loc)
 end
 function c33280639.activate(e,tp,eg,ep,ev,re,r,rp)
-	local loc=0
+	local loc=LOCATION_EXTRA
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then loc=loc+LOCATION_GRAVE end
-	if Duel.GetLocationCountFromEx(tp)>0 then loc=loc+LOCATION_EXTRA end
-	if loc==0 then return end
 	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c33280639.filter),tp,loc,0,1,1,nil,e,tp)
 	local tc=g:GetFirst()
 	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
