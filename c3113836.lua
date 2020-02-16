@@ -1,5 +1,7 @@
 --ジェムナイト・セラフィ
-function c3113836.initial_effect(c)
+--Gem-Knight Seraphinite
+local s,id=GetID()
+function s.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
 	aux.AddFusionProcMix(c,false,false,aux.FilterBoolFunction(Card.IsFusionSetCard,0x1047),aux.FilterBoolFunctionEx(Card.IsAttribute,ATTRIBUTE_LIGHT))
@@ -8,10 +10,11 @@ function c3113836.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(c3113836.splimit)
+	e1:SetValue(s.splimit)
 	c:RegisterEffect(e1)
 	--extra summon
 	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetTargetRange(LOCATION_HAND+LOCATION_MZONE,0)
 	e2:SetCode(EFFECT_EXTRA_SUMMON_COUNT)
@@ -21,7 +24,7 @@ function c3113836.initial_effect(c)
 	e3:SetCode(EFFECT_EXTRA_SET_COUNT)
 	c:RegisterEffect(e3)
 end
-c3113836.material_setcode={0x47,0x1047}
-function c3113836.splimit(e,se,sp,st)
+s.material_setcode={0x47,0x1047}
+function s.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA) or bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end

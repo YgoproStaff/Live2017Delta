@@ -1,30 +1,42 @@
+--琥珀の落とし穴
 --Amber Pitfall
-function c511001270.initial_effect(c)
+--Updated by Larry126
+local s,id=GetID()
+function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_POSITION)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
-	e1:SetCondition(c511001270.condition)
-	e1:SetTarget(c511001270.target)
-	e1:SetOperation(c511001270.activate)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCondition(s.condition)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
-function c511001270.condition(e,tp,eg,ep,ev,re,r,rp)
-	return tp~=Duel.GetTurnPlayer()
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	return not Duel.GetAttacker():IsControler(tp)
 end
-function c511001270.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_POSITION,Duel.GetAttacker(),1,0,0)
-end
-function c511001270.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tc=Duel.GetAttacker()
-	Duel.NegateAttack()
-	if Duel.ChangePosition(tc,POS_FACEUP_DEFENSE,POS_FACEDOWN_DEFENSE,0,0) then
-		local e2=Effect.CreateEffect(e:GetHandler())
-		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
-		e2:SetReset(RESET_EVENT+0x1fe0000)
-		tc:RegisterEffect(e2)
+	if chkc then return chkc==tc end
+	if chk==0 then return tc:IsLocation(LOCATION_MZONE) and tc:IsAttackPos()
+		and tc:IsCanChangePosition() and tc:IsCanBeEffectTarget(e) end
+	Duel.SetTargetCard(tc)
+end
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
+	local tc=Duel.GetAttacker()
+	if tc:IsRelateToEffect(e) and Duel.NegateAttack() and Duel.ChangePosition(tc,POS_FACEUP_DEFENSE)~=0 then
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetCondition(s.con)
+		tc:RegisterEffect(e1)
+		e:GetHandler():CreateEffectRelation(e1)
 	end
+end
+function s.con(e,tp,eg,ep,ev,re,r,rp)
+	if e:GetOwner():IsRelateToEffect(e) then return true
+	else e:Reset() return false end
 end
